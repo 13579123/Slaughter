@@ -4127,6 +4127,10 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "DetailInfoPrefab": {
+      "__uuid__": "746e292b-c71b-4494-b4e5-a6848b8a4575",
+      "__expectedType__": "cc.Prefab"
+    },
     "_id": "9d4KKTQOpFnoRjJ7SV6Z5X"
   },
   {

@@ -2,6 +2,7 @@ import { _decorator, Component, Node, Sprite, SpriteFrame, Enum } from 'cc';
 import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
 import { EquipmentQuality } from '../../Script/System/Core/Prototype/EquipmentPrototype';
+import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
 const { ccclass, property } = _decorator;
 
 @ccclass('EquipmentItemPrefab')
@@ -33,11 +34,11 @@ export class EquipmentItemPrefab extends ExtensionComponent {
     protected ShadowType: "Weapon"|"Shose"|"Armor"|"Accessory"|"None" = "None"
 
     // 装备信息实例
-    protected instance: EquipmentInstance = null;
+    protected instance: EquipmentInstance|ItemInstance = null;
 
     public start(): void {
         // 初始化装备item
-        this.setEquipmentInfo(null)
+        this.setInfo(null)
     }
 
     // 开启虚影
@@ -68,8 +69,8 @@ export class EquipmentItemPrefab extends ExtensionComponent {
         return this.OrdinaryQuality
     }
 
-    // 设置装备信息
-    public setEquipmentInfo(instance: EquipmentInstance) {
+    // 设置装备或者物品信息
+    public setInfo(instance: EquipmentInstance|ItemInstance) {
         this.instance = instance
         const sprite = this.node.getComponent(Sprite)
         if (!instance) {
@@ -78,16 +79,20 @@ export class EquipmentItemPrefab extends ExtensionComponent {
             this.openShadow()
             return
         }
-        sprite.spriteFrame = this.getQualitySpriteFrame(instance.quality)
+        if (instance instanceof EquipmentInstance) {
+            sprite.spriteFrame = this.getQualitySpriteFrame(instance.quality)
+            this.closeShadow()
+        }
         instance.proto.icon().then((spriteFrame) => {
             if (this.instance === instance)
                 this.ItemIconSprite.spriteFrame = spriteFrame
         })
-        this.closeShadow()
     }
 
     // 点击装备图标回调
     public showDetail(parmas: "Comparison"|"Show" = "Show") {
+        if (this.instance === null) return
+        
     }
 
 }
