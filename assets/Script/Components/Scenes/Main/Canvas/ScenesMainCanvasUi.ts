@@ -5,11 +5,18 @@ const { ccclass, property } = _decorator;
 @ccclass('ScenesMainCanvasUi')
 export class ScenesMainCanvasUi extends Component {
 
+    // 关卡选择节点
     @property(Node)
     protected levelSelectNode: Node = null;
 
+    // 背包节点
+    @property(Node)
+    protected backpackNode: Node = null;
+
+    // 初始化
     protected start(): void {
         this.levelSelectNode.active = false;
+        this.backpackNode.active = false;
     }
 
     // 开启设置
@@ -27,6 +34,7 @@ export class ScenesMainCanvasUi extends Component {
 
     // 开启背包界面
     protected async openBackpack() {
+        this.backpackNode.active = true
     }
 
     // 开启技能界面

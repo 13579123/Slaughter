@@ -5,25 +5,6 @@ import { EquipmentPrototype } from "../Core/Prototype/EquipmentPrototype";
 const registry: Map<string, Constructor<EquipmentPrototype>> = new Map();
 const registryReverse: Map<Constructor<EquipmentPrototype>,string> = new Map();
 
-// 装备类型
-export enum EquipmentType {
-    Weapon = "weapon",
-    Armor = "armor",
-    Shoes = "shoes",
-    Accessory = "accessory",
-    Null = "null",
-}
-
-// 装备品质
-export enum EquipmentQuality {
-    Ordinary = 0, // 普通
-    Fine = 1,       // 精良
-    Rare = 2,       // 稀有
-    Epic = 3,       // 史诗
-    Legendary = 4, // 传说
-    Mythic = 5,     // 神话
-}
-
 // 装备用品注册装饰器
 export const RegisterEquipment: (k: string) => ClassDecorator = (key: string) => {
     return (T) => {

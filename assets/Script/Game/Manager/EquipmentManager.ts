@@ -1,7 +1,7 @@
 import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
 import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Manager } from "../../System/Manager";
-import { EquipmentType } from "../../System/Manager/EquipmentManager";
+import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
 
 class EquipmentManagerDTO {

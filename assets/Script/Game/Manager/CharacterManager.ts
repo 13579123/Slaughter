@@ -4,7 +4,7 @@ import { CharacterDTO } from "../../System/Core/Prototype/CharacterPrototype";
 import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Manager } from "../../System/Manager";
 import { getCharacterKey } from "../../System/Manager/CharacterManager";
-import { EquipmentType } from "../../System/Manager/EquipmentManager";
+import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
 
 class CharacterManagerDTO {

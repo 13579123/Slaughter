@@ -1,5 +1,4 @@
 import { SpriteFrame } from "cc";
-import { EquipmentType } from "../../Manager/EquipmentManager";
 import { EquipmentInstance } from "../Instance/EquipmentInstance";
 import { BasePrototypeProperty } from "../Property/BasePrototypeProperty";
 import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgress, HealProgress } from "../Progress/FightProgress";
@@ -8,6 +7,25 @@ export type EquipmentDTO = {
     lv: number,
     prototype: string,
     extraProperty: Partial<BasePrototypeProperty>,
+}
+
+// 装备品质
+export enum EquipmentQuality {
+    Ordinary = 0, // 普通
+    Fine = 1,       // 精良
+    Rare = 2,       // 稀有
+    Epic = 3,       // 史诗
+    Legendary = 4, // 传说
+    Mythic = 5,     // 神话
+}
+
+// 装备类型
+export enum EquipmentType {
+    Weapon = "weapon",
+    Armor = "armor",
+    Shoes = "shoes",
+    Accessory = "accessory",
+    Null = "null",
 }
 
 export class EquipmentPrototype {

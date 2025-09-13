@@ -11,12 +11,12 @@ export type CharacterDTO = {
     lv: number,
     prototype: string,
     // 增益信息
-    buffs: BuffDTO[],
+    buffs?: BuffDTO[],
     // 装备信息
-    equipments: CharacterEquipmentDTO,
+    equipments?: CharacterEquipmentDTO,
     // 携带技能信息
-    skills: SkillDTO[],
-
+    skills?: SkillDTO[],
+    // 额外属性
     extraProperty: Partial<BasePrototypeProperty>,
 }
 

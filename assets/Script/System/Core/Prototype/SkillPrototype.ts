@@ -1,5 +1,5 @@
 import { log, SpriteFrame } from "cc";
-import { EquipmentType } from "../../Manager/EquipmentManager";
+import { EquipmentType } from "../../Core/Prototype/EquipmentPrototype";
 import { EquipmentInstance } from "../Instance/EquipmentInstance";
 import { BasePrototypeProperty } from "../Property/BasePrototypeProperty";
 import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgress, HealProgress, SkillProgress } from "../Progress/FightProgress";

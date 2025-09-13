@@ -4,7 +4,7 @@ import { CharacterInstanceProperty } from "../Property/CharacterInstanceProperty
 import { EquipmentInstance } from "./EquipmentInstance"
 import { BaseInstanceProperty } from "../Property/BaseInstanceProperty"
 import { EquipmentDTO } from "../Prototype/EquipmentPrototype"
-import { EquipmentType, getEquipmentPrototype } from "../../Manager/EquipmentManager"
+import { getEquipmentPrototype } from "../../Manager/EquipmentManager"
 import { BuffDTO, BuffPrototype } from "../Prototype/BuffPrototype"
 import { BuffInstance } from "./BuffInstance"
 import { getBuffPrototype } from "../../Manager/BuffManager"

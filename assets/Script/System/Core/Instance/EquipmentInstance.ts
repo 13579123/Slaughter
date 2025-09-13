@@ -1,9 +1,8 @@
 import { Constructor } from "cc";
-import { EquipmentPrototype } from "../Prototype/EquipmentPrototype";
+import { EquipmentPrototype, EquipmentQuality } from "../Prototype/EquipmentPrototype";
 import { EquipmentInstanceProperty } from "../Property/EquipmentInstanceProperty";
 import { CharacterInstance } from "./CharacterInstance";
 import { BaseInstanceProperty } from "../Property/BaseInstanceProperty";
-import { EquipmentQuality } from "../../Manager/EquipmentManager";
 
 export type EquipmentInstanceOption = {
     // 等级
