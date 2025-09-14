@@ -1,8 +1,10 @@
-import { _decorator, Component, Node, Sprite, SpriteFrame, Enum } from 'cc';
+import { _decorator, Component, Node, Sprite, SpriteFrame, Enum, Prefab } from 'cc';
 import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
 import { EquipmentQuality } from '../../Script/System/Core/Prototype/EquipmentPrototype';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
+import { CcNative } from '../../Script/Module/CcNative';
+import { DetailInfoPrefab } from './DetailInfoPrefab';
 const { ccclass, property } = _decorator;
 
 @ccclass('EquipmentItemPrefab')
@@ -36,10 +38,7 @@ export class EquipmentItemPrefab extends ExtensionComponent {
     // 装备信息实例
     protected instance: EquipmentInstance|ItemInstance = null;
 
-    public start(): void {
-        // 初始化装备item
-        this.setInfo(null)
-    }
+    protected showDetailCallback: Function = null;
 
     // 开启虚影
     protected openShadow(): void {
@@ -70,29 +69,30 @@ export class EquipmentItemPrefab extends ExtensionComponent {
     }
 
     // 设置装备或者物品信息
-    public setInfo(instance: EquipmentInstance|ItemInstance) {
+    public setInfo(instance: EquipmentInstance|ItemInstance , showDetailCallback?: Function) {
         this.instance = instance
+        this.showDetailCallback = showDetailCallback
         const sprite = this.node.getComponent(Sprite)
         if (!instance) {
             sprite.spriteFrame = this.OrdinaryQuality
             this.ItemIconSprite.spriteFrame = null
             this.openShadow()
-            return
         }
         if (instance instanceof EquipmentInstance) {
             sprite.spriteFrame = this.getQualitySpriteFrame(instance.quality)
             this.closeShadow()
+            instance.proto.icon().then((spriteFrame) => {
+                // console.log(spriteFrame , this.instance , instance)
+                if (this.instance === instance)
+                    this.ItemIconSprite.spriteFrame = spriteFrame
+            })
         }
-        instance.proto.icon().then((spriteFrame) => {
-            if (this.instance === instance)
-                this.ItemIconSprite.spriteFrame = spriteFrame
-        })
     }
 
     // 点击装备图标回调
-    public showDetail(parmas: "Comparison"|"Show" = "Show") {
+    public async showDetail() {
         if (this.instance === null) return
-        
+        if (this.showDetailCallback) this.showDetailCallback()
     }
 
 }

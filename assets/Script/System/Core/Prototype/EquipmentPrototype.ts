@@ -5,6 +5,7 @@ import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgr
 
 export type EquipmentDTO = {
     lv: number,
+    quality: EquipmentQuality,
     prototype: string,
     extraProperty: Partial<BasePrototypeProperty>,
 }

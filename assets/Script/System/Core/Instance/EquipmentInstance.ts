@@ -27,6 +27,7 @@ export class EquipmentInstance extends EquipmentInstanceProperty{
         this.lv = option.lv || 1
         this.proto = new option.Proto(this)
         this.character = option.character || null
+        this.quality = option.quality || EquipmentQuality.Ordinary
         if (option.extraProperty) this.extraProperty = option.extraProperty
     }
 

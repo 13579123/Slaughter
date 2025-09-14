@@ -13,33 +13,6 @@ export class ScenesMainCanvas extends Component {
     protected DetailInfoPrefab: Prefab = null;
 
     async start() {
-        const spear = new EquipmentInstance({
-            lv: 1,
-            quality: EquipmentQuality.Epic,
-            Proto: Spear,
-        })
-        const node = CcNative.instantiate(this.DetailInfoPrefab)
-        node.getComponent(DetailInfoPrefab).setDetail({
-            content: [
-                {
-                    title: spear.proto.name,
-                    icon: await spear.proto.icon(),
-                    buttons: [
-                        {
-                            label: "测试" ,
-                            callback: () => {
-                                log('测试')
-                            }
-                        }
-                    ]
-                }
-            ],
-            closeCallback: () => {
-                log('closeCallback')
-                this.node.removeChild(node)
-            }
-        })
-        this.node.addChild(node)
     }
 
 }

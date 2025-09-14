@@ -7,11 +7,11 @@ import { EquipmentItemPrefab } from './EquipmentItemPrefab';
 const { ccclass, property } = _decorator;
 
 type DetailContainer = {
-    title: string ,
+    title: string,
     icon: SpriteFrame,
-    rightMessage?: string , 
-    bottomMessage?: string ,
-    buttons: {label: string , callback: () => void}[],
+    rightMessage?: string,
+    bottomMessage?: string,
+    buttons?: { label: string, callback: () => void }[],
 }
 
 export type DetailInfoSetOption = {
@@ -36,43 +36,45 @@ export class DetailInfoPrefab extends ExtensionComponent {
         else if (option.content.length < 2) {
             only.active = true
             comparison.active = false
-            this.setDetailData(option.content[0] , only.children[0])
+            this.setDetailData(option.content[0], only.children[0])
         } else {
             only.active = false
             comparison.active = true
-            this.setDetailData(option.content[0] , comparison.children[0])
-            this.setDetailData(option.content[1] , comparison.children[1])
+            this.setDetailData(option.content[0], comparison.children[0])
+            this.setDetailData(option.content[1], comparison.children[1])
         }
     }
 
     // 设置详情数据
-    protected setDetailData(container: DetailContainer , settingNode: Node) {
+    protected setDetailData(container: DetailContainer, settingNode: Node) {
         // 标题
         settingNode.getChildByName("Title").getComponent(Label).string = container.title
         // 右侧信息
         settingNode.getChildByName("RightMessage")
-        .getComponent(ScrollView)
-        .content.getChildByName("item")
-        .getComponent(RichText).string = container.rightMessage || ""
+            .getComponent(ScrollView)
+            .content.getChildByName("item")
+            .getComponent(RichText).string = container.rightMessage || ""
         // 下侧信息
         settingNode.getChildByName("BottomMessage")
-        .getComponent(ScrollView)
-        .content.getChildByName("item")
-        .getComponent(RichText).string = container.bottomMessage || ""
+            .getComponent(ScrollView)
+            .content.getChildByName("item")
+            .getComponent(RichText).string = container.bottomMessage || ""
         // 按钮
         const buttonsNode = settingNode.getChildByName("Buttons")
         const temp = buttonsNode.children[0]
         temp.parent = null
-        container.buttons.forEach((item , index) => {
-            const button = instantiate(temp)
-            button.on(Button.EventType.CLICK , () => item.callback())
-            button.getChildByName("Label").getComponent(Label).string = item.label
-            buttonsNode.addChild(button)
-        })
+        if (container.buttons) {
+            container.buttons.forEach((item, index) => {
+                const button = instantiate(temp)
+                button.on(Button.EventType.CLICK, () => item.callback())
+                button.getChildByName("Label").getComponent(Label).string = item.label
+                buttonsNode.addChild(button)
+            })
+        }
         // 图标信息
         settingNode.getChildByName("Icon")
-        .getChildByName("Icon")
-        .getComponent(Sprite).spriteFrame = container.icon
+            .getChildByName("Icon")
+            .getComponent(Sprite).spriteFrame = container.icon
     }
 
     // 关闭详情

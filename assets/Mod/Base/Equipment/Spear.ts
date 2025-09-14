@@ -1,4 +1,5 @@
 import { SpriteFrame } from 'cc';
+import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { CcNative } from 'db://assets/Script/Module/CcNative';
 import { LanguageEntry } from 'db://assets/Script/Module/Language/LanguageEntry';
 import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Script/Module/Language/LanguageManager';
@@ -24,11 +25,11 @@ class Spear_Description_Entry extends LanguageEntry {
 export class Spear extends EquipmentPrototype {
 
     public get name(): string {
-        return LanguageManager.getEntry("Spear").getValue();
+        return LanguageManager.getEntry("Spear").getValue(settingManager.data.language);
     }
 
     public get description(): string {
-        return LanguageManager.getEntry("Spear Description").getValue();
+        return LanguageManager.getEntry("Spear Description").getValue(settingManager.data.language);
     }
 
     public get type(): EquipmentType {

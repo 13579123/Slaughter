@@ -163,3 +163,21 @@ import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
         
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Unload")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "卸下"
+        }
+
+        public get eng(): string {
+            return "Unload"
+        }
+
+        public get jpn(): string {
+            return "アンロード"
+        }
+
+    }
+})();

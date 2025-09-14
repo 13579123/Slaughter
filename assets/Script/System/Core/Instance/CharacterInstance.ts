@@ -85,13 +85,15 @@ export class CharacterInstance extends CharacterInstanceProperty {
 
     // 初始化装备
     protected initEquipments(equipments: CharacterEquipmentDTO) {
-        Object.keys(equipments).forEach((k) => {
+        Object.keys(equipments).forEach((k: keyof CharacterEquipmentDTO) => {
             const dto = equipments[k]
+            if (!dto) return
             const Proto = getEquipmentPrototype(dto.prototype)
             if (Proto) {
                 this.equipments[k] = new EquipmentInstance({
                     lv: dto.lv,
                     character: this,
+                    quality: dto.quality,
                     extraProperty: dto.extraProperty,
                     Proto
                 })
