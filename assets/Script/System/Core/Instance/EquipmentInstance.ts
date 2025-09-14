@@ -5,6 +5,7 @@ import { CharacterInstance } from "./CharacterInstance";
 import { BaseInstanceProperty } from "../Property/BaseInstanceProperty";
 
 export type EquipmentInstanceOption = {
+    id: string,
     // 等级
     lv?: number,
     // 质量
@@ -22,8 +23,11 @@ export class EquipmentInstance extends EquipmentInstanceProperty{
     // 对应的角色
     public readonly character: CharacterInstance = null
 
+    public readonly id: string
+
     constructor(option: EquipmentInstanceOption) {
         super()
+        this.id = option.id
         this.lv = option.lv || 1
         this.proto = new option.Proto(this)
         this.character = option.character || null

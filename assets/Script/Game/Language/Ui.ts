@@ -181,3 +181,201 @@ import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
 
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Equipment")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "装备"
+        }
+
+        public get eng(): string {
+            return "Equipment"
+        }
+
+        public get jpn(): string {
+            return "装備"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Quality")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "品质"
+        }
+
+        public get eng(): string {
+            return "Quality"
+        }
+
+        public get jpn(): string {
+            return "品質"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Ordinary")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "普通"
+        }
+
+        public get eng(): string {
+            return "Ordinary"
+        }
+
+        public get jpn(): string {
+            return "普通"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Fine")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "精良"
+        }
+
+        public get eng(): string {
+            return "Fine"
+        }
+
+        public get jpn(): string {
+            return "精良"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Rare")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "稀有"
+        }
+
+        public get eng(): string {
+            return "Rare"
+        }
+
+        public get jpn(): string {
+            return "希少"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Epic")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "史诗"
+        }
+
+        public get eng(): string {
+            return "Epic"
+        }
+
+        public get jpn(): string {
+            return "エピック"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Legendary")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "传说"
+        }
+
+        public get eng(): string {
+            return "Legendary"
+        }
+
+        public get jpn(): string {
+            return "伝説"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Mythic")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "神话"
+        }
+
+        public get eng(): string {
+            return "Mythic"
+        }
+
+        public get jpn(): string {
+            return "神話"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Equipment")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "装备"
+        }
+
+        public get eng(): string {
+            return "Equipment"
+        }
+
+        public get jpn(): string {
+            return "装備"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Item")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "物品"
+        }
+
+        public get eng(): string {
+            return "Item"
+        }
+
+        public get jpn(): string {
+            return "アイテム"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Use")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "使用"
+        }
+
+        public get eng(): string {
+            return "Use"
+        }
+
+        public get jpn(): string {
+            return "使用"
+        }
+
+    }
+})();

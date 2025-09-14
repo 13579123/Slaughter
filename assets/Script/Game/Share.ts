@@ -14,3 +14,9 @@ export function createPlayerInstance() {
         Proto: getCharacterPrototype(characterManager.data.currentCharacter.prototype),
     })
 }
+
+let id = 0
+const date = Date.now()
+export function createId() {
+    return `${date}_${id++}`
+}

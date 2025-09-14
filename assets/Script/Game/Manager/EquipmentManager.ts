@@ -3,31 +3,22 @@ import { EquipmentDTO, EquipmentQuality } from "../../System/Core/Prototype/Equi
 import { Manager } from "../../System/Manager";
 import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
-
-function deepCompare(x: {[k: string]: any}, y: {[k: string]: any}) {
-    if (x === y) return true;
-    if (typeof x !== 'object' || typeof y !== 'object') return false;
-
-    const keysX = Object.keys(x);
-    const keysY = Object.keys(y);
-
-    if (keysX.length !== keysY.length) return false;
-
-    for (let key of keysX) {
-        if (!deepCompare(x[key], y[key])) return false;
-    }
-
-    return true;
-}
+import { createId } from "../Share";
+import { EquipmentInstance } from "../../System/Core/Instance/EquipmentInstance";
 
 class EquipmentManagerDTO {
 
     public equipment: {
-        weapon?: EquipmentDTO,
-        armor?: EquipmentDTO,
-        shoes?: EquipmentDTO,
-        Accessory?: EquipmentDTO,
-    } = {}
+        weapon: EquipmentDTO,
+        armor: EquipmentDTO,
+        shoes: EquipmentDTO,
+        accessory: EquipmentDTO,
+    } = {
+            weapon: null,
+            armor: null,
+            shoes: null,
+            accessory: null,
+        }
 
     public equipments: EquipmentDTO[] = []
 
@@ -46,15 +37,17 @@ class EquipmentData {
         weapon: EquipmentDTO,
         armor: EquipmentDTO,
         shoes: EquipmentDTO,
-        Accessory: EquipmentDTO,
+        accessory: EquipmentDTO,
     } = {
-            weapon: { lv: 1, prototype: "Spear", extraProperty: {}, quality: EquipmentQuality.Legendary },
-            armor: null,
-            shoes: null,
-            Accessory: null,
+            weapon: { id: createId() , lv: 1, prototype: "Spear", extraProperty: {}, quality: EquipmentQuality.Ordinary },
+            armor: { id: createId() , lv: 1, prototype: "LeatherArmor", extraProperty: {}, quality: EquipmentQuality.Fine },
+            shoes: { id: createId() , lv: 1, prototype: "LeatherShoes", extraProperty: {}, quality: EquipmentQuality.Rare },
+            accessory: { id: createId() , lv: 1, prototype: "LeatherShoulder", extraProperty: {}, quality: EquipmentQuality.Epic },
         }
 
-    public equipments: EquipmentDTO[] = []
+    public equipments: EquipmentDTO[] = [
+        { id: createId() , lv: 1, prototype: "Spear", extraProperty: {}, quality: EquipmentQuality.Mythic }
+    ]
 
     constructor(data?: EquipmentManagerDTO) {
         if (data) {
@@ -69,6 +62,20 @@ class EquipmentData {
         this.equipment[type] = null
         if (equip)
             this.equipments.push(equip)
+    }
+
+    // 穿上装备
+    public equip(instance: EquipmentInstance) {
+        let equipmentDTO = null , index = -1
+        for (let i = 0; i < this.equipments.length; i++) {
+            if (instance.id !== this.equipments[i].id) continue
+            equipmentDTO = this.equipments[i];
+            index = i
+            break
+        }
+        this.equipments.splice(index, 1)
+        this.unequip(instance.proto.type)
+        this.equipment[instance.proto.type] = equipmentDTO
     }
 
 }

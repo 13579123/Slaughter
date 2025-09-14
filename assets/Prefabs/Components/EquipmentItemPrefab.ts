@@ -82,7 +82,6 @@ export class EquipmentItemPrefab extends ExtensionComponent {
             sprite.spriteFrame = this.getQualitySpriteFrame(instance.quality)
             this.closeShadow()
             instance.proto.icon().then((spriteFrame) => {
-                // console.log(spriteFrame , this.instance , instance)
                 if (this.instance === instance)
                     this.ItemIconSprite.spriteFrame = spriteFrame
             })

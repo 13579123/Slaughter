@@ -16,8 +16,8 @@ export class ItemPrototype {
         return ""
     }
 
-    public get maxCount() {
-        return 99
+    public get canUse() {
+        return false
     }
 
     public constructor(public readonly instance: ItemInstance) {
@@ -28,6 +28,8 @@ export class ItemPrototype {
         return Promise.resolve(null);
     }
 
+    public async use(number: number = 1) {
+    }
 }
 
 

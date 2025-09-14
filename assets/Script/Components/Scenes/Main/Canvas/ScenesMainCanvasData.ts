@@ -23,6 +23,7 @@ export class ScenesMainCanvasData extends ExtensionComponent {
             const character = createPlayerInstance()
             // @ts-ignore
             window.character = character
+            // 绑定渲染器
             this.userBaseData.bindCharacter(character)
         })
         return

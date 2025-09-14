@@ -4,6 +4,7 @@ import { BasePrototypeProperty } from "../Property/BasePrototypeProperty";
 import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgress, HealProgress } from "../Progress/FightProgress";
 
 export type EquipmentDTO = {
+    id: string,
     lv: number,
     quality: EquipmentQuality,
     prototype: string,
@@ -29,6 +30,30 @@ export enum EquipmentType {
     Null = "null",
 }
 
+// 装备品质
+export function getQualityName(quality: EquipmentQuality): string {
+    switch (quality) {
+        case EquipmentQuality.Ordinary: return "Ordinary";
+        case EquipmentQuality.Fine: return "Fine";
+        case EquipmentQuality.Rare: return "Rare";
+        case EquipmentQuality.Epic: return "Epic";
+        case EquipmentQuality.Legendary: return "Legendary";
+        case EquipmentQuality.Mythic: return "Mythic";
+    }
+}
+
+// 装备颜色
+export function getQualityColor(quality: EquipmentQuality): string {
+    switch (quality) {
+        case EquipmentQuality.Ordinary: return "#ffffff";
+        case EquipmentQuality.Fine: return "#7af87aff";
+        case EquipmentQuality.Rare: return "#6191f9ff";
+        case EquipmentQuality.Epic: return "#cc6afdff";
+        case EquipmentQuality.Legendary: return "#f5cc6dff";
+        case EquipmentQuality.Mythic: return "#f5695fff";
+    }
+}
+
 export class EquipmentPrototype {
     // 名称信息
     public get name(): string { return "Equipment Name" }
@@ -36,6 +61,15 @@ export class EquipmentPrototype {
     public get description(): string { return "Equipment Description" }
     // 装备类型
     public get type(): EquipmentType { return EquipmentType.Null }
+    // 装备属性展示
+    public get propertyDescription(): string { return "" }
+    // 套装名称
+    public get suit(): string { return "" }
+    // 强化所需材料
+    public get strengthenMaterial(): {
+        count: number ,
+        itemPrototype: string , 
+    }[] { return [] }
     // 成长属性
     public readonly growProperty: BasePrototypeProperty = new BasePrototypeProperty();
     // 基础属性
@@ -46,5 +80,18 @@ export class EquipmentPrototype {
     // 图标信息 Sprite
     public async icon(): Promise<SpriteFrame> {
         return Promise.resolve(null);
+    }
+    // 获取同套装备数量
+    public get suitCount(): number {
+        let suit = 0
+        if (this.instance.character && this.suit) {
+            Object.keys(this.instance.character.equipments).forEach((key) => {
+                if (this.instance.character.equipments[key]) {
+                    if (this.instance.character.equipments[key].proto.suit === this.suit)
+                        suit += 1
+                }
+            })
+        }
+        return suit
     }
 }

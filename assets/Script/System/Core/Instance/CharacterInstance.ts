@@ -91,6 +91,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
             const Proto = getEquipmentPrototype(dto.prototype)
             if (Proto) {
                 this.equipments[k] = new EquipmentInstance({
+                    id: dto.id,
                     lv: dto.lv,
                     character: this,
                     quality: dto.quality,

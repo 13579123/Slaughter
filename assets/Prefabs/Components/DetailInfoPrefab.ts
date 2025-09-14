@@ -8,10 +8,16 @@ const { ccclass, property } = _decorator;
 
 type DetailContainer = {
     title: string,
+    // 物品或者装备图片
     icon: SpriteFrame,
+    // 方框图标
+    boxIcon?: SpriteFrame,
+    // 右侧文字 RichText
     rightMessage?: string,
+    // 底部文字 RichText
     bottomMessage?: string,
-    buttons?: { label: string, callback: () => void }[],
+    // 按钮列表
+    buttons?: { label: string, callback: (close: Function) => void }[],
 }
 
 export type DetailInfoSetOption = {
@@ -59,26 +65,30 @@ export class DetailInfoPrefab extends ExtensionComponent {
             .getComponent(ScrollView)
             .content.getChildByName("item")
             .getComponent(RichText).string = container.bottomMessage || ""
-        // 按钮
+        // 生成按钮
         const buttonsNode = settingNode.getChildByName("Buttons")
         const temp = buttonsNode.children[0]
         temp.parent = null
         if (container.buttons) {
             container.buttons.forEach((item, index) => {
                 const button = instantiate(temp)
-                button.on(Button.EventType.CLICK, () => item.callback())
+                button.on(Button.EventType.CLICK, () => item.callback(this.closeDetail))
                 button.getChildByName("Label").getComponent(Label).string = item.label
                 buttonsNode.addChild(button)
             })
         }
         // 图标信息
+        if (container.boxIcon) {
+            settingNode.getChildByName("Icon")
+                .getComponent(Sprite).spriteFrame = container.boxIcon
+        }
         settingNode.getChildByName("Icon")
             .getChildByName("Icon")
             .getComponent(Sprite).spriteFrame = container.icon
     }
 
     // 关闭详情
-    protected closeDetail() {
+    protected closeDetail = () => {
         this.node.active = false
         if (this.closeCallback) this.closeCallback()
     }
