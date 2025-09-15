@@ -24,6 +24,10 @@ export function getItemPrototype(key: string): Constructor<ItemPrototype> | unde
 }
 
 // 根据装备原型或者实例获取key
-export function getItemKey(proto: Constructor<ItemPrototype>): string | undefined {
+export function getItemKey(proto: Constructor<ItemPrototype>|ItemPrototype): string | undefined {
+    if (proto instanceof ItemPrototype) {
+        // @ts-ignore
+        return registryReverse.get(proto.constructor);
+    }
     return registryReverse.get(proto);
 }

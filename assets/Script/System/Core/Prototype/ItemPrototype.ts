@@ -28,7 +28,7 @@ export class ItemPrototype {
         return Promise.resolve(null);
     }
 
-    public async use(number: number = 1) {
+    public use(number: number = 1) {
     }
 }
 

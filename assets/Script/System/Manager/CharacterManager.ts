@@ -4,7 +4,7 @@ import { CharacterPrototype } from "../Core/Prototype/CharacterPrototype";
 
 // 该文件用于管理游戏中的角色系统
 const registry: Map<string, Constructor<CharacterPrototype>> = new Map();
-const registryReverse: Map<Constructor<CharacterPrototype>,string> = new Map();
+const registryReverse: Map<Constructor<CharacterPrototype>, string> = new Map();
 
 // 装备用品注册装饰器
 export const RegisterCharacter: (k: string) => ClassDecorator = (key: string) => {
@@ -26,5 +26,9 @@ export function getCharacterPrototype(key: string): Constructor<CharacterPrototy
 
 // 根据装备原型或者实例获取key
 export function getCharacterKey(proto: Constructor<CharacterPrototype>): string | undefined {
+    if (proto instanceof CharacterPrototype) {
+        // @ts-ignore
+        return registryReverse.get(proto.constructor);
+    }
     return registryReverse.get(proto);
 }

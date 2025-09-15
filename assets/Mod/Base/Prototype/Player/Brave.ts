@@ -56,14 +56,14 @@ export class Brave extends CharacterPrototype {
     public icon(): Promise<SpriteFrame> {
         return new Promise(async res => {
             const assets = new CcNative.Asset.AssetManager("ModBaseResource")
-            res((await assets.load("Texture/avatar/spriteFrame" , SpriteFrame)).value)
+            res((await assets.load("Texture/Player/Brave/spriteFrame" , SpriteFrame , true)).value)
         })
     }
 
     public skeletonData(): Promise<sp.SkeletonData> {
         return new Promise(async res => {
             const assets = new CcNative.Asset.AssetManager("ModBaseResource")
-            res((await assets.load("Spine/Player/hero0001" , sp.SkeletonData)).value)
+            res((await assets.load("Spine/Player/hero0001" , sp.SkeletonData , true)).value)
         })
     }
 

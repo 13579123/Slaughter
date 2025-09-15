@@ -3,7 +3,7 @@ import { EquipmentPrototype } from "../Core/Prototype/EquipmentPrototype";
 
 // 该文件用于管理游戏中的装备系统
 const registry: Map<string, Constructor<EquipmentPrototype>> = new Map();
-const registryReverse: Map<Constructor<EquipmentPrototype>,string> = new Map();
+const registryReverse: Map<Constructor<EquipmentPrototype>, string> = new Map();
 
 // 装备用品注册装饰器
 export const RegisterEquipment: (k: string) => ClassDecorator = (key: string) => {
@@ -24,6 +24,10 @@ export function getEquipmentPrototype(key: string): Constructor<EquipmentPrototy
 }
 
 // 根据装备原型或者实例获取key
-export function getEquipmentKey(proto: Constructor<EquipmentPrototype>): string | undefined {
+export function getEquipmentKey(proto: Constructor<EquipmentPrototype> | EquipmentPrototype): string | undefined {
+    if (proto instanceof EquipmentPrototype) {
+        // @ts-ignore
+        return registryReverse.get(proto.constructor);
+    }
     return registryReverse.get(proto);
 }

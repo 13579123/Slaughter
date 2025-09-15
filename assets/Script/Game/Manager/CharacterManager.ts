@@ -1,4 +1,3 @@
-import { Brave } from "db://assets/Mod/Base/Player/Brave";
 import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
 import { CharacterDTO } from "../../System/Core/Prototype/CharacterPrototype";
 import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
@@ -31,9 +30,9 @@ class CharacterData {
 
     public exp: number = 0
 
-    public characters: CharacterDTO[] = [{lv: 1 , prototype: getCharacterKey(Brave) , extraProperty: {}}]
+    public characters: CharacterDTO[] = [{lv: 1 , prototype: "Brave" , extraProperty: {}}]
 
-    public currentCharacter: CharacterDTO = {lv: 1 , prototype: getCharacterKey(Brave) , extraProperty: {}}
+    public currentCharacter: CharacterDTO = {lv: 1 , prototype: "Brave" , extraProperty: {}}
 
     constructor(data?: CharacterManagerDTO) {
         if (data) {

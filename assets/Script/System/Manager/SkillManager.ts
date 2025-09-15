@@ -4,7 +4,7 @@ import { SkillPrototype } from "../Core/Prototype/SkillPrototype";
 
 // 该文件用于管理游戏中的技能系统
 const registry: Map<string, Constructor<SkillPrototype>> = new Map();
-const registryReverse: Map<Constructor<SkillPrototype>,string> = new Map();
+const registryReverse: Map<Constructor<SkillPrototype>, string> = new Map();
 
 // 装备用品注册装饰器
 export const RegisterSkill: (k: string) => ClassDecorator = (key: string) => {
@@ -25,6 +25,10 @@ export function getSkillPrototype(key: string): Constructor<SkillPrototype> | un
 }
 
 // 根据装备原型或者实例获取key
-export function getSkillKey(proto: Constructor<SkillPrototype>): string | undefined {
+export function getSkillKey(proto: Constructor<SkillPrototype> | SkillPrototype): string | undefined {
+    if (proto instanceof SkillPrototype) {
+        // @ts-ignore
+        return registryReverse.get(proto.constructor);
+    }
     return registryReverse.get(proto);
 }

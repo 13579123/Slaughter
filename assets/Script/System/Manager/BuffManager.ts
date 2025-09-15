@@ -23,6 +23,10 @@ export function getBuffPrototype(key: string): Constructor<BuffPrototype> | unde
 }
 
 // 根据装备原型或者实例获取key
-export function getBuffKey(proto: Constructor<BuffPrototype>): string | undefined {
-    return registryReverse.get(proto);
+export function getBuffKey(proto: Constructor<BuffPrototype>|BuffPrototype): string | undefined {
+    if (proto instanceof BuffPrototype) {
+            // @ts-ignore
+            return registryReverse.get(proto.constructor);
+        }
+        return registryReverse.get(proto);
 }

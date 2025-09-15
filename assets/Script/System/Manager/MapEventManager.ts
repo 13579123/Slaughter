@@ -23,6 +23,10 @@ export function getMapEventPrototype(key: string): Constructor<MapEventPrototype
 }
 
 // 根据装备原型或者实例获取key
-export function getMapEventKey(proto: Constructor<MapEventPrototype>): string | undefined {
-    return registryReverse.get(proto);
+export function getMapEventKey(proto: Constructor<MapEventPrototype>|MapEventPrototype): string | undefined {
+    if (proto instanceof MapEventPrototype) {
+            // @ts-ignore
+            return registryReverse.get(proto.constructor);
+        }
+        return registryReverse.get(proto);
 }

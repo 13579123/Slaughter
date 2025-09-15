@@ -14,7 +14,7 @@ import { Ref } from '../../Script/Module/Rx/reactivity';
 import { Rx } from '../../Script/Module/Rx';
 import { backpackManager } from '../../Script/Game/Manager/BackpackManager';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
-import { getItemPrototype } from '../../Script/System/Manager/ItemManager';
+import { getItemKey, getItemPrototype } from '../../Script/System/Manager/ItemManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasBackpack')
@@ -60,26 +60,33 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
             .getChildByName("Content").getComponent(ScrollView).content
         containerNode.removeAllChildren()
         backpackManager.data.items.forEach(async dto => {
+            if (dto.count === 0) return
             const instance = new ItemInstance({
                 count: dto.count,
                 Proto: getItemPrototype(dto.prototype)
             })
-            const node = CcNative.instantiate(this.DetailInfoPrefab)
-            node.getComponent(DetailInfoPrefab).setDetail({
-                content: [{
-                    title: instance.proto.name,
-                    icon: await instance.proto.icon(),
-                    bottomMessage: instance.proto.description,
-                    buttons: instance.proto.canUse ? [{
-                        label: LanguageManager.getEntry("Use").getValue(settingManager.data.language),
-                        callback: (close) => {
-                            instance.proto.use()
-                        },
-                    }] : []
-                }] ,
-                closeCallback: () => canvasNode.removeChild(node)
+            const node = CcNative.instantiate(this.EquipmentItemPrefab)
+            const equipmentItemPrefab = node.getComponent(EquipmentItemPrefab)
+            equipmentItemPrefab.setInfo(instance, async () => {
+                const node = CcNative.instantiate(this.DetailInfoPrefab)
+                node.getComponent(DetailInfoPrefab).setDetail({
+                    content: [{
+                        title: instance.proto.name,
+                        icon: await instance.proto.icon(),
+                        bottomMessage: instance.proto.description,
+                        buttons: instance.proto.canUse ? [{
+                            label: LanguageManager.getEntry("Use").getValue(settingManager.data.language),
+                            callback: (close) => {
+                                backpackManager.data.useItem(instance, 1)
+                                if (dto.count === 0) close()
+                            },
+                        }] : []
+                    }],
+                    closeCallback: () => canvasNode.removeChild(node)
+                })
+                canvasNode.addChild(node)
             })
-            canvasNode.addChild(node)
+            containerNode.addChild(node)
         })
     }
 
@@ -110,8 +117,8 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
         })
         // 展示详情
         const showDetail = async (
-            instance: EquipmentInstance , 
-            comparison: EquipmentInstance , 
+            instance: EquipmentInstance,
+            comparison: EquipmentInstance,
             equipmentItemPrefab: EquipmentItemPrefab
         ) => {
             if (!instance) return
@@ -144,7 +151,7 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
                 ]
             })
             node.getComponent(DetailInfoPrefab).setDetail({
-                content ,
+                content,
                 closeCallback: () => canvasNode.removeChild(node)
             })
             canvasNode.addChild(node)

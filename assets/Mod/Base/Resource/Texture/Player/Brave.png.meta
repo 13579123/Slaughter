@@ -11,7 +11,7 @@
     "6c48a": {
       "importer": "texture",
       "uuid": "445800c1-cdcb-4c46-a2e1-fb9ece73046b@6c48a",
-      "displayName": "avatar",
+      "displayName": "Brave",
       "id": "6c48a",
       "name": "texture",
       "userData": {
@@ -35,20 +35,20 @@
     "f9941": {
       "importer": "sprite-frame",
       "uuid": "445800c1-cdcb-4c46-a2e1-fb9ece73046b@f9941",
-      "displayName": "avatar",
+      "displayName": "Brave",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {
         "trimThreshold": 1,
         "rotated": false,
         "offsetX": 0,
-        "offsetY": -1,
+        "offsetY": 0,
         "trimX": 0,
-        "trimY": 2,
-        "width": 150,
-        "height": 148,
-        "rawWidth": 150,
-        "rawHeight": 150,
+        "trimY": 0,
+        "width": 215,
+        "height": 201,
+        "rawWidth": 215,
+        "rawHeight": 201,
         "borderTop": 0,
         "borderBottom": 0,
         "borderLeft": 0,
@@ -60,17 +60,17 @@
         "meshType": 0,
         "vertices": {
           "rawPosition": [
-            -75,
-            -74,
+            -107.5,
+            -100.5,
             0,
-            75,
-            -74,
+            107.5,
+            -100.5,
             0,
-            -75,
-            74,
+            -107.5,
+            100.5,
             0,
-            75,
-            74,
+            107.5,
+            100.5,
             0
           ],
           "indexes": [
@@ -83,12 +83,12 @@
           ],
           "uv": [
             0,
-            148,
-            150,
-            148,
+            201,
+            215,
+            201,
             0,
             0,
-            150,
+            215,
             0
           ],
           "nuv": [
@@ -97,18 +97,18 @@
             1,
             0,
             0,
-            0.9866666666666667,
             1,
-            0.9866666666666667
+            1,
+            1
           ],
           "minPos": [
-            -75,
-            -74,
+            -107.5,
+            -100.5,
             0
           ],
           "maxPos": [
-            75,
-            74,
+            107.5,
+            100.5,
             0
           ]
         },

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Sprite, SpriteFrame, Enum, Prefab } from 'cc';
+import { _decorator, Component, Node, Sprite, SpriteFrame, Enum, Prefab, Label } from 'cc';
 import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
 import { EquipmentQuality } from '../../Script/System/Core/Prototype/EquipmentPrototype';
@@ -85,6 +85,15 @@ export class EquipmentItemPrefab extends ExtensionComponent {
                 if (this.instance === instance)
                     this.ItemIconSprite.spriteFrame = spriteFrame
             })
+            this.node.getChildByName("Count").active = false
+        }
+        if (instance instanceof ItemInstance) {
+            instance.proto.icon().then((spriteFrame) => {
+                if (this.instance === instance)
+                    this.ItemIconSprite.spriteFrame = spriteFrame
+            })
+            this.node.getChildByName("Count").active = true
+            this.node.getChildByName("Count").getComponent(Label).string = instance.count.toString()
         }
     }
 
