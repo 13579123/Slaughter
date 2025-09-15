@@ -1,10 +1,13 @@
 
 export class Normal {
 
-    public static number(num: number): string {
-        if (num < 100000) return num.toFixed(0);
-        if (num < 100000000) return (num / 10000).toFixed(1) + "W";
-        return (num / 100000000).toFixed(1) + "Y";
+    public static number(num: number , fixed = 1 , force = false): string {
+        let useFixed = fixed
+        if (num.toString().indexOf(".") === -1) useFixed = 0
+        if (force) useFixed = fixed
+        if (num < 100000) return num.toFixed(useFixed);
+        if (num < 100000000) return (num / 10000).toFixed(useFixed) + "W";
+        return (num / 100000000).toFixed(useFixed) + "Y";
     }
 
 }

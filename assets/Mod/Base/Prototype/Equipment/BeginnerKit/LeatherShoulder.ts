@@ -66,7 +66,7 @@ export class LeatherShoulder extends EquipmentPrototype {
             LanguageManager.getEntry("physicalPenetration")
                 .getValue(settingManager.data.language)
             }: +5${this.suitCount >= oneSuit ? `</color>` : ""}\n`
-        res += `${this.suitCount >= oneSuit ? `<color=#00ff00>` : ""}${suitEntryStr}(${oneSuit}): ${
+        res += `${this.suitCount >= twoSuit ? `<color=#00ff00>` : ""}${suitEntryStr}(${twoSuit}): ${
             LanguageManager.getEntry("criticalRate")
                 .getValue(settingManager.data.language)
             }: +5%${this.suitCount >= twoSuit ? `</color>` : ""}\n`

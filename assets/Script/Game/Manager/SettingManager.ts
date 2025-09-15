@@ -25,10 +25,10 @@ class SettingDTO {
 class SettingData {
 
     // 背景音乐
-    public backVolume: number = 0
+    public backVolume: number = 0.5
 
     // 音效音乐
-    public effectVolume: number = 0
+    public effectVolume: number = 0.5
 
     // 语言
     public language: LanguageType = AllLanguageType.chs as LanguageType

@@ -68,9 +68,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.maxMp || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.maxMp : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.maxMp ? sum + bf.extraProperty.maxMp : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 物理攻击力
@@ -80,9 +80,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.physicalAttack || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.physicalAttack : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.physicalAttack ? sum + bf.extraProperty.physicalAttack : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 魔法攻击力
@@ -92,9 +92,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.magicAttack || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.magicAttack : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.magicAttack ? sum + bf.extraProperty.magicAttack : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 光属性攻击力
@@ -104,9 +104,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.lightAttack || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.lightAttack : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.lightAttack ? sum + bf.extraProperty.lightAttack : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 暗属性攻击力
@@ -116,9 +116,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.darkAttack || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.darkAttack : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.darkAttack ? sum + bf.extraProperty.darkAttack : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 物理防御力
@@ -128,9 +128,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.physicalDefense || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.physicalDefense : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.physicalDefense ? sum + bf.extraProperty.physicalDefense : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 魔法防御力
@@ -140,9 +140,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.magicDefense || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.magicDefense : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.magicDefense ? sum + bf.extraProperty.magicDefense : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 光属性抗性
@@ -152,9 +152,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.lightResistance || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.lightResistance : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.lightResistance ? sum + bf.extraProperty.lightResistance : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 暗属性抗性
@@ -164,9 +164,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.darkResistance || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.darkResistance : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.darkResistance ? sum + bf.extraProperty.darkResistance : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 物理穿透
@@ -176,9 +176,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.physicalPenetration || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.physicalPenetration : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.physicalPenetration ? sum + bf.extraProperty.physicalPenetration : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 魔法穿透
@@ -188,9 +188,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.magicPenetration || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.magicPenetration : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.magicPenetration ? sum + bf.extraProperty.magicPenetration : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 暴击率 0 - 1
@@ -200,9 +200,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.criticalRate || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.criticalRate : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.criticalRate ? sum + bf.extraProperty.criticalRate : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 暴击伤害
@@ -212,9 +212,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.criticalDamage || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
+            .reduce((sum, eq) => eq ? sum + eq.criticalDamage : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.criticalDamage ? sum + bf.extraProperty.criticalDamage : sum, 0)
         return base + grow + extra + equip + buff
     }
     // 攻击速度

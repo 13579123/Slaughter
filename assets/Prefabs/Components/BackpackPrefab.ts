@@ -1,4 +1,4 @@
-import { _decorator, Color, Component, find, Node, Prefab, ScrollView, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Color, Component, find, Label, Node, Prefab, RichText, ScrollView, Sprite, SpriteFrame } from 'cc';
 import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { equipmentManager } from '../../Script/Game/Manager/EquipmentManager';
 import { EquipmentItemPrefab } from './EquipmentItemPrefab';
@@ -15,6 +15,7 @@ import { Rx } from '../../Script/Module/Rx';
 import { backpackManager } from '../../Script/Game/Manager/BackpackManager';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
 import { getItemKey, getItemPrototype } from '../../Script/System/Manager/ItemManager';
+import { Normal } from '../../Script/System/Normal';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasBackpack')
@@ -29,10 +30,14 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
     // 修改展示数据
     public showDataType = Rx.ref("item")
 
+    // 修改是否展示详细信息
+    public showDetailProperty = Rx.ref(false)
+
     // 开始生命周期
     protected start(): void {
         const itemBtn = this.node.getChildByName("Ui").getChildByName("Item")
         const equipmentBtn = this.node.getChildByName("Ui").getChildByName("Equipment")
+        this.effect(() => this.initDetail())
         this.effect(() => this.initHasEquipment())
         this.effect(() => {
             if (this.showDataType.value === "equipment") {
@@ -46,11 +51,14 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
                 this.initItem()
             }
         })
+        this.effect(() => this.node.getChildByName("DetailProoerty").active = this.showDetailProperty.value)
     }
 
     // 关闭
     protected close() {
         this.node.active = false
+        this.closeShowUserDetail()
+        this.changeToItem()
     }
 
     // 初始化物品
@@ -61,32 +69,42 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
         containerNode.removeAllChildren()
         backpackManager.data.items.forEach(async dto => {
             if (dto.count === 0) return
+            const renderItem = (instance: ItemInstance) => {
+                const showDetail = async () => {
+                    const node = CcNative.instantiate(this.DetailInfoPrefab)
+                    node.getComponent(DetailInfoPrefab).setDetail({
+                        content: [{
+                            title: instance.proto.name,
+                            icon: await instance.proto.icon(),
+                            rightMessage: LanguageManager.getEntry("Count").getValue(settingManager.data.language)
+                                + instance.count,
+                            bottomMessage: instance.proto.description,
+                            buttons: instance.proto.canUse ? [{
+                                label: LanguageManager.getEntry("Use").getValue(settingManager.data.language),
+                                callback: (close) => {
+                                    backpackManager.data.useItem(instance, 1)
+                                    close()
+                                    // 再次展示详情
+                                    if (dto.count !== 0) showDetail()
+                                },
+                            }] : []
+                        }],
+                        closeCallback: () => canvasNode.removeChild(node)
+                    })
+                    canvasNode.addChild(node)
+                }
+                const node = CcNative.instantiate(this.EquipmentItemPrefab)
+                const equipmentItemPrefab = node.getComponent(EquipmentItemPrefab)
+                equipmentItemPrefab.setInfo(instance , async () => {
+                    showDetail()
+                })
+                containerNode.addChild(node)
+            }
             const instance = new ItemInstance({
                 count: dto.count,
                 Proto: getItemPrototype(dto.prototype)
             })
-            const node = CcNative.instantiate(this.EquipmentItemPrefab)
-            const equipmentItemPrefab = node.getComponent(EquipmentItemPrefab)
-            equipmentItemPrefab.setInfo(instance, async () => {
-                const node = CcNative.instantiate(this.DetailInfoPrefab)
-                node.getComponent(DetailInfoPrefab).setDetail({
-                    content: [{
-                        title: instance.proto.name,
-                        icon: await instance.proto.icon(),
-                        bottomMessage: instance.proto.description,
-                        buttons: instance.proto.canUse ? [{
-                            label: LanguageManager.getEntry("Use").getValue(settingManager.data.language),
-                            callback: (close) => {
-                                backpackManager.data.useItem(instance, 1)
-                                if (dto.count === 0) close()
-                            },
-                        }] : []
-                    }],
-                    closeCallback: () => canvasNode.removeChild(node)
-                })
-                canvasNode.addChild(node)
-            })
-            containerNode.addChild(node)
+            renderItem(instance)
         })
     }
 
@@ -218,7 +236,50 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
         return
     }
 
+    // 初始化详细信息
+    protected async initDetail() {
+        const characterInstance = createPlayerInstance()
+        const detailPropertyNode = this.node.getChildByName("DetailProoerty")
+        const avatarSprite = detailPropertyNode.getChildByName("Avatar").getComponent(Sprite)
+        detailPropertyNode.getChildByName("Title")
+            .getComponent(Label).string = characterInstance.proto.name
+        detailPropertyNode.getChildByName("Detail")
+            .getComponent(ScrollView).content.getComponent(Label).string = characterInstance.proto.description
+        // 渲染其他属性
+        const label = detailPropertyNode.getChildByName("Property")
+            .getComponent(ScrollView)
+            .content
+            .getComponent(Label)
+        label.string = ""
+        const property = [
+            {key: "maxHp" , force: false , fixed: 0},
+            {key: "maxMp" , force: false , fixed: 0},
+            {key: "physicalAttack" , force: false , fixed: 1},
+            {key: "magicAttack" , force: false , fixed: 1},
+            {key: "lightAttack" , force: false , fixed: 1},
+            {key: "darkAttack" , force: false , fixed: 1},
+            {key: "physicalDefense" , force: false , fixed: 1},
+            {key: "magicDefense" , force: false , fixed: 1},
+            {key: "lightResistance" , force: false , fixed: 1},
+            {key: "darkResistance" , force: false , fixed: 1},
+            {key: "physicalPenetration" , force: false , fixed: 1},
+            {key: "magicPenetration" , force: false , fixed: 1},
+            {key: "attackSpeed" , force: true , fixed: 2},
+        ]
+        property.forEach(setting => {
+            label.string += `${
+                LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
+            }: ${Normal.number(characterInstance[setting.key] , setting.fixed , setting.force)}\n`
+        })
+        avatarSprite.spriteFrame = await characterInstance.proto.icon()
+    }
+
+    // 改变展示类型
     protected changeToItem() { this.showDataType.value = "item" }
     protected changeToEquipment() { this.showDataType.value = "equipment" }
+
+    // 改变展示用户
+    protected openShowUserDetail() { this.showDetailProperty.value = true }
+    protected closeShowUserDetail() { this.showDetailProperty.value = false }
 
 }

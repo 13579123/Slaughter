@@ -1,4 +1,5 @@
 import { sp, SpriteFrame } from "cc";
+import { settingManager } from "db://assets/Script/Game/Manager/SettingManager";
 import { CcNative } from "db://assets/Script/Module/CcNative";
 import { LanguageEntry } from "db://assets/Script/Module/Language/LanguageEntry";
 import { LanguageManager, RegisterLanguageEntry } from "db://assets/Script/Module/Language/LanguageManager";
@@ -24,11 +25,11 @@ class Brave_Description_Entry extends LanguageEntry {
 export class Brave extends CharacterPrototype {
 
     public get name(): string {
-        return LanguageManager.getEntry("Brave").getValue();
+        return LanguageManager.getEntry("Brave").getValue(settingManager.data.language);
     }
 
     public get description(): string {
-        return LanguageManager.getEntry("Brave Description").getValue();
+        return LanguageManager.getEntry("Brave Description").getValue(settingManager.data.language);
     }
 
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({

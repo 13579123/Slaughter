@@ -379,3 +379,21 @@ import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
 
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Count")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "数量"
+        }
+
+        public get eng(): string {
+            return "Count"
+        }
+
+        public get jpn(): string {
+            return "数量"
+        }
+
+    }
+})();
