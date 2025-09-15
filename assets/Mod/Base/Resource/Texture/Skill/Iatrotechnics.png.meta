@@ -2,7 +2,7 @@
   "ver": "1.0.27",
   "importer": "image",
   "imported": true,
-  "uuid": "90a7a440-0386-435d-baea-7b7bd7c363e5",
+  "uuid": "a55022db-e91c-4c51-bd98-79d379fd2e15",
   "files": [
     ".json",
     ".png"
@@ -10,14 +10,14 @@
   "subMetas": {
     "6c48a": {
       "importer": "texture",
-      "uuid": "90a7a440-0386-435d-baea-7b7bd7c363e5@6c48a",
-      "displayName": "SettingBack",
+      "uuid": "a55022db-e91c-4c51-bd98-79d379fd2e15@6c48a",
+      "displayName": "Iatrotechnics",
       "id": "6c48a",
       "name": "texture",
       "userData": {
         "wrapModeS": "clamp-to-edge",
         "wrapModeT": "clamp-to-edge",
-        "imageUuidOrDatabaseUri": "90a7a440-0386-435d-baea-7b7bd7c363e5",
+        "imageUuidOrDatabaseUri": "a55022db-e91c-4c51-bd98-79d379fd2e15",
         "isUuid": true,
         "visible": false,
         "minfilter": "linear",
@@ -34,8 +34,8 @@
     },
     "f9941": {
       "importer": "sprite-frame",
-      "uuid": "90a7a440-0386-435d-baea-7b7bd7c363e5@f9941",
-      "displayName": "SettingBack",
+      "uuid": "a55022db-e91c-4c51-bd98-79d379fd2e15@f9941",
+      "displayName": "Iatrotechnics",
       "id": "f9941",
       "name": "spriteFrame",
       "userData": {
@@ -45,12 +45,12 @@
         "offsetY": 0,
         "trimX": 0,
         "trimY": 0,
-        "width": 552,
-        "height": 397,
-        "rawWidth": 552,
-        "rawHeight": 397,
-        "borderTop": 170,
-        "borderBottom": 163,
+        "width": 128,
+        "height": 128,
+        "rawWidth": 128,
+        "rawHeight": 128,
+        "borderTop": 0,
+        "borderBottom": 0,
         "borderLeft": 0,
         "borderRight": 0,
         "packable": true,
@@ -60,17 +60,17 @@
         "meshType": 0,
         "vertices": {
           "rawPosition": [
-            -276,
-            -198.5,
+            -64,
+            -64,
             0,
-            276,
-            -198.5,
+            64,
+            -64,
             0,
-            -276,
-            198.5,
+            -64,
+            64,
             0,
-            276,
-            198.5,
+            64,
+            64,
             0
           ],
           "indexes": [
@@ -83,12 +83,12 @@
           ],
           "uv": [
             0,
-            397,
-            552,
-            397,
+            128,
+            128,
+            128,
             0,
             0,
-            552,
+            128,
             0
           ],
           "nuv": [
@@ -102,18 +102,18 @@
             1
           ],
           "minPos": [
-            -276,
-            -198.5,
+            -64,
+            -64,
             0
           ],
           "maxPos": [
-            276,
-            198.5,
+            64,
+            64,
             0
           ]
         },
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "90a7a440-0386-435d-baea-7b7bd7c363e5@6c48a",
+        "imageUuidOrDatabaseUri": "a55022db-e91c-4c51-bd98-79d379fd2e15@6c48a",
         "atlasUuid": "",
         "trimType": "auto"
       },
@@ -129,6 +129,6 @@
     "type": "sprite-frame",
     "hasAlpha": true,
     "fixAlphaTransparencyArtifacts": false,
-    "redirect": "90a7a440-0386-435d-baea-7b7bd7c363e5@6c48a"
+    "redirect": "a55022db-e91c-4c51-bd98-79d379fd2e15@6c48a"
   }
 }

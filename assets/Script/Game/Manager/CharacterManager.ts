@@ -83,7 +83,23 @@ class CharacterData {
 
     // 添加角色
     public addCharacter(prototype: string) {
-        this.characters.push({ lv: 1 , prototype , extraProperty: {} })
+        this.characters.push({ 
+            lv: 1 , 
+            prototype , 
+            extraProperty: {} 
+        })
+    }
+
+    // 切换角色
+    public switchCharacter(prototype: string) {
+        for (let i = 0; i < this.characters.length; i++) {
+            const character = this.characters[i];
+            if (character.prototype === prototype) {
+                this.currentCharacter = character
+                return true
+            }
+        }
+        return false
     }
 
 }

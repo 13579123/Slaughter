@@ -123,11 +123,12 @@ export class CharacterInstance extends CharacterInstanceProperty {
         const list = skills.map(dto => {
             const Proto = getSkillPrototype(dto.prototype)
             if (Proto) {
-                return new SkillInstance({ Proto })
+                return new SkillInstance({ characterInstance: this , lv: dto.lv , Proto })
             }
             else warn(`Can not found skill by prototype key: ${dto.prototype}`)
         })
         this.skills.push(...list)
+        list.forEach(skill => skill.proto.load())
     }
 
     // 触发战斗流程事件

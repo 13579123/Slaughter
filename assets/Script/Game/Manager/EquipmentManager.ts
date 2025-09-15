@@ -78,6 +78,17 @@ class EquipmentData {
         this.equipment[instance.proto.type] = equipmentDTO
     }
 
+    // 添加装备
+    public addEquipment(prototype: string , quality?: EquipmentQuality) {
+        this.equipments.push({ 
+            id: createId(),
+            prototype,
+            lv: 1,
+            extraProperty: {},
+            quality: quality || EquipmentQuality.Ordinary,
+        })
+    }
+
 }
 
 export const equipmentManager = new Manager({

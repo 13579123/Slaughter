@@ -12,6 +12,10 @@ export class ScenesMainCanvasUi extends Component {
     // 背包节点
     @property(Node)
     protected backpackNode: Node = null;
+    
+    // 技能节点
+    @property(Node)
+    protected skillNode: Node = null;
 
     // 初始化
     protected start(): void {
@@ -39,7 +43,7 @@ export class ScenesMainCanvasUi extends Component {
 
     // 开启技能界面
     protected async openSkill() {
-        
+        this.skillNode.active = true
     }
 
 }

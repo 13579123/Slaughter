@@ -21,7 +21,7 @@ export class SkillPrototype {
     // 描述信息
     public get description(): string { return "Equipment Description" }
     // 技能消耗
-    public get cost() { 
+    public get cost() {
         return {
             hp: 0,
             mp: 0,
@@ -31,6 +31,22 @@ export class SkillPrototype {
     public get coolTime() {
         return 15
     }
+    // 学习消耗
+    public get learnCost() {
+        return {
+            gold: 0,
+            diamond: 0
+        }
+    }
+    // 升级消耗
+    public get upgradeMaterial() {
+        return {
+            gold: this.instance.lv * 1000,
+            diamond: this.instance.lv * 5
+        }
+    }
+    // 是否是被动
+    public get isPassive(): boolean { return false }
     // 保存对应的实例
     constructor(public readonly instance: EquipmentInstance) {
     }
@@ -39,16 +55,19 @@ export class SkillPrototype {
         return Promise.resolve(null);
     }
     // 技能使用失败回调
-    public useFail(reason: SkillFailReason , progress: SkillProgress) {
+    public useFail(reason: SkillFailReason, progress: SkillProgress) {
         if (reason == SkillFailReason.NotEnoughCoast) {
-            log("消耗不足" , progress.cost)
+            log("消耗不足", progress.cost)
         } else if (reason == SkillFailReason.CoolDown) {
             log("冷却中" + (progress.coolTime / 1000).toFixed(2) + "s")
         }
     }
+    // 挂载到角色身上生效
+    public load() {
+    }
     // 使用技能回调
     public use(useOption: {
-        use: CharacterInstance ,
+        use: CharacterInstance,
     }) {
     }
 }

@@ -1,5 +1,7 @@
-import { log } from "cc";
+import { log, SpriteFrame } from "cc";
 import { settingManager } from "db://assets/Script/Game/Manager/SettingManager";
+import { RegisterPlayerSkill } from "db://assets/Script/Game/System/SkillTree";
+import { CcNative } from "db://assets/Script/Module/CcNative";
 import { LanguageEntry } from "db://assets/Script/Module/Language/LanguageEntry";
 import { LanguageManager, RegisterLanguageEntry } from "db://assets/Script/Module/Language/LanguageManager";
 import { CharacterInstance } from "db://assets/Script/System/Core/Instance/CharacterInstance";
@@ -9,8 +11,8 @@ import { RegisterSkill } from "db://assets/Script/System/Manager/SkillManager";
 
 
 @RegisterLanguageEntry("Iatrotechnics_Name")
-class Iatrotechnics_Name extends LanguageEntry{
-    
+class Iatrotechnics_Name extends LanguageEntry {
+
     public get chs(): string {
         return "治疗术";
     }
@@ -26,7 +28,7 @@ class Iatrotechnics_Name extends LanguageEntry{
 }
 
 @RegisterLanguageEntry("Iatrotechnics_Description")
-class Iatrotechnics_Description extends LanguageEntry{
+class Iatrotechnics_Description extends LanguageEntry {
 
     public get chs(): string {
         return `消耗${this.data.lv * 10 + 30}的魔法值，回复${this.data.lv * 4 + 5}%的生命值`;
@@ -43,20 +45,28 @@ class Iatrotechnics_Description extends LanguageEntry{
 }
 
 @RegisterSkill("Iatrotechnics")
+@RegisterPlayerSkill("Iatrotechnics", "Brave")
 export class Iatrotechnics extends SkillPrototype {
 
     public get name(): string {
         return LanguageManager.getEntry("Iatrotechnics_Name").getValue(
-            settingManager.data.language , 
-            {lv: this.instance.lv}
+            settingManager.data.language,
+            { lv: this.instance.lv }
         )
     }
 
     public get description(): string {
         return LanguageManager.getEntry("Iatrotechnics_Description").getValue(
-            settingManager.data.language , 
-            {lv: this.instance.lv}
+            settingManager.data.language,
+            { lv: this.instance.lv }
         )
+    }
+
+    public icon(): Promise<SpriteFrame> {
+        return new Promise(async res => {
+            const assets = new CcNative.Asset.AssetManager("ModBaseResource")
+            res((await assets.load("Texture/Skill/Iatrotechnics/spriteFrame", SpriteFrame, true)).value)
+        })
     }
 
     public get cost(): { hp: number; mp: number; } {

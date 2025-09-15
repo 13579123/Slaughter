@@ -252,24 +252,26 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
             .getComponent(Label)
         label.string = ""
         const property = [
-            {key: "maxHp" , force: false , fixed: 0},
-            {key: "maxMp" , force: false , fixed: 0},
-            {key: "physicalAttack" , force: false , fixed: 1},
-            {key: "magicAttack" , force: false , fixed: 1},
-            {key: "lightAttack" , force: false , fixed: 1},
-            {key: "darkAttack" , force: false , fixed: 1},
-            {key: "physicalDefense" , force: false , fixed: 1},
-            {key: "magicDefense" , force: false , fixed: 1},
-            {key: "lightResistance" , force: false , fixed: 1},
-            {key: "darkResistance" , force: false , fixed: 1},
-            {key: "physicalPenetration" , force: false , fixed: 1},
-            {key: "magicPenetration" , force: false , fixed: 1},
-            {key: "attackSpeed" , force: true , fixed: 2},
+            {key: "maxHp" , force: false , fixed: 0 , rate: 1 , exit: ""},
+            {key: "maxMp" , force: false , fixed: 0 , rate: 1 , exit: ""},
+            {key: "physicalAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "magicAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "lightAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "darkAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "physicalDefense" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "magicDefense" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "lightResistance" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "darkResistance" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "physicalPenetration" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "magicPenetration" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
+            {key: "criticalRate" , force: false , fixed: 1 , rate: 100 , exit: "%"},
+            {key: "criticalDamage" , force: false , fixed: 1 , rate: 100 , exit: "%"},
+            {key: "attackSpeed" , force: true , fixed: 2 , rate: 1 , exit: ""},
         ]
         property.forEach(setting => {
             label.string += `${
                 LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
-            }: ${Normal.number(characterInstance[setting.key] , setting.fixed , setting.force)}\n`
+            }: ${Normal.number(characterInstance[setting.key] * setting.rate , setting.fixed , setting.force)}${setting.exit}\n`
         })
         avatarSprite.spriteFrame = await characterInstance.proto.icon()
     }
