@@ -1,11 +1,11 @@
-import { _decorator, Button, Component, EventTouch, find, instantiate, Label, Node, NodeEventType, Prefab, Sprite, SpriteFrame } from 'cc';
+import { _decorator, Button, Color, Component, EventTouch, find, Graphics, instantiate, Label, Node, NodeEventType, Prefab, Sprite, SpriteFrame } from 'cc';
 import { DetailInfoPrefab } from 'db://assets/Prefabs/Components/DetailInfoPrefab';
 import { characterManager } from 'db://assets/Script/Game/Manager/CharacterManager';
 import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { skillManager } from 'db://assets/Script/Game/Manager/SkillManager';
 import { message } from 'db://assets/Script/Game/Message/Message';
 import { createPlayerInstance } from 'db://assets/Script/Game/Share';
-import { getPlayerSkillRootNode, getSkillUpLevelMaterial } from 'db://assets/Script/Game/System/SkillConfig';
+import { getPlayerSkillRootsNode, getSkillUpLevelMaterial, SkillNode } from 'db://assets/Script/Game/System/SkillConfig';
 import { CcNative } from 'db://assets/Script/Module/CcNative';
 import ExtensionComponent from 'db://assets/Script/Module/Extension/Component/ExtensionComponent';
 import { LanguageManager } from 'db://assets/Script/Module/Language/LanguageManager';
@@ -25,6 +25,9 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
     // 技能item模板
     protected SkillItemTempNode: Node = null
 
+    @property(Graphics)
+    protected SkillTreeGraphics: Graphics = null;
+
     protected onLoad(): void {
         // 获取模板节点
         this.SkillItemTempNode = this.node.getChildByName("SkillPanel").children[0]
@@ -38,7 +41,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
     // 设置模板节点
     protected setSkillItemTempNode(node: Node, lv: number, icon: SpriteFrame, callback: Function) {
         node.getChildByName("Icon").getComponent(Sprite).spriteFrame = icon
-        node.getChildByName("Level").getComponent(Label).string = "Lv: " + lv
+        node.getChildByName("Level").getComponent(Label).string = lv > 0 ? ("Lv: " + lv) : ""
         node.on(Button.EventType.CLICK, () => callback())
     }
 
@@ -63,31 +66,140 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
         return
     }
 
+    // 移除触摸事件
+    protected removeTouchEvent: Function = null
+
     // 初始化未携带的技能
     protected initSkillList() {
-        const maskNode = this.node.getChildByName("AllSkillPanel")
-            .getChildByName("Mask")
+        const maskNode = this.node.getChildByName("AllSkillPanel").getChildByName("Mask")
         const skillContainerNode = this.node.getChildByName("AllSkillPanel")
             .getChildByName("Mask").getChildByName("Container")
-        let touching = false
-        maskNode.on(NodeEventType.TOUCH_START , (e: EventTouch) => touching = true)
-        maskNode.on(NodeEventType.TOUCH_END , (e: EventTouch) => touching = false)
-        maskNode.on(NodeEventType.TOUCH_CANCEL , (e: EventTouch) => touching = false)
-        maskNode.on(NodeEventType.TOUCH_MOVE , (e: EventTouch) => {
-            if (!touching) return
-            skillContainerNode.setPosition(skillContainerNode.x + e.getDelta().x, skillContainerNode.y + e.getDelta().y)
-        })
+        // 移除触摸事件
+        if( this.removeTouchEvent ) this.removeTouchEvent()
         // 清空技能节点
         skillContainerNode.removeAllChildren()
         // 获取技能树根节点
-        const root = getPlayerSkillRootNode(characterManager.data.currentCharacter)
-        if (!root) return message.toast("获取技能树根节点失败")
-        // 渲染技能
-
+        const roots = getPlayerSkillRootsNode(characterManager.data.currentCharacter)
+        if (!roots) return message.toast("获取技能树根节点失败")
+        // 技能树对应的结构
+        const skillTreeToMatrix: Array<Array<SkillNode>> = []
+        const skillTreeSkewPostion: Map<SkillNode, { x: number, y: number }> = new Map()
+        // 生成技能树
+        let currentLine = 0
+        const convertToMatrix = (skillNode: SkillNode, add: number = 0) => {
+            if (skillTreeToMatrix[skillNode.floor] == null) skillTreeToMatrix[skillNode.floor] = []
+            skillTreeToMatrix[skillNode.floor][currentLine] = skillNode
+            if (skillNode.children.length > 0) {
+                skillNode.children.forEach(child => convertToMatrix(child, 1))
+            } else {
+                currentLine += add
+            }
+        }
+        roots.forEach(r => convertToMatrix(r, 1))
+        // 生成技能节点坐标
+        skillTreeToMatrix.forEach((list, y) => {
+            list?.forEach((skillNode, x) => {
+                skillTreeSkewPostion.set(skillNode, { x: -90 + x * 190, y: 90 - y * 190 })
+            })
+        })
+        // 开始坐标对齐
+        const aligningPosition = (root: SkillNode) => {
+            root.children.forEach(c => aligningPosition(c))
+            if (root.children.length <= 1) return
+            if (root.children.length % 2 === 0) {
+                const diIndex = root.children.length / 2 - 1
+                const gaoIndex = root.children.length / 2
+                const diNodeX = skillTreeSkewPostion.get(root.children[diIndex]).x
+                const gaoNodeX = skillTreeSkewPostion.get(root.children[gaoIndex]).x
+                skillTreeSkewPostion.get( root ).x = diNodeX + (gaoNodeX - diNodeX) / 2
+            } else {
+                const index = Math.floor(root.children.length / 2)
+                skillTreeSkewPostion.get( root ).x = skillTreeSkewPostion.get(root.children[index]).x
+            }
+        }
+        roots.forEach(r => aligningPosition(r))
+        // 画线
+        const drowLine = (root: SkillNode, parent: SkillNode = null) => {
+            if (parent === null) {
+                root.children.forEach(c => drowLine(c , root))
+                return
+            }
+            const point1 = skillTreeSkewPostion.get(root) , point2 = skillTreeSkewPostion.get(parent)
+            this.SkillTreeGraphics.lineWidth = 10
+            this.SkillTreeGraphics.moveTo(point1.x , point1.y)
+            this.SkillTreeGraphics.lineTo(point2.x , point2.y)
+            this.SkillTreeGraphics.close()
+            this.SkillTreeGraphics.stroke();
+            this.SkillTreeGraphics.fill();
+            root.children.forEach(c => drowLine(c , root))
+        }
+        roots.forEach((r) => drowLine(r))
+        // 绘制技能节点
+        const renderSkill = async (skillNode: SkillNode) => {
+            skillNode.children.forEach(node => renderSkill(node))
+            const getMaskType = (node: SkillNode) => {
+                if (node.parent) {
+                    if (skillManager.data.getSkillLevel(node.parent.key) === 0) return "unlearn"
+                    if (skillManager.data.getSkillLevel(node.key) === 0) return "learn"
+                }
+                if (skillManager.data.getSkillLevel(node.key) === 0) return "learn"
+                return "none"
+            }
+            // 坐标
+            const pos = skillTreeSkewPostion.get(skillNode)
+            // 创建技能节点
+            const skillItemNode = await this.createdSkillItemNode(skillNode.key , [
+                skillManager.data.skills.indexOf(skillNode.key) !== -1 ? 
+                "unload" : "",
+                skillManager.data.getSkillLevel(skillNode.key) > 0 
+                &&
+                skillManager.data.skills.indexOf(skillNode.key) === -1? 
+                "eqiupment" : "",
+                skillManager.data.getSkillLevel(skillNode.key) > 0
+                && 
+                skillManager.data.getSkillLevel(skillNode.key) < 10 ?
+                "uplevel" : "",
+                skillManager.data.getSkillLevel(skillNode.key) === 0
+                &&
+                skillNode.parent
+                &&
+                skillManager.data.getSkillLevel(skillNode.parent.key) > 0 ?
+                "learn" : "",
+                skillManager.data.getSkillLevel(skillNode.key) === 0
+                &&
+                !skillNode.parent ?
+                "learn" : "",
+            ] , getMaskType(skillNode) as any)
+            skillContainerNode.addChild(skillItemNode)
+            skillItemNode.setPosition(pos.x , pos.y)
+        }
+        roots.forEach((r) => renderSkill(r))
+        // 触摸回调
+        let touching = false
+        const c1 = (e: EventTouch) => touching = true
+        const c2 = (e: EventTouch) => touching = false
+        const c3 = (e: EventTouch) => {
+            if (!touching) return
+            skillContainerNode.setPosition(skillContainerNode.x + e.getDelta().x, skillContainerNode.y + e.getDelta().y)
+        }
+        maskNode.on(NodeEventType.TOUCH_START , c1)
+        maskNode.on(NodeEventType.TOUCH_END , c2)
+        maskNode.on(NodeEventType.TOUCH_CANCEL , c2)
+        maskNode.on(NodeEventType.TOUCH_MOVE , c3)
+        this.removeTouchEvent = () => {
+            maskNode.off(NodeEventType.TOUCH_START , c1)
+            maskNode.off(NodeEventType.TOUCH_END , c2)
+            maskNode.off(NodeEventType.TOUCH_CANCEL , c2)
+            maskNode.off(NodeEventType.TOUCH_MOVE , c3)
+        }
+        return
     }
 
     // 创建技能节点
-    protected async createdSkillItemNode(prototype: string, btns: ("uplevel"|"unload"|"eqiupment"|"learn"|"")[]): Promise<Node> {
+    protected async createdSkillItemNode(
+        prototype: string, 
+        btns: ("uplevel"|"unload"|"eqiupment"|"learn"|"")[] , 
+        maskType: "learn"|"unLearn"|"none" = "none"): Promise<Node> {
         const canvasNode = find('Canvas')
         const resultNode = instantiate(this.SkillItemTempNode)
         const instance = new SkillInstance({
@@ -114,11 +226,12 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                         title: instance.proto.name,
                         icon: icon,
                         rightMessage:
-                            "Lv: " + instance.lv +
-                            "\n\n" +
+                            (instance.lv > 0 ? ("Lv: " + instance.lv + "\n\n") : "") +
                             instance.proto.description +
                             "\n\n\n" +
-                            LanguageManager.getEntry("LevelUp").getValue(settingManager.data.language) +
+                            (btns.indexOf("learn") !== -1 ?
+                            LanguageManager.getEntry("LevelUp").getValue(settingManager.data.language) :
+                            LanguageManager.getEntry("Learn").getValue(settingManager.data.language)) +
                             LanguageManager.getEntry("Material").getValue(settingManager.data.language) +
                             "\n\n" +
                             LanguageManager.getEntry("Gold").getValue(settingManager.data.language) +
@@ -138,7 +251,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                                 }
                             } : null ,
                             (btns.indexOf("eqiupment") !== -1) ?{
-                                label: LanguageManager.getEntry("Eqiupment").getValue(settingManager.data.language),
+                                label: LanguageManager.getEntry("Equipment").getValue(settingManager.data.language),
                                 callback: (close: Function) => {
                                     skillManager.data.equipSkill(prototype)
                                     close()
@@ -154,6 +267,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                                 label: LanguageManager.getEntry("Learn").getValue(settingManager.data.language),
                                 callback: (close: Function) => {
                                     skillManager.data.learnSkill(prototype)
+                                    close()
                                 }
                             } : null,
                         ],
@@ -174,6 +288,18 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
             icon,
             clickCallback
         )
+        // 设置技能节点mask
+        const maskNode = resultNode.getChildByName("Mask")
+        if (maskType === "learn") {
+            maskNode.active = true
+            maskNode.getComponent(Sprite).color = new Color(0,0,0,80)
+        } else if (maskType === "unLearn") {
+            maskNode.active = true
+            maskNode.addComponent(Button)
+            maskNode.getComponent(Sprite).color = new Color(0,0,0,255)
+        } else if (maskType === "none") {
+            maskNode.active = false
+        }
         return resultNode
     }
 

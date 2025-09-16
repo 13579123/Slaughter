@@ -48,7 +48,7 @@ class Iatrotechnics_Description extends LanguageEntry {
 
 @RegisterSkill("Iatrotechnics")
 @RegisterPlayerSkill("Iatrotechnics", "Brave")
-@RegisterSkillUpLevel("Iatrotechnics" , (lv: number) => ({gold: Math.pow(2 , lv) * 100 , diamond: lv * 50 + 100}))
+@RegisterSkillUpLevel("Iatrotechnics" , (lv: number) => ({gold: Math.pow(2 , lv) * 100 + 100 , diamond: lv * 50 + 150}))
 export class Iatrotechnics extends SkillPrototype {
 
     public get name(): string {
@@ -93,4 +93,53 @@ export class Iatrotechnics extends SkillPrototype {
 
 }
 
+@RegisterSkill("Root")
+@RegisterPlayerSkill("Root", "Brave")
+@RegisterSkillUpLevel("Root" , (lv: number) => ({gold: Math.pow(2 , lv) * 100 + 100 , diamond: lv * 50 + 150}))
+export class Root extends SkillPrototype {
 
+    public get name(): string {
+        return "Root"
+    }
+
+    public get description(): string {
+        return LanguageManager.getEntry("Iatrotechnics_Description").getValue(
+            settingManager.data.language,
+            { lv: this.instance.lv }
+        )
+    }
+
+    public icon(): Promise<SpriteFrame> {
+        return new Promise(async res => {
+            const assets = new CcNative.Asset.AssetManager("ModBaseResource")
+            res((await assets.load("Texture/Skill/Iatrotechnics/spriteFrame", SpriteFrame, true)).value)
+        })
+    }
+
+}
+
+
+@RegisterSkill("T")
+@RegisterPlayerSkill("T", "Brave" , "Iatrotechnics")
+@RegisterSkillUpLevel("T" , (lv: number) => ({gold: Math.pow(2 , lv) * 100 + 100 , diamond: lv * 50 + 150}))
+export class T extends SkillPrototype {
+
+    public get name(): string {
+        return "Test1"
+    }
+
+    public get description(): string {
+        return LanguageManager.getEntry("Iatrotechnics_Description").getValue(
+            settingManager.data.language,
+            { lv: this.instance.lv }
+        )
+    }
+
+    public icon(): Promise<SpriteFrame> {
+        return new Promise(async res => {
+            const assets = new CcNative.Asset.AssetManager("ModBaseResource")
+            res((await assets.load("Texture/Skill/Iatrotechnics/spriteFrame", SpriteFrame, true)).value)
+        })
+    }
+
+}

@@ -4,7 +4,7 @@ import { SkillPrototype } from "../../System/Core/Prototype/SkillPrototype";
 // k 技能key player 玩家key parent 父节点key
 type PlayerSkillClassDecorator = (k: string , player: string , parent?: string) => ClassDecorator
 
-class SkillNode {
+export class SkillNode {
     public constructor(
         public readonly key: string, // 技能key
         public readonly SkillPrototype: Constructor<SkillPrototype>, // 技能原型
@@ -15,57 +15,71 @@ class SkillNode {
     ) {
     }
 
-    // 递归寻找子节点
-    public findChildByKey(key: string): SkillNode {
-        for (let i = 0; i < this.children.length; i++) {
-            const child = this.children[i];
-            if (child.key === key) {
-                return child
-            }
-            let r = child.findChildByKey(key)
-            if (r) return r
-        }
-        return null
-    }
-
 }
 
+
+// 等待添加的回调
+const WaitAddNode = new Set<() => boolean>()
 // 所有玩家技能根节点
-const PlayerSkillRoot = new Map<string , SkillNode>()
+const PlayerSkillRoot = new Map<string , SkillNode[]>()
 // 玩家技能表
-const PlayerSkillTable = new Map<string , Array<string>>()
+const PlayerSkillTable = new Map<string , Array<SkillNode>>()
 
 // 注册到玩家技能表
 export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , player: string , parent?: string) => {
-    return (T) => {
-        // 寻找parent
-        const root = PlayerSkillRoot.get(player)
-        let parentNode = root ? root.findChildByKey(parent) : null
-        // 创建node
-        const node = new SkillNode( 
-            key , T as unknown as Constructor<SkillPrototype> , [] , 
-            player , parentNode ? parentNode.floor + 1 : 0 , parentNode 
-        )
-        // 添加到父节点
-        if (!parentNode) PlayerSkillRoot.set(player , node)
-        else parentNode.children.push(node)
-        // 添加到玩家技能表
-        const skills = PlayerSkillTable.get(player) || []
-        skills.push(key)
-        PlayerSkillTable.set(player , skills)
+    return (T: any) => {
+        // 注册为子技能
+        const registerToChild = () => {
+            const skillList = PlayerSkillTable.get(player) || []
+            for (let i = 0; i < skillList.length; i++) {
+                const skillNode = skillList[i];
+                if (skillNode.key === parent) {
+                    const node = new SkillNode(key , T , [] , player , skillNode.floor + 1 , skillNode)
+                    skillNode.children.push(node)
+                    const skillTable = PlayerSkillTable.get(player) || []
+                    PlayerSkillTable.set(player , skillTable)
+                    skillTable.push(node)
+                    foreach()
+                    return true
+                }
+            }
+            return false
+        }
+        const foreach = () => new Set(WaitAddNode).forEach(c => {
+            if (c()) WaitAddNode.delete(c)
+        })
+        // 注册为根技能
+        if (!parent) {
+            const roots = PlayerSkillRoot.get(player) || []
+            PlayerSkillRoot.set(player , roots)
+            const node = new SkillNode(key , T , [] , player , 0 , null)
+            roots.push(node)
+            const skillTable = PlayerSkillTable.get(player) || []
+            PlayerSkillTable.set(player , skillTable)
+            skillTable.push(node)
+            foreach()
+            return
+        } 
+        // 添加失败，等待添加，每次添加一个技能则尝试再次添加
+        if (!registerToChild()) WaitAddNode.add(registerToChild) 
     }
 }
 
 // 获取玩家技能树根节点
-export function getPlayerSkillRootNode(player: string): SkillNode {
-    return PlayerSkillRoot.get(player)
+export function getPlayerSkillRootsNode(player: string): SkillNode[] {
+    return PlayerSkillRoot.get(player) || []
 }
 
 // 判断技能是否属于某个角色
 export function isSkillBelongToPlayer(skill: string , player: string): boolean {
-    return PlayerSkillTable.get(player)?.indexOf(skill) !== -1
+    const skills = PlayerSkillTable.get(player)
+    let result = false
+    for (let i = 0; i < skills.length; i++) {
+        const s = skills[i];
+        if (skill === s.key) return true
+    }
+    return result
 }
-
 
 // 技能升级需要的材料
 type SkillUpLevelClassDecorator = (

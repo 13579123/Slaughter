@@ -5,6 +5,7 @@ import { message } from "../Message/Message";
 import { getSkillUpLevelMaterial, isSkillBelongToPlayer } from "../System/SkillConfig";
 import { characterManager } from "./CharacterManager";
 import { resourceManager } from "./ResourceManager";
+import { getSkillPrototype } from "../../System/Manager/SkillManager";
 
 class SkillManagerDTO {
 
@@ -26,17 +27,20 @@ class SkillManagerDTO {
 class SkillData {
 
     // 已经装备的技能
-    public skills: string[] = ["Iatrotechnics"];
+    public skills: string[] = [];
 
     // 所有技能等级
-    public skillLevel: {[key: string]: number} = {
-        "Iatrotechnics": 1
-    };
+    public skillLevel: {[key: string]: number} = {};
 
     constructor(data?: SkillManagerDTO) {
         if (data) {
             this.skills = data.skills;
             this.skillLevel = data.skillLevel;
+            // 剔除不存在的技能
+            for (let key in Object.keys(this.skillLevel)) {
+                if (getSkillPrototype(key) === null)
+                    delete this.skillLevel[key];
+            }
         }
         // 响应式更换角色时，重新获取技能
         characterManager.data.on("changeCharacter" , () => {
@@ -59,6 +63,7 @@ class SkillData {
                 index = i
         })
         if (index !== -1) this.skills.splice(index , 1)
+        skillManager.save()
     }
 
     // 装备技能
@@ -77,6 +82,7 @@ class SkillData {
         )
         if (is) this.skills.push(prototype)
         else message.toast("该技能不属于当前角色")
+        skillManager.save()
     }
 
     // 升级技能
@@ -109,7 +115,24 @@ class SkillData {
 
     // 学习技能
     public learnSkill(prototype: string) {
-        
+        // 获取升级材料
+        const upMaterial = getSkillUpLevelMaterial(prototype , 0)
+        if (upMaterial.gold > resourceManager.data.gold) {
+            message.toast("金币不足")
+            return
+        }
+        if (upMaterial.diamond > resourceManager.data.diamond) {
+            message.toast("钻石不足")
+            return
+        }
+        // 减少资源
+        resourceManager.data.reduceGold(upMaterial.gold)
+        resourceManager.data.reduceDiamond(upMaterial.diamond)
+        // 升级技能
+        this.skillLevel[prototype] = (this.skillLevel[prototype] || 0) + 1
+        // 保存
+        skillManager.save()
+        resourceManager.save()
     }
 
 }
