@@ -12,9 +12,9 @@ class CharacterManagerDTO {
 
     public lv: number = 1
 
-    public characters: CharacterDTO[] = []
+    public characters: string[] = ["Brave"]
 
-    public currentCharacter: CharacterDTO = null
+    public currentCharacter: string = "Brave"
 
     constructor(data?: CharacterData) {
         if (data) {
@@ -32,9 +32,9 @@ class CharacterData extends BaseEventManagerData<EventType> {
 
     public exp: number = 0
 
-    public characters: CharacterDTO[] = [{lv: 1 , prototype: "Brave" , extraProperty: {}}]
+    public characters: string[] = ["Brave"]
 
-    public currentCharacter: CharacterDTO = {lv: 1 , prototype: "Brave" , extraProperty: {}}
+    public currentCharacter: string = "Brave"
 
     constructor(data?: CharacterManagerDTO) {
         super()
@@ -87,20 +87,15 @@ class CharacterData extends BaseEventManagerData<EventType> {
 
     // 添加角色
     public addCharacter(prototype: string) {
-        const dto = { 
-            lv: 1 , 
-            prototype , 
-            extraProperty: {} 
-        }
-        this.characters.push(dto)
-        this.emit("addCharacter" , dto)
+        this.characters.push(prototype)
+        this.emit("addCharacter" , prototype)
     }
 
     // 切换角色
     public switchCharacter(prototype: string) {
         for (let i = 0; i < this.characters.length; i++) {
             const character = this.characters[i];
-            if (character.prototype === prototype) {
+            if (character === prototype) {
                 const old = this.currentCharacter
                 this.currentCharacter = character
                 this.emit("changeCharacter" , this.currentCharacter , old)

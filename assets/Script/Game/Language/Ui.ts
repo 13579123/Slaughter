@@ -481,3 +481,19 @@ import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
         }
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Learn")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "学习"
+        }
+
+        public get eng(): string {
+            return "Learn"
+        }
+
+        public get jpn(): string {
+            return "学習"
+        }
+    }
+})();

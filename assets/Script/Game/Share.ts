@@ -15,7 +15,7 @@ export function createPlayerInstance() {
             prototype: skillProto
         })),
         equipments: equipmentManager.data.equipment,
-        Proto: getCharacterPrototype(characterManager.data.currentCharacter.prototype),
+        Proto: getCharacterPrototype(characterManager.data.currentCharacter),
     })
 }
 

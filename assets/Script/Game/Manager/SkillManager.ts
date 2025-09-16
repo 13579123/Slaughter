@@ -73,7 +73,7 @@ class SkillData {
         }
         const is = isSkillBelongToPlayer(
             prototype , 
-            characterManager.data.currentCharacter.prototype
+            characterManager.data.currentCharacter
         )
         if (is) this.skills.push(prototype)
         else message.toast("该技能不属于当前角色")
@@ -105,6 +105,11 @@ class SkillData {
         // 保存
         skillManager.save()
         resourceManager.save()
+    }
+
+    // 学习技能
+    public learnSkill(prototype: string) {
+        
     }
 
 }
