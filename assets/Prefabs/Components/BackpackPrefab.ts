@@ -10,7 +10,7 @@ import { LanguageManager } from '../../Script/Module/Language/LanguageManager';
 import { settingManager } from '../../Script/Game/Manager/SettingManager';
 import { getEquipmentPrototype } from '../../Script/System/Manager/EquipmentManager';
 import { EquipmentDTO } from '../../Script/System/Core/Prototype/EquipmentPrototype';
-import { Ref } from '../../Script/Module/Rx/reactivity';
+import { ReactiveEffectRunner, Ref } from '../../Script/Module/Rx/reactivity';
 import { Rx } from '../../Script/Module/Rx';
 import { backpackManager } from '../../Script/Game/Manager/BackpackManager';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
@@ -69,42 +69,53 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
         containerNode.removeAllChildren()
         backpackManager.data.items.forEach(async dto => {
             if (dto.count === 0) return
-            const renderItem = (instance: ItemInstance) => {
-                const showDetail = async () => {
-                    const node = CcNative.instantiate(this.DetailInfoPrefab)
-                    node.getComponent(DetailInfoPrefab).setDetail({
+            const instance = new ItemInstance({
+                count: dto.count,
+                Proto: getItemPrototype(dto.prototype)
+            })
+            const sprite = await instance.proto.icon()
+            const node = CcNative.instantiate(this.EquipmentItemPrefab)
+            const equipmentItemPrefab = node.getComponent(EquipmentItemPrefab)
+            const effects: ReactiveEffectRunner[] = []
+            const detailNode = CcNative.instantiate(this.DetailInfoPrefab)
+            equipmentItemPrefab.setInfo(instance, async () => {
+                const effect = this.effect(() => {
+                    const instance = new ItemInstance({
+                        count: backpackManager.data.items.find(i => i.prototype === dto.prototype)?.count ?? 0,
+                        Proto: getItemPrototype(dto.prototype)
+                    })
+                    detailNode.getComponent(DetailInfoPrefab).setDetail({
                         content: [{
                             title: instance.proto.name,
-                            icon: await instance.proto.icon(),
-                            rightMessage: LanguageManager.getEntry("Count").getValue(settingManager.data.language)
-                                + instance.count,
+                            icon: sprite,
+                            rightMessage: LanguageManager.getEntry("Count")
+                                .getValue(settingManager.data.language) +
+                                " " +
+                                instance.count,
                             bottomMessage: instance.proto.description,
                             buttons: instance.proto.canUse ? [{
                                 label: LanguageManager.getEntry("Use").getValue(settingManager.data.language),
                                 callback: (close) => {
                                     backpackManager.data.useItem(instance, 1)
-                                    close()
-                                    // 再次展示详情
-                                    if (dto.count !== 0) showDetail()
+                                    const count = backpackManager.data.items.find(
+                                        i => i.prototype === dto.prototype
+                                    )?.count ?? 0
+                                    if (count <= 0) {
+                                        close()
+                                        effects.forEach(c => c())
+                                        effects.length = 0
+                                        return
+                                    }
                                 },
                             }] : []
                         }],
-                        closeCallback: () => canvasNode.removeChild(node)
+                        closeCallback: () => canvasNode.removeChild(detailNode)
                     })
-                    canvasNode.addChild(node)
-                }
-                const node = CcNative.instantiate(this.EquipmentItemPrefab)
-                const equipmentItemPrefab = node.getComponent(EquipmentItemPrefab)
-                equipmentItemPrefab.setInfo(instance , async () => {
-                    showDetail()
                 })
-                containerNode.addChild(node)
-            }
-            const instance = new ItemInstance({
-                count: dto.count,
-                Proto: getItemPrototype(dto.prototype)
+                canvasNode.addChild(detailNode)
+                effects.push(effect)
             })
-            renderItem(instance)
+            containerNode.addChild(node)
         })
     }
 
@@ -252,26 +263,25 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
             .getComponent(Label)
         label.string = ""
         const property = [
-            {key: "maxHp" , force: false , fixed: 0 , rate: 1 , exit: ""},
-            {key: "maxMp" , force: false , fixed: 0 , rate: 1 , exit: ""},
-            {key: "physicalAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "magicAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "lightAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "darkAttack" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "physicalDefense" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "magicDefense" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "lightResistance" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "darkResistance" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "physicalPenetration" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "magicPenetration" , force: false ,  fixed: 1 , rate: 1 , exit: ""},
-            {key: "criticalRate" , force: false , fixed: 1 , rate: 100 , exit: "%"},
-            {key: "criticalDamage" , force: false , fixed: 1 , rate: 100 , exit: "%"},
-            {key: "attackSpeed" , force: true , fixed: 2 , rate: 1 , exit: ""},
+            { key: "maxHp", force: false, fixed: 0, rate: 1, exit: "" },
+            { key: "maxMp", force: false, fixed: 0, rate: 1, exit: "" },
+            { key: "physicalAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "magicAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "lightAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "darkAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "physicalDefense", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "magicDefense", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "lightResistance", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "darkResistance", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "physicalPenetration", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "magicPenetration", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "criticalRate", force: false, fixed: 1, rate: 100, exit: "%" },
+            { key: "criticalDamage", force: false, fixed: 1, rate: 100, exit: "%" },
+            { key: "attackSpeed", force: true, fixed: 2, rate: 1, exit: "" },
         ]
         property.forEach(setting => {
-            label.string += `${
-                LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
-            }: ${Normal.number(characterInstance[setting.key] * setting.rate , setting.fixed , setting.force)}${setting.exit}\n`
+            label.string += `${LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
+                }: ${Normal.number(characterInstance[setting.key] * setting.rate, setting.fixed, setting.force)}${setting.exit}\n`
         })
         avatarSprite.spriteFrame = await characterInstance.proto.icon()
     }

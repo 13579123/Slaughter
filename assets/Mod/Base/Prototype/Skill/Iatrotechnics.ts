@@ -1,6 +1,6 @@
 import { log, SpriteFrame } from "cc";
 import { settingManager } from "db://assets/Script/Game/Manager/SettingManager";
-import { RegisterPlayerSkill } from "db://assets/Script/Game/System/SkillTree";
+import { RegisterPlayerSkill, RegisterSkillUpLevel } from "db://assets/Script/Game/System/SkillConfig";
 import { CcNative } from "db://assets/Script/Module/CcNative";
 import { LanguageEntry } from "db://assets/Script/Module/Language/LanguageEntry";
 import { LanguageManager, RegisterLanguageEntry } from "db://assets/Script/Module/Language/LanguageManager";
@@ -26,26 +26,29 @@ class Iatrotechnics_Name extends LanguageEntry {
     }
 
 }
-
 @RegisterLanguageEntry("Iatrotechnics_Description")
 class Iatrotechnics_Description extends LanguageEntry {
 
     public get chs(): string {
-        return `消耗${this.data.lv * 10 + 30}的魔法值，回复${this.data.lv * 4 + 5}%的生命值`;
+        return `<color=0E70FB>消耗: ${ this.data.lv * 10 + 30 } 魔法值</color>\n` + 
+        `恢复 ${ (this.data.lv - 1) * 3 + 5 }% 最大魔法值 ，最低回复 ${ (this.data.lv - 1) * 10 + 50 } 生命值`
     }
 
     public get eng(): string {
-        return `Consumes ${this.data.lv * 10 + 30} of magic value to recover ${this.data.lv * 4 + 5}% of health`
+        return `<color=0E70FB>Cost: ${ this.data.lv * 10 + 30 } MP</color>\n` + 
+        `Restore ${ (this.data.lv - 1) * 3 + 5 }% max MP, minimum ${ (this.data.lv - 1) * 10 + 50 } HP`
     }
 
     public get jpn(): string {
-        return `魔法値の${this.data.lv * 10 + 30}を消費して、${this.data.lv * 4 + 5}%の生命値を回復する`
+        return `<color=0E70FB>消費: ${ this.data.lv * 10 + 30 } MP</color>\n` +
+        `最大魔法値 ${ (this.data.lv - 1) * 3 + 5 }% 回復、最低 ${ (this.data.lv - 1) * 10 + 50 } 生命値 回復`
     }
 
 }
 
 @RegisterSkill("Iatrotechnics")
 @RegisterPlayerSkill("Iatrotechnics", "Brave")
+@RegisterSkillUpLevel("Iatrotechnics" , (lv: number) => ({gold: Math.pow(2 , lv) * 100 , diamond: lv * 50 + 100}))
 export class Iatrotechnics extends SkillPrototype {
 
     public get name(): string {
@@ -78,9 +81,11 @@ export class Iatrotechnics extends SkillPrototype {
     }
 
     public use(useOption: { use: CharacterInstance; }): void {
-        log(`使用 治疗术 回复了 ${useOption.use.maxHp * (this.instance.lv * 4 + 5) / 100} 生命值`)
         useOption.use.increaseHp({
-            increase: useOption.use.maxHp * (this.instance.lv * 4 + 5) / 100,
+            increase: Math.max(
+                useOption.use.maxHp * ((this.instance.lv - 1) * 3 + 5) / 100 , 
+                (this.instance.lv - 1) * 10 + 50
+            ),
             fromType: FromType.skill,
             from: useOption.use,
         })

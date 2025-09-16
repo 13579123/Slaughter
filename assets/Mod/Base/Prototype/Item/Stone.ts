@@ -43,7 +43,6 @@ export class Stone extends ItemPrototype {
     }
 
     public use(number: number) {
-        this.instance.count -= number
         backpackManager.data.reduceCount(getItemKey(Stone) , number)
         backpackManager.save()
     }

@@ -10,7 +10,10 @@ export function createPlayerInstance() {
     return new CharacterInstance({
         lv: characterManager.data.lv,
         buffs: [],
-        skills: skillManager.data.skills,
+        skills: skillManager.data.skills.map(skillProto => ({
+            lv: skillManager.data.skillLevel[skillProto],
+            prototype: skillProto
+        })),
         equipments: equipmentManager.data.equipment,
         Proto: getCharacterPrototype(characterManager.data.currentCharacter.prototype),
     })

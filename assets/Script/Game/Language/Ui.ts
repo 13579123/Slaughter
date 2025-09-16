@@ -128,6 +128,24 @@ import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
     }
 })();
 (function() {
+    @RegisterLanguageEntry("LevelUp")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "升级"
+        }
+
+        public get eng(): string {
+            return "Level Up"
+        }
+
+        public get jpn(): string {
+            return "レベルアップ"
+        }
+
+    }
+})();
+(function() {
     @RegisterLanguageEntry("Backpack")
     class _ extends LanguageEntry {
 
@@ -395,5 +413,71 @@ import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
             return "数量"
         }
 
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Levelup")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "升级"
+        }
+
+        public get eng(): string {
+            return "Levelup"
+        }
+
+        public get jpn(): string {
+            return "レベルアップ"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Gold")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "金币"
+        }
+
+        public get eng(): string {
+            return "Gold"
+        }
+
+        public get jpn(): string {
+            return "ゴールド"
+        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Diamond")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "钻石"
+        }
+
+        public get eng(): string {
+            return "Diamond"
+        }
+
+        public get jpn(): string {
+            return "ダイヤモンド"
+        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Material")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "材料"
+        }
+
+        public get eng(): string {
+            return "Material"
+        }
+
+        public get jpn(): string {
+            return "素材"
+        }
     }
 })();

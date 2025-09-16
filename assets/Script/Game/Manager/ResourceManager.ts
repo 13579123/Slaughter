@@ -1,8 +1,8 @@
 import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
-import { Manager } from "../../System/Manager";
+import { BaseEventManagerData, Manager } from "../../System/Manager";
 import { Config } from "../Config";
 
-type ResourceEvent = "goldChange" | "diamondChange"
+type EventType = "goldChange" | "diamondChange"
 
 class ResourcecDTO {
 
@@ -24,15 +24,15 @@ class ResourcecDTO {
     }
 }
 
-class ResourcecData {
+class ResourcecData extends BaseEventManagerData<EventType> {
 
-    protected _gold: number = 1000
+    protected _gold: number = 10000
 
     public get gold() {
         return this._gold
     }
 
-    protected _diamond: number = 0
+    protected _diamond: number = 1000
 
     public get diamond() {
         return this._diamond
@@ -44,16 +44,17 @@ class ResourcecData {
     }
 
     constructor(data?: ResourcecDTO) {
+        super()
         if (data) {
             this._gold = data.gold
             this._diamond = data.diamond 
             this.history = data.history
         }
-        this.registerResourceChangeListener("goldChange" , (num) => {
+        this.on("goldChange" , (num) => {
             if (num > 0) this.history.addGold += num
             else this.history.reduceGold -= num
         })
-        this.registerResourceChangeListener("diamondChange" , (num) => {
+        this.on("diamondChange" , (num) => {
             if (num > 0) this.history.addDiamond += num
             else this.history.reduceDiamond -= num
         })
@@ -61,31 +62,22 @@ class ResourcecData {
 
     addGold(value: number) {
         this._gold += value
-        this.resourceChangeListeners["goldChange"]?.forEach(callback => callback(value))
+        this.emit("goldChange" , value)
     }
 
     reduceGold(value: number) {
         this._gold -= value
-        this.resourceChangeListeners["goldChange"]?.forEach(callback => callback(-value))
+        this.emit("goldChange" , -value)
     }
 
     addDiamond(value: number) {
         this._diamond += value
-        this.resourceChangeListeners["diamondChange"]?.forEach(callback => callback(value))
+        this.emit("diamondChange" , value)
     }
 
     reduceDiamond(value: number) {
         this._diamond -= value
-        this.resourceChangeListeners["diamondChange"]?.forEach(callback => callback(-value))
-    }
-
-    protected resourceChangeListeners: { [key in ResourceEvent]?: Array<(num: number) => void> } = {}
-
-    registerResourceChangeListener(e: ResourceEvent , callback: (num: number) => void) {
-        if (!this.resourceChangeListeners[e]) {
-            this.resourceChangeListeners[e] = []
-        }
-        this.resourceChangeListeners[e]!.push(callback)
+        this.emit("diamondChange" , -value)
     }
 
 }

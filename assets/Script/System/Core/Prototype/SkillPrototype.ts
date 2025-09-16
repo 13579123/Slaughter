@@ -38,15 +38,6 @@ export class SkillPrototype {
             diamond: 0
         }
     }
-    // 升级消耗
-    public get upgradeMaterial() {
-        return {
-            gold: this.instance.lv * 1000,
-            diamond: this.instance.lv * 5
-        }
-    }
-    // 是否是被动
-    public get isPassive(): boolean { return false }
     // 保存对应的实例
     constructor(public readonly instance: EquipmentInstance) {
     }
@@ -61,9 +52,6 @@ export class SkillPrototype {
         } else if (reason == SkillFailReason.CoolDown) {
             log("冷却中" + (progress.coolTime / 1000).toFixed(2) + "s")
         }
-    }
-    // 挂载到角色身上生效
-    public load() {
     }
     // 使用技能回调
     public use(useOption: {

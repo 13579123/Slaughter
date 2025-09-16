@@ -38,6 +38,7 @@ export class DetailInfoPrefab extends ExtensionComponent {
         this.closeCallback = option.closeCallback
         const only = this.node.getChildByName("Only")
         const comparison = this.node.getChildByName("Comparison")
+        option.content = option.content.filter(item => item)
         if (option.content.length < 1) this.closeDetail()
         else if (option.content.length < 2) {
             only.active = true
@@ -68,9 +69,11 @@ export class DetailInfoPrefab extends ExtensionComponent {
         // 生成按钮
         const buttonsNode = settingNode.getChildByName("Buttons")
         const temp = buttonsNode.children[0]
+        buttonsNode.removeAllChildren()
         temp.parent = null
         if (container.buttons) {
             container.buttons.forEach((item, index) => {
+                if (!item) return
                 const button = instantiate(temp)
                 button.on(Button.EventType.CLICK, () => item.callback(this.closeDetail))
                 button.getChildByName("Label").getComponent(Label).string = item.label

@@ -1,5 +1,6 @@
 import { Constructor } from "cc";
 import { ItemPrototype } from "../Prototype/ItemPrototype";
+import { createId } from "../../../Game/Share";
 
 export type ItemInstanceOption = {
     // 物品数量
@@ -10,7 +11,7 @@ export type ItemInstanceOption = {
 
 export class ItemInstance {
 
-    public count: number = 0
+    public readonly count: number = 0
 
     public readonly proto: ItemPrototype = null
 

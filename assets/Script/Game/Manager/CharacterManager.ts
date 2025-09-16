@@ -1,10 +1,12 @@
 import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
 import { CharacterDTO } from "../../System/Core/Prototype/CharacterPrototype";
 import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
-import { Manager } from "../../System/Manager";
+import { BaseEventManagerData, Manager } from "../../System/Manager";
 import { getCharacterKey } from "../../System/Manager/CharacterManager";
 import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
+
+type EventType = "changeCharacter"|"addCharacter"|"addExp"
 
 class CharacterManagerDTO {
 
@@ -24,7 +26,7 @@ class CharacterManagerDTO {
 
 }
 
-class CharacterData {
+class CharacterData extends BaseEventManagerData<EventType> {
 
     public lv: number = 1
 
@@ -35,6 +37,7 @@ class CharacterData {
     public currentCharacter: CharacterDTO = {lv: 1 , prototype: "Brave" , extraProperty: {}}
 
     constructor(data?: CharacterManagerDTO) {
+        super()
         if (data) {
             this.lv = data.lv
             this.characters = data.characters
@@ -71,6 +74,7 @@ class CharacterData {
             return
         }
         this.exp += exp
+        this.emit("addExp" , exp)
         while (this.exp >= this.maxExp) {
             this.exp -= this.maxExp
             this.lv++
@@ -83,11 +87,13 @@ class CharacterData {
 
     // 添加角色
     public addCharacter(prototype: string) {
-        this.characters.push({ 
+        const dto = { 
             lv: 1 , 
             prototype , 
             extraProperty: {} 
-        })
+        }
+        this.characters.push(dto)
+        this.emit("addCharacter" , dto)
     }
 
     // 切换角色
@@ -95,7 +101,9 @@ class CharacterData {
         for (let i = 0; i < this.characters.length; i++) {
             const character = this.characters[i];
             if (character.prototype === prototype) {
+                const old = this.currentCharacter
                 this.currentCharacter = character
+                this.emit("changeCharacter" , this.currentCharacter , old)
                 return true
             }
         }

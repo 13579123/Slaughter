@@ -128,7 +128,6 @@ export class CharacterInstance extends CharacterInstanceProperty {
             else warn(`Can not found skill by prototype key: ${dto.prototype}`)
         })
         this.skills.push(...list)
-        list.forEach(skill => skill.proto.load())
     }
 
     // 触发战斗流程事件
