@@ -1,6 +1,6 @@
 import { _decorator, AudioSource, Component, Enum, Node } from 'cc';
-import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
 import { settingManager } from '../../Game/Manager/SettingManager';
+import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 const { ccclass, property, requireComponent } = _decorator;
 
 @ccclass('AutoAudioVolume')

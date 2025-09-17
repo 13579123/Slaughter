@@ -1,11 +1,10 @@
 import { _decorator, Component, Node } from 'cc';
-import { Iatrotechnics } from 'db://assets/Mod/Base/Skill/Iatrotechnics';
 import { UserBaseDataPrefab } from 'db://assets/Prefabs/Components/UserBaseDataPrefab';
 import { characterManager } from 'db://assets/Script/Game/Manager/CharacterManager';
 import { equipmentManager } from 'db://assets/Script/Game/Manager/EquipmentManager';
 import { createPlayerInstance } from 'db://assets/Script/Game/Share';
-import ExtensionComponent from 'db://assets/Script/Module/Extension/Component/ExtensionComponent';
-import { Rx } from 'db://assets/Script/Module/Rx';
+import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
+import { Rx } from 'db://assets/Module/Rx';
 import { CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
 import { getCharacterPrototype } from 'db://assets/Script/System/Manager/CharacterManager';
 import { getSkillKey, getSkillPrototype } from 'db://assets/Script/System/Manager/SkillManager';

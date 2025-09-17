@@ -1,5 +1,5 @@
 import { _decorator, Component, find, Node, Prefab } from 'cc';
-import { CcNative } from 'db://assets/Script/Module/CcNative';
+import { CcNative } from 'db://assets/Module/CcNative';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasUi')

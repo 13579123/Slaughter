@@ -1,4 +1,4 @@
-import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
+import { LanguageType, AllLanguageType } from "db://assets/Module/Language/LangaugeType";
 import { Manager } from "../../System/Manager";
 import { Config } from "../Config";
 

@@ -1,4 +1,3 @@
-import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
 import { EquipmentDTO, EquipmentQuality } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Manager } from "../../System/Manager";
 import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";

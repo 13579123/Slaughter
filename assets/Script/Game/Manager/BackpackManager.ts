@@ -1,14 +1,7 @@
-import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
-import { CharacterDTO } from "../../System/Core/Prototype/CharacterPrototype";
-import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Manager } from "../../System/Manager";
-import { getCharacterKey } from "../../System/Manager/CharacterManager";
-import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
 import { ItemDTO } from "../../System/Core/Prototype/ItemPrototype";
-import { error } from "cc";
 import { ItemInstance } from "../../System/Core/Instance/ItemInstance";
-import { getItemKey } from "../../System/Manager/ItemManager";
 
 class BackpackDTO {
 

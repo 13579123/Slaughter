@@ -1,21 +1,22 @@
-import { _decorator, Color, Component, find, Label, Node, Prefab, RichText, ScrollView, Sprite, SpriteFrame } from 'cc';
-import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
-import { equipmentManager } from '../../Script/Game/Manager/EquipmentManager';
-import { EquipmentItemPrefab } from './EquipmentItemPrefab';
-import { createPlayerInstance } from '../../Script/Game/Share';
-import { CcNative } from '../../Script/Module/CcNative';
-import { DetailInfoPrefab } from './DetailInfoPrefab';
-import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
-import { LanguageManager } from '../../Script/Module/Language/LanguageManager';
-import { settingManager } from '../../Script/Game/Manager/SettingManager';
-import { getEquipmentPrototype } from '../../Script/System/Manager/EquipmentManager';
-import { EquipmentDTO } from '../../Script/System/Core/Prototype/EquipmentPrototype';
-import { ReactiveEffectRunner, Ref } from '../../Script/Module/Rx/reactivity';
-import { Rx } from '../../Script/Module/Rx';
-import { backpackManager } from '../../Script/Game/Manager/BackpackManager';
-import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
-import { getItemKey, getItemPrototype } from '../../Script/System/Manager/ItemManager';
-import { Normal } from '../../Script/System/Normal';
+import { _decorator, Prefab, Sprite, Color, find, ScrollView, Label } from "cc";
+import { CcNative } from "../../Module/CcNative";
+import ExtensionComponent from "../../Module/Extension/Component/ExtensionComponent";
+import { LanguageManager } from "../../Module/Language/LanguageManager";
+import { Rx } from "../../Module/Rx";
+import { ReactiveEffectRunner } from "../../Module/Rx/reactivity";
+import { backpackManager } from "../../Script/Game/Manager/BackpackManager";
+import { equipmentManager } from "../../Script/Game/Manager/EquipmentManager";
+import { settingManager } from "../../Script/Game/Manager/SettingManager";
+import { createPlayerInstance } from "../../Script/Game/Share";
+import { EquipmentInstance } from "../../Script/System/Core/Instance/EquipmentInstance";
+import { ItemInstance } from "../../Script/System/Core/Instance/ItemInstance";
+import { EquipmentDTO } from "../../Script/System/Core/Prototype/EquipmentPrototype";
+import { getEquipmentPrototype } from "../../Script/System/Manager/EquipmentManager";
+import { getItemPrototype } from "../../Script/System/Manager/ItemManager";
+import { Normal } from "../../Script/System/Normal";
+import { DetailInfoPrefab } from "./DetailInfoPrefab";
+import { EquipmentItemPrefab } from "./EquipmentItemPrefab";
+
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasBackpack')

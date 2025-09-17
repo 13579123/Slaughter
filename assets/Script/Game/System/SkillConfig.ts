@@ -24,10 +24,14 @@ const WaitAddNode = new Set<() => boolean>()
 const PlayerSkillRoot = new Map<string , SkillNode[]>()
 // 玩家技能表
 const PlayerSkillTable = new Map<string , Array<SkillNode>>()
+// 玩家技能树每一层的技能数量
+const PlayerSkillTreeFloor = new Map<string , Array<number>>()
 
 // 注册到玩家技能表
 export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , player: string , parent?: string) => {
     return (T: any) => {
+        const playerSkillTreeFloor = PlayerSkillTreeFloor.get(player) || []
+        PlayerSkillTreeFloor.set(player , playerSkillTreeFloor)
         // 注册为子技能
         const registerToChild = () => {
             const skillList = PlayerSkillTable.get(player) || []
@@ -39,6 +43,7 @@ export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , pla
                     const skillTable = PlayerSkillTable.get(player) || []
                     PlayerSkillTable.set(player , skillTable)
                     skillTable.push(node)
+                    playerSkillTreeFloor[skillNode.floor + 1] = (playerSkillTreeFloor[skillNode.floor + 1] || 0) + 1
                     foreach()
                     return true
                 }
@@ -57,6 +62,7 @@ export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , pla
             const skillTable = PlayerSkillTable.get(player) || []
             PlayerSkillTable.set(player , skillTable)
             skillTable.push(node)
+            playerSkillTreeFloor[0] = (playerSkillTreeFloor[0] || 0) + 1
             foreach()
             return
         } 
@@ -79,6 +85,11 @@ export function isSkillBelongToPlayer(skill: string , player: string): boolean {
         if (skill === s.key) return true
     }
     return result
+}
+
+// 获取玩家技能树层级
+export function getPlayerSkillTreeFloor(player: string): number[] {
+    return PlayerSkillTreeFloor.get(player) || []
 }
 
 // 技能升级需要的材料

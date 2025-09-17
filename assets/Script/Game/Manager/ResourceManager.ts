@@ -1,4 +1,3 @@
-import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
 import { BaseEventManagerData, Manager } from "../../System/Manager";
 import { Config } from "../Config";
 

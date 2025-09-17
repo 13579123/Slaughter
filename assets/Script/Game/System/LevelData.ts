@@ -3,7 +3,7 @@ import { CharacterInstance } from "../../System/Core/Instance/CharacterInstance"
 import { MapEventDTO } from "../../System/Core/Prototype/MapEventPrototype";
 import { MapEventInstance } from "../../System/Core/Instance/MapEventInstance";
 import { getMapEventPrototype } from "../../System/Manager/MapEventManager";
-import { Rx } from "../../Module/Rx";
+import { Rx } from "..//Rx";
 
 // 战斗数据参数
 export type LevelDataOption = {

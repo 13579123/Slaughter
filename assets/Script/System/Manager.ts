@@ -1,6 +1,6 @@
 import { Constructor } from "cc"
-import { CcNative } from "../Module/CcNative"
-import { Rx } from "../Module/Rx"
+import { CcNative } from "../../Module/CcNative"
+import { Rx } from "../../Module/Rx"
 
 export type ManagerOption<T> = {
     // 是否加密

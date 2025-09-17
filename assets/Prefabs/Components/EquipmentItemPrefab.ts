@@ -1,10 +1,9 @@
 import { _decorator, Component, Node, Sprite, SpriteFrame, Enum, Prefab, Label } from 'cc';
-import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
 import { EquipmentQuality } from '../../Script/System/Core/Prototype/EquipmentPrototype';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
-import { CcNative } from '../../Script/Module/CcNative';
 import { DetailInfoPrefab } from './DetailInfoPrefab';
+import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
 const { ccclass, property } = _decorator;
 
 @ccclass('EquipmentItemPrefab')

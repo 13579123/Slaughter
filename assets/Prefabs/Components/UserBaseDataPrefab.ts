@@ -1,11 +1,11 @@
 import { _decorator, Component, Label, Node, Sprite } from 'cc';
 const { ccclass, property } = _decorator;
-import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
-import { ModuleProgressPrefab } from '../../Script/Module/Prefabs/ModuleProgressPrefab';
-import { CharacterInstance } from '../../Script/System/Core/Instance/CharacterInstance';
-import { characterManager } from '../../Script/Game/Manager/CharacterManager';
-import { ReactiveEffectRunner } from '../../Script/Module/Rx/reactivity';
 import { Normal } from '../../Script/System/Normal';
+import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
+import { ModuleProgressPrefab } from '../../Module/Prefabs/ModuleProgressPrefab';
+import { ReactiveEffectRunner } from '../../Module/Rx/reactivity';
+import { characterManager } from '../../Script/Game/Manager/CharacterManager';
+import { CharacterInstance } from '../../Script/System/Core/Instance/CharacterInstance';
 
 @ccclass('UserBaseDataPrefab')
 export class UserBaseDataPrefab extends ExtensionComponent {

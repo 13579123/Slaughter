@@ -1,8 +1,7 @@
 import { _decorator, Component, Label, Node } from 'cc';
-import { Rx } from '../../Module/Rx';
-import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
+import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
+import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
 import { settingManager } from '../../Game/Manager/SettingManager';
-import { LanguageManager } from '../../Module/Language/LanguageManager';
 const { ccclass, property, requireComponent } = _decorator;
 
 @ccclass('AutoTransformLabel')

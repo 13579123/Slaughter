@@ -1,9 +1,9 @@
 import { _decorator, Component, Node, SpriteFrame } from 'cc';
 import { backpackManager } from 'db://assets/Script/Game/Manager/BackpackManager';
 import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
-import { CcNative } from 'db://assets/Script/Module/CcNative';
-import { LanguageEntry } from 'db://assets/Script/Module/Language/LanguageEntry';
-import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Script/Module/Language/LanguageManager';
+import { CcNative } from 'db://assets/Module/CcNative';
+import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
+import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Module/Language/LanguageManager';
 import { ItemPrototype } from 'db://assets/Script/System/Core/Prototype/ItemPrototype';
 import { getItemKey, RegisterItem } from 'db://assets/Script/System/Manager/ItemManager';
 const { ccclass, property } = _decorator;

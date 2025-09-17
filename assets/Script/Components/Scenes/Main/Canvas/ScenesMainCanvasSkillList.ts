@@ -5,11 +5,11 @@ import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { skillManager } from 'db://assets/Script/Game/Manager/SkillManager';
 import { message } from 'db://assets/Script/Game/Message/Message';
 import { createPlayerInstance } from 'db://assets/Script/Game/Share';
-import { getPlayerSkillRootsNode, getSkillUpLevelMaterial, SkillNode } from 'db://assets/Script/Game/System/SkillConfig';
-import { CcNative } from 'db://assets/Script/Module/CcNative';
-import ExtensionComponent from 'db://assets/Script/Module/Extension/Component/ExtensionComponent';
-import { LanguageManager } from 'db://assets/Script/Module/Language/LanguageManager';
-import { ReactiveEffect, ReactiveEffectRunner } from 'db://assets/Script/Module/Rx/reactivity';
+import { getPlayerSkillRootsNode, getPlayerSkillTreeFloor, getSkillUpLevelMaterial, SkillNode } from 'db://assets/Script/Game/System/SkillConfig';
+import { CcNative } from 'db://assets/Module/CcNative';
+import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
+import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
+import { ReactiveEffect, ReactiveEffectRunner } from 'db://assets/Module/Rx/reactivity';
 import { SkillInstance } from 'db://assets/Script/System/Core/Instance/SkillInstance';
 import { getSkillKey, getSkillPrototype } from 'db://assets/Script/System/Manager/SkillManager';
 const { ccclass, property } = _decorator;
@@ -55,7 +55,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
         skillManager.data.skills.forEach(async (proto, i) => {
             // 创建技能节点
             const skillItemNode = await this.createdSkillItemNode(proto , [
-                skillManager.data.getSkillLevel(proto) <= 10 ? "uplevel" : "",
+                skillManager.data.getSkillLevel(proto) < 10 ? "uplevel" : "",
                 "unload"
             ])
             // 添加技能节点
@@ -99,7 +99,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
         // 生成技能节点坐标
         skillTreeToMatrix.forEach((list, y) => {
             list?.forEach((skillNode, x) => {
-                skillTreeSkewPostion.set(skillNode, { x: -90 + x * 190, y: 90 - y * 190 })
+                skillTreeSkewPostion.set(skillNode, { x: -180 + x * 190, y: 180 - y * 190 })
             })
         })
         // 开始坐标对齐
@@ -137,6 +137,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
         // 绘制技能节点
         const renderSkill = async (skillNode: SkillNode) => {
             skillNode.children.forEach(node => renderSkill(node))
+            // 获取技能覆盖情况
             const getMaskType = (node: SkillNode) => {
                 if (node.parent) {
                     if (skillManager.data.getSkillLevel(node.parent.key) === 0) return "unlearn"
@@ -174,13 +175,25 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
             skillItemNode.setPosition(pos.x , pos.y)
         }
         roots.forEach((r) => renderSkill(r))
+        // 获取最大技能宽高
+        const floors = getPlayerSkillTreeFloor(characterManager.data.currentCharacter)
+        let maxWidth = 0 , maxHeight = floors.length
+        floors.forEach(floor => { maxWidth = Math.max(maxWidth , floor) })
         // 触摸回调
         let touching = false
+        const movePos = { x : 0 , y : 0 }
         const c1 = (e: EventTouch) => touching = true
         const c2 = (e: EventTouch) => touching = false
         const c3 = (e: EventTouch) => {
             if (!touching) return
-            skillContainerNode.setPosition(skillContainerNode.x + e.getDelta().x, skillContainerNode.y + e.getDelta().y)
+            const pos = e.getDelta()
+            movePos.x += pos.x
+            movePos.y += pos.y
+            if (movePos.x > 0) movePos.x = 0
+            if (movePos.y < 0) movePos.y = 0
+            if (movePos.x < -maxWidth * 190 + 560) movePos.x = -maxWidth * 190 + 560
+            if (movePos.y > maxHeight * 190 - 300) movePos.y = maxHeight * 190 - 300
+            skillContainerNode.setPosition( movePos.x , movePos.y )
         }
         maskNode.on(NodeEventType.TOUCH_START , c1)
         maskNode.on(NodeEventType.TOUCH_END , c2)
@@ -261,6 +274,9 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                                 label: LanguageManager.getEntry("Levelup").getValue(settingManager.data.language),
                                 callback: (close: Function) => {
                                     skillManager.data.upgradeSkill(prototype)
+                                    if (skillManager.data.getSkillLevel(prototype) >= 10) {
+                                        close()
+                                    }
                                 }
                             } : null,
                             (btns.indexOf("learn") !== -1) ? {

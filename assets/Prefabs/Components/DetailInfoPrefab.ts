@@ -1,9 +1,8 @@
 import { _decorator, Button, Component, instantiate, Label, Node, NodeEventType, RichText, ScrollView, Sprite, SpriteFrame } from 'cc';
-import { Extension } from '../../Script/Module/Extension';
-import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';
 import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
 import { EquipmentItemPrefab } from './EquipmentItemPrefab';
+import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
 const { ccclass, property } = _decorator;
 
 type DetailContainer = {

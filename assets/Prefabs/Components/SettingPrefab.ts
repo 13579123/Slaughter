@@ -1,10 +1,10 @@
 import { _decorator, Component, Node, Prefab, Slider } from 'cc';
 import { settingManager } from '../../Script/Game/Manager/SettingManager';
-import { CcNative } from '../../Script/Module/CcNative';
-import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
-import { AllLanguageTypeTranslation, LanguageType } from '../../Script/Module/Language/LangaugeType';
-import { LoadingManager } from '../../Script/Module/Manager/LoadingManager';
-import { ModuleDropListPrefab } from '../../Script/Module/Prefabs/ModuleDropListPrefab';
+import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
+import { CcNative } from '../../Module/CcNative';
+import { AllLanguageTypeTranslation, LanguageType } from '../../Module/Language/LangaugeType';
+import { LoadingManager } from '../../Module/Manager/LoadingManager';
+import { ModuleDropListPrefab } from '../../Module/Prefabs/ModuleDropListPrefab';
 const { ccclass, property } = _decorator;
 
 @ccclass('SettingPrefab')

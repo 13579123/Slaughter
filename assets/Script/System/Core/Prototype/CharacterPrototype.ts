@@ -39,6 +39,17 @@ export enum FromType {
     skillCost = "skillCost"
 }
 
+export type AnimationConfig = {
+    // 动画名称
+    animations: {
+        attack: string,
+        move: string,
+        idle: string,
+    },
+    // 动画帧事件回调
+    frameEvent?: (e: string) => void,
+}
+
 export class CharacterPrototype {
     // 名称信息
     public get name(): string { return "Character Name" }
@@ -48,6 +59,16 @@ export class CharacterPrototype {
     public readonly growProperty: BasePrototypeProperty = new BasePrototypeProperty();
     // 基础属性
     public readonly baseProperty: BasePrototypeProperty = new BasePrototypeProperty();
+    // 动画配置
+    public get animation(): AnimationConfig {
+        return {
+            animations: {
+                attack: "Attack01",
+                move: "Run",
+                idle: "Idle",
+            },
+        }
+    }
     // 保存对应的实例
     constructor(public readonly instance: CharacterInstance) {
     }

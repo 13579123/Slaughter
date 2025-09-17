@@ -1,7 +1,7 @@
 import { _decorator, Component, Label, Node } from 'cc';
-import ExtensionComponent from '../../Script/Module/Extension/Component/ExtensionComponent';
 import { resourceManager } from '../../Script/Game/Manager/ResourceManager';
 import { Normal } from '../../Script/System/Normal';
+import ExtensionComponent from '../../Module/Extension/Component/ExtensionComponent';
 const { ccclass, property } = _decorator;
 
 @ccclass('DiamondResourcePrefab')

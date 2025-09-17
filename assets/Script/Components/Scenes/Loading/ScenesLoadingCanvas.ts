@@ -1,6 +1,6 @@
 import { _decorator, Component, director, Label, Node } from 'cc';
-import { LoadingManager } from '../../../Module/Manager/LoadingManager';
-import { ModuleProgressPrefab } from '../../../Module/Prefabs/ModuleProgressPrefab';
+import { LoadingManager } from 'db://assets/Module/Manager/LoadingManager';
+import { ModuleProgressPrefab } from 'db://assets/Module/Prefabs/ModuleProgressPrefab';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesLoadingCanvas')

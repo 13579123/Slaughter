@@ -1,5 +1,5 @@
-import { LanguageEntry } from "../../Module/Language/LanguageEntry";
-import { RegisterLanguageEntry } from "../../Module/Language/LanguageManager";
+import { LanguageEntry } from "db://assets/Module/Language/LanguageEntry";
+import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManager";
 
 (function() {
     @RegisterLanguageEntry("maxHp")

@@ -1,4 +1,3 @@
-import { AllLanguageType, LanguageType } from "../../Module/Language/LangaugeType";
 import { CharacterDTO } from "../../System/Core/Prototype/CharacterPrototype";
 import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
 import { BaseEventManagerData, Manager } from "../../System/Manager";

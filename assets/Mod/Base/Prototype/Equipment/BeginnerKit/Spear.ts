@@ -1,8 +1,8 @@
 import { SpriteFrame } from 'cc';
 import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
-import { CcNative } from 'db://assets/Script/Module/CcNative';
-import { LanguageEntry } from 'db://assets/Script/Module/Language/LanguageEntry';
-import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Script/Module/Language/LanguageManager';
+import { CcNative } from 'db://assets/Module/CcNative';
+import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
+import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Module/Language/LanguageManager';
 import { BasePrototypeProperty } from 'db://assets/Script/System/Core/Property/BasePrototypeProperty';
 import { EquipmentPrototype, EquipmentType, getQualityColor, getQualityName } from 'db://assets/Script/System/Core/Prototype/EquipmentPrototype';
 import { RegisterEquipment } from 'db://assets/Script/System/Manager/EquipmentManager';
