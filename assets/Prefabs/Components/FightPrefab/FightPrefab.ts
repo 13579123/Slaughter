@@ -44,7 +44,7 @@ export class FightPrefab extends ExtensionComponent {
         this.leftCharacter = option.leftCharacter
         this.rightCharacter = option.rightCharacter
         // 创建角色
-        await this.createCharacter()
+        await this.createCharacter(option.player)
         // 两边角色播放入场动画
         await Promise.all([
             this.leftCharacterPrefab.characterEnter(), 
@@ -56,17 +56,17 @@ export class FightPrefab extends ExtensionComponent {
     }
 
     // 创建两个角色
-    protected async createCharacter() {
+    protected async createCharacter(playerPos = "left") {
         // 左侧
         const leftNode = CcNative.instantiate(this.CharacterPrefab)
         const leftCharacterPrefab = leftNode.getComponent(FightCharacterPrefab)
-        await leftCharacterPrefab.bindCharacter(this.leftCharacter , "left")
+        await leftCharacterPrefab.bindCharacter(this.leftCharacter , "left" , playerPos !== "left")
         this.node.getChildByName("LeftCharacterContainer").addChild(leftNode)
         this.leftCharacterPrefab = leftCharacterPrefab
         // 右侧
         const rightNode = CcNative.instantiate(this.CharacterPrefab)
         const rightCharacterPrefab = rightNode.getComponent(FightCharacterPrefab)
-        await rightCharacterPrefab.bindCharacter(this.rightCharacter , "right")
+        await rightCharacterPrefab.bindCharacter(this.rightCharacter , "right" , playerPos !== "right")
         this.node.getChildByName("RightCharacterContainer").addChild(rightNode)
         this.rightCharacterPrefab = rightCharacterPrefab
     }
