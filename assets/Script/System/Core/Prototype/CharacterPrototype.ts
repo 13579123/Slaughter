@@ -45,9 +45,14 @@ export type AnimationConfig = {
         attack: string,
         move: string,
         idle: string,
+        skill: string,
+        die: string,
     },
-    // 动画帧事件回调
-    frameEvent?: (e: string) => void,
+    // 动画帧生效事件名称
+    animationFrameName: {
+        attack: string,
+        skill: string,
+    },
 }
 
 export class CharacterPrototype {
@@ -66,7 +71,13 @@ export class CharacterPrototype {
                 attack: "Attack01",
                 move: "Run",
                 idle: "Idle",
+                skill: "Attack02",
+                die: "Die"
             },
+            animationFrameName: {
+                attack: "attack",
+                skill: "skill"
+            }
         }
     }
     // 保存对应的实例

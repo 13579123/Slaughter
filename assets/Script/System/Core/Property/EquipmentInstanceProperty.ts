@@ -95,16 +95,14 @@ export class EquipmentInstanceProperty extends BaseInstanceProperty {
     // 暴击率 0 - 1
     public get criticalRate(): number {
         const base = this.proto.baseProperty.criticalRate
-        const grow = Math.floor(this.lv / 3)
         const extra = this.extraProperty.criticalRate || 0
-        return base + grow + extra
+        return base + extra
     }
     // 暴击伤害
     public get criticalDamage(): number {
         const base = this.proto.baseProperty.criticalDamage * (1 + this.quality / 10)
-        const grow = this.proto.growProperty.criticalDamage * (this.lv - 1)
         const extra = this.extraProperty.criticalDamage || 0
-        return base + grow + extra
+        return base + extra
     }
     // 攻击速度
     public get attackSpeed(): number {

@@ -14,6 +14,7 @@ export class SpineAnimation extends sp.Skeleton {
     public playAnimation(name: string, option: AnimationOption = {}): Promise<void> {
         let count = option.count || -1
         let speed = option.speed || 1
+        const temScale = this.timeScale
         this.timeScale = speed
         return new Promise(res => {
             this.clearAnimation(0)
@@ -21,7 +22,10 @@ export class SpineAnimation extends sp.Skeleton {
             this.setCompleteListener(() => {
                 if (count === -1) return
                 if (count > 0) count--
-                if (count === 0) return res()
+                if (count === 0) {
+                    this.timeScale = temScale
+                    return res()
+                }
             })
         })
     }

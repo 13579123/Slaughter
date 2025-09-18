@@ -1,5 +1,6 @@
 import { BuffInstance } from '../Instance/BuffInstance';
 import { EquipmentInstance } from '../Instance/EquipmentInstance';
+import { SkillInstance } from '../Instance/SkillInstance';
 import { CharacterPrototype } from '../Prototype/CharacterPrototype';
 import { EquipmentDTO } from '../Prototype/EquipmentPrototype';
 import { BaseInstanceProperty } from './BaseInstanceProperty';
@@ -18,6 +19,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
 
     // buff列表
     public buffs: BuffInstance[] = []
+
+    // 技能列表
+    public skills: SkillInstance[] = []
 
     // 装备列表
     public equipments: CharacterEquipment = {
@@ -200,7 +204,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.criticalRate || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => eq ? sum + eq.criticalRate : sum, 0)
+            .reduce((sum, eq) => {
+                return eq ? (sum + eq.criticalRate) : sum
+            } , 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.criticalRate ? sum + bf.extraProperty.criticalRate : sum, 0)
         return base + grow + extra + equip + buff
@@ -214,15 +220,17 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .map(k => this.equipments[k])
             .reduce((sum, eq) => eq ? sum + eq.criticalDamage : sum, 0)
         const buff = this.buffs
-            .reduce((sum, bf) => bf.extraProperty.criticalDamage ? sum + bf.extraProperty.criticalDamage : sum, 0)
+            .reduce((sum, bf) => bf.extraProperty.criticalDamage ? sum + bf.extraProperty.criticalDamage : sum , 0)
         return base + grow + extra + equip + buff
     }
     // 攻击速度
     public get attackSpeed(): number {
+        const buff = this.buffs
+            .reduce((sum, bf) => bf.extraProperty.attackSpeed ? sum + bf.extraProperty.attackSpeed : sum, 0)
         if (this.equipments.weapon) {
-            return this.equipments.weapon.attackSpeed
+            return Math.max(0.4 , Math.min(this.equipments.weapon.attackSpeed + buff , 3))
         } else {
-            return 1
+            return Math.max(0.4 , Math.min(1 + buff , 3))
         }
     }
 

@@ -2,7 +2,7 @@ import { Constructor, log } from "cc";
 import { SkillPrototype } from "../../System/Core/Prototype/SkillPrototype";
 
 // k 技能key player 玩家key parent 父节点key
-type PlayerSkillClassDecorator = (k: string , player: string , parent?: string) => ClassDecorator
+type PlayerSkillClassDecorator = (key: string , player: string , isPassive?: boolean , parent?: string) => ClassDecorator
 
 export class SkillNode {
     public constructor(
@@ -12,6 +12,7 @@ export class SkillNode {
         public readonly player: string, // 所属玩家
         public readonly floor: number, // 层数
         public readonly parent: SkillNode, // 父节点
+        public readonly isPassive: boolean, // 是否被动
     ) {
     }
 
@@ -28,7 +29,7 @@ const PlayerSkillTable = new Map<string , Array<SkillNode>>()
 const PlayerSkillTreeFloor = new Map<string , Array<number>>()
 
 // 注册到玩家技能表
-export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , player: string , parent?: string) => {
+export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , player: string , isPassive: boolean = false , parent?: string) => {
     return (T: any) => {
         const playerSkillTreeFloor = PlayerSkillTreeFloor.get(player) || []
         PlayerSkillTreeFloor.set(player , playerSkillTreeFloor)
@@ -38,7 +39,7 @@ export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , pla
             for (let i = 0; i < skillList.length; i++) {
                 const skillNode = skillList[i];
                 if (skillNode.key === parent) {
-                    const node = new SkillNode(key , T , [] , player , skillNode.floor + 1 , skillNode)
+                    const node = new SkillNode(key , T , [] , player , skillNode.floor + 1 , skillNode , isPassive)
                     skillNode.children.push(node)
                     const skillTable = PlayerSkillTable.get(player) || []
                     PlayerSkillTable.set(player , skillTable)
@@ -57,7 +58,7 @@ export const RegisterPlayerSkill: PlayerSkillClassDecorator = (key: string , pla
         if (!parent) {
             const roots = PlayerSkillRoot.get(player) || []
             PlayerSkillRoot.set(player , roots)
-            const node = new SkillNode(key , T , [] , player , 0 , null)
+            const node = new SkillNode(key , T , [] , player , 0 , null , isPassive)
             roots.push(node)
             const skillTable = PlayerSkillTable.get(player) || []
             PlayerSkillTable.set(player , skillTable)
@@ -83,6 +84,26 @@ export function isSkillBelongToPlayer(skill: string , player: string): boolean {
     for (let i = 0; i < skills.length; i++) {
         const s = skills[i];
         if (skill === s.key) return true
+    }
+    return result
+}
+
+// 获取玩家所有被动技能
+export function getPlayerAllPassiveSkills(player: string): string[] {
+    const skills = PlayerSkillTable.get(player) || []
+    return skills.map(skill => {
+        if (skill.isPassive) return skill.key
+        else return void 0
+    }).filter(skill => skill)
+}
+
+// 判断技能是否为被动技能
+export function isSkillPassive(player: string , skill: string): boolean {
+    const skills = PlayerSkillTable.get(player) || []
+    let result = false
+    for (let i = 0; i < skills.length; i++) {
+        const s = skills[i];
+        if (skill === s.key) return s.isPassive
     }
     return result
 }

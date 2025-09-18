@@ -5,7 +5,7 @@ import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { skillManager } from 'db://assets/Script/Game/Manager/SkillManager';
 import { message } from 'db://assets/Script/Game/Message/Message';
 import { createPlayerInstance } from 'db://assets/Script/Game/Share';
-import { getPlayerSkillRootsNode, getPlayerSkillTreeFloor, getSkillUpLevelMaterial, SkillNode } from 'db://assets/Script/Game/System/SkillConfig';
+import { getPlayerSkillRootsNode, getPlayerSkillTreeFloor, getSkillUpLevelMaterial, isSkillPassive, SkillNode } from 'db://assets/Script/Game/System/SkillConfig';
 import { CcNative } from 'db://assets/Module/CcNative';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
@@ -154,7 +154,9 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                 "unload" : "",
                 skillManager.data.getSkillLevel(skillNode.key) > 0 
                 &&
-                skillManager.data.skills.indexOf(skillNode.key) === -1? 
+                skillManager.data.skills.indexOf(skillNode.key) === -1
+                &&
+                !isSkillPassive(characterManager.data.currentCharacter , skillNode.key) ? 
                 "eqiupment" : "",
                 skillManager.data.getSkillLevel(skillNode.key) > 0
                 && 
@@ -242,9 +244,11 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                             (instance.lv > 0 ? ("Lv: " + instance.lv + "\n\n") : "") +
                             instance.proto.description +
                             "\n\n\n" +
-                            (btns.indexOf("learn") !== -1 ?
-                            LanguageManager.getEntry("LevelUp").getValue(settingManager.data.language) :
-                            LanguageManager.getEntry("Learn").getValue(settingManager.data.language)) +
+                            (
+                                btns.indexOf("learn") !== -1 ?
+                                LanguageManager.getEntry("LevelUp").getValue(settingManager.data.language) :
+                                LanguageManager.getEntry("Learn").getValue(settingManager.data.language)
+                            ) +
                             LanguageManager.getEntry("Material").getValue(settingManager.data.language) +
                             "\n\n" +
                             LanguageManager.getEntry("Gold").getValue(settingManager.data.language) +

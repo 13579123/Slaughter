@@ -1,7 +1,9 @@
+import { Constructor } from "cc"
 import { BuffInstance } from "../Instance/BuffInstance"
 import { CharacterInstance } from "../Instance/CharacterInstance"
 import { SkillInstance } from "../Instance/SkillInstance"
 import { FromType, DamageType } from "../Prototype/CharacterPrototype"
+import { BuffPrototype } from "../Prototype/BuffPrototype"
 
 export class Progress {
     // 数据
@@ -48,7 +50,7 @@ export class BuffProgress extends Progress {
 
     public target: CharacterInstance = null
 
-    public buff: BuffInstance[] = []
+    public buff: Constructor<BuffPrototype>[] = []
 
 }
 

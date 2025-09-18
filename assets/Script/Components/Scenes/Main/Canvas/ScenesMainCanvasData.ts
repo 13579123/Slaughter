@@ -8,6 +8,7 @@ import { Rx } from 'db://assets/Module/Rx';
 import { CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
 import { getCharacterPrototype } from 'db://assets/Script/System/Manager/CharacterManager';
 import { getSkillKey, getSkillPrototype } from 'db://assets/Script/System/Manager/SkillManager';
+import { DefenseUp } from 'db://assets/Mod/Base/Prototype/Buff/DefenseUp';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasData')
@@ -17,9 +18,10 @@ export class ScenesMainCanvasData extends ExtensionComponent {
     protected userBaseData: UserBaseDataPrefab = null
 
     protected start() {
+        let character: CharacterInstance
         this.effect(() => {
             // 根据本地信息生成角色对象
-            const character = createPlayerInstance()
+            character = Rx.reactive(createPlayerInstance())
             // @ts-ignore
             window.character = character
             // 绑定渲染器

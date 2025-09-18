@@ -84,15 +84,16 @@ export class EquipmentItemPrefab extends ExtensionComponent {
                 if (this.instance === instance)
                     this.ItemIconSprite.spriteFrame = spriteFrame
             })
-            this.node.getChildByName("Count").active = false
+            this.node.getChildByName("Data").active = true
+            this.node.getChildByName("Data").getComponent(Label).string = "Lv: " + instance.lv
         }
         if (instance instanceof ItemInstance) {
             instance.proto.icon().then((spriteFrame) => {
                 if (this.instance === instance)
                     this.ItemIconSprite.spriteFrame = spriteFrame
             })
-            this.node.getChildByName("Count").active = true
-            this.node.getChildByName("Count").getComponent(Label).string = instance.count.toString()
+            this.node.getChildByName("Data").active = true
+            this.node.getChildByName("Data").getComponent(Label).string = instance.count.toString()
         }
     }
 

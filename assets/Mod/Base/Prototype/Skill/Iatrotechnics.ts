@@ -8,6 +8,8 @@ import { CharacterInstance } from "db://assets/Script/System/Core/Instance/Chara
 import { FromType } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { SkillPrototype } from "db://assets/Script/System/Core/Prototype/SkillPrototype";
 import { RegisterSkill } from "db://assets/Script/System/Manager/SkillManager";
+import { DefenseUp } from "../Buff/DefenseUp";
+import { Rx } from "db://assets/Module/Rx";
 
 
 @RegisterLanguageEntry("Iatrotechnics_Name")
@@ -95,3 +97,37 @@ export class Iatrotechnics extends SkillPrototype {
     }
 
 }
+
+
+// @RegisterSkill("Passive")
+// @RegisterPlayerSkill("Passive", "Brave" , true , "Iatrotechnics")
+// @RegisterSkillUpLevel("Passive" , (lv: number) => ({
+//     diamond: lv * 50 + 150 ,
+//     gold: Math.pow(2 , lv) * 100 + 100 , 
+// }))
+// export class Passive extends SkillPrototype {
+
+//     public get name(): string {
+//         return "被动技能"
+//     }
+
+//     public get description(): string {
+//         return "获得" + this.instance.lv * 20 + "物理防御" 
+//     }
+
+//     public icon(): Promise<SpriteFrame> {
+//         return new Promise(async res => {
+//             const assets = new CcNative.Asset.AssetManager("ModBaseResource")
+//             res((await assets.load("Texture/Buff/defenseUp/spriteFrame", SpriteFrame, true)).value)
+//         })
+//     }
+
+//     protected onCreate(): void {
+//         if (!this.instance.characterInstance) return
+//         Rx.reactive(this.instance.characterInstance).addBuff({
+//             Proto: DefenseUp , 
+//             extraProperty: {physicalDefense: this.instance.lv * 20 , magicDefense: this.instance.lv * 20},
+//         })
+//     }
+
+// }

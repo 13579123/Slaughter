@@ -48,7 +48,7 @@ export class LeatherShoulder extends EquipmentPrototype {
     public get propertyDescription(): string {
         let res = ""
         // 基础属性
-        res += `${
+        res += `Lv: ${this.instance.lv}\n${
             LanguageManager.getEntry("Quality").getValue(settingManager.data.language)
         }: <color=${getQualityColor(this.instance.quality)}>${
             LanguageManager.getEntry(getQualityName(this.instance.quality)).getValue(settingManager.data.language)
@@ -79,7 +79,7 @@ export class LeatherShoulder extends EquipmentPrototype {
         physicalPenetration: 5,
     }).setProperty("criticalRate", (critical) => {
         return critical +
-            Math.floor(this.instance.lv / 3) / 10 +
+            Math.floor(this.instance.lv / 3) / 100 +
             (this.suitCount >= twoSuit ? 0.05 : 0)
     }).setProperty("physicalPenetration", (physicalPenetration) => {
         return physicalPenetration +

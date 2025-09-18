@@ -48,7 +48,7 @@ export class LeatherShoes extends EquipmentPrototype {
     public get propertyDescription(): string {
         let res = ""
         // 基础属性
-        res += `${
+        res += `Lv: ${this.instance.lv}\n${
             LanguageManager.getEntry("Quality").getValue(settingManager.data.language)
             }: <color=${getQualityColor(this.instance.quality)}>${
                 LanguageManager.getEntry(getQualityName(this.instance.quality)).getValue(settingManager.data.language)

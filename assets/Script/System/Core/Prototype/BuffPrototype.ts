@@ -5,7 +5,7 @@ import { AttackProgress , BuffProgress, DamageProgress, DeathProgress, FightProg
 
 export type BuffDTO = {
     prototype: string,
-    extraProperty: Partial<BasePrototypeProperty>,
+    extraProperty?: Partial<BasePrototypeProperty>,
 }
 
 export class BuffPrototype {

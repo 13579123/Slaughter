@@ -13,6 +13,7 @@ import { darkDamage, lightDamage, magicDamage, physicalDamage } from "../Calcula
 import { SkillInstance } from "./SkillInstance"
 import { SkillDTO, SkillFailReason } from "../Prototype/SkillPrototype"
 import { getSkillPrototype } from "../../Manager/SkillManager"
+import { createId } from "../../../Game/Share"
 
 export type CharacterInstanceOption = {
     // 等级
@@ -69,9 +70,6 @@ export class CharacterInstance extends CharacterInstanceProperty {
         set.forEach(c => c(...arg))
     }
 
-    // 技能列表
-    public skills: SkillInstance[] = []
-
     // 构造器
     public constructor(option: CharacterInstanceOption) {
         super()
@@ -123,7 +121,11 @@ export class CharacterInstance extends CharacterInstanceProperty {
         const list = skills.map(dto => {
             const Proto = getSkillPrototype(dto.prototype)
             if (Proto) {
-                return new SkillInstance({ characterInstance: this , lv: dto.lv , Proto })
+                return new SkillInstance({ 
+                    characterInstance: this, 
+                    lv: dto.lv, 
+                    Proto 
+                })
             }
             else warn(`Can not found skill by prototype key: ${dto.prototype}`)
         })
@@ -166,6 +168,12 @@ export class CharacterInstance extends CharacterInstanceProperty {
         return Promise.all(promises)
     }
 
+    // 是否已经死亡
+    protected _hasDeath = false
+    public get hasDeath() {
+        return this._hasDeath
+    }
+
     // 尝试死亡
     public death(option: {
         damage: number,
@@ -177,6 +185,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         this.emitProgress("beforeDeath", progress)
             .then(() => {
                 if (this.hp > 0) return
+                this._hasDeath = true
                 this.emit(CharacterEvent.Death)
                 this.emitProgress("afterDeath", progress)
             })
@@ -193,21 +202,23 @@ export class CharacterInstance extends CharacterInstanceProperty {
         const progress = new BuffProgress()
         progress.target = option.target || this
         progress.from = option.from || this
-        const buff = new BuffInstance({
-            Proto: option.Proto,
-            extraProperty: option.extraProperty,
-        })
-        progress.buff.push(buff)
-        if (option.data) {
-            Object.keys(option.data)
-                .forEach(k => buff.data.set(k, option.data[k]))
-        }
-        this.emitProgress("beforeAddBuff", progress)
-            .then(() => {
-                this.buffs.push(...progress.buff)
-                progress.buff.forEach(b => b.proto.onAdd())
-                return this.emitProgress("afterAddBuff", progress)
+        progress.buff.push(option.Proto)
+        progress.target.emitProgress("beforeAddBuff", progress).then(() => {
+            progress.buff.forEach(proto => {
+                const buff = new BuffInstance({
+                    Proto: proto,
+                    character: progress.target,
+                    extraProperty: option.extraProperty,
+                })
+                if (option.data) {
+                    Object.keys(option.data)
+                        .forEach(k => buff.data.set(k, option.data[k]))
+                }
+                progress.target.buffs.push(buff)
+                buff.proto.onAdd()
             })
+            return progress.target.emitProgress("afterAddBuff", progress)
+        })
         return
     }
 
@@ -220,19 +231,20 @@ export class CharacterInstance extends CharacterInstanceProperty {
         const progress = new BuffProgress()
         progress.target = option.target || this
         progress.from = option.from || this
-        progress.buff = []
-        this.buffs.forEach(b => {
-            if (b.proto.constructor === option.Proto) {
-                progress.buff.push(b)
-            }
-        })
-        this.emitProgress("beforeRemoveBuff", progress)
+        progress.buff = [option.Proto]
+        progress.target.emitProgress("beforeRemoveBuff", progress)
             .then(() => {
                 progress.buff.forEach(b => {
-                    b.proto.onRemove()
-                    this.buffs.splice(this.buffs.indexOf(b), 1)
+                    for (let i = 0; i < progress.target.buffs.length; i++) {
+                        const buff = progress.target.buffs[i];
+                        if (buff.proto.constructor === b) {
+                            progress.target.buffs.splice(i, 1)
+                            buff.proto.onRemove()
+                            return
+                        }
+                    }
                 })
-                return this.emitProgress("afterRemoveBuff", progress)
+                return progress.target.emitProgress("afterRemoveBuff", progress)
             })
         return
     }
@@ -396,34 +408,34 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.critical = this.criticalRate <= Math.random()
         this.emitProgress("beforeAttack", progress)
             .then(() => {
+                // 伤害浮动和暴击伤害
+                const damageRate = (Math.random() * 0.2 + 0.9) * (
+                    progress.critical ? progress.from.criticalDamage : 1
+                )
                 // 基础物理伤害
                 progress.target.beDamage({
-                    atk: (progress.from.physicalAttack * progress.damageRateType.physic) *
-                        (progress.critical ? progress.from.criticalDamage : 1),
+                    atk: (progress.from.physicalAttack * progress.damageRateType.physic) * damageRate,
                     type: DamageType.physic,
                     from: progress.from,
                     fromType: FromType.attack
                 })
                 // 基础魔法伤害
                 progress.target.beDamage({
-                    atk: progress.from.magicAttack * progress.damageRateType.magic *
-                        (progress.critical ? progress.from.criticalDamage : 1),
-                    type: DamageType.physic,
+                    atk: progress.from.magicAttack * progress.damageRateType.magic * damageRate,
+                    type: DamageType.magic,
                     from: progress.from,
                     fromType: FromType.attack
                 })
                 // 基础光伤害
                 progress.target.beDamage({
-                    atk: progress.from.lightAttack * progress.damageRateType.light *
-                        (progress.critical ? progress.from.criticalDamage : 1),
+                    atk: progress.from.lightAttack * progress.damageRateType.light,
                     type: DamageType.light,
                     from: progress.from,
                     fromType: FromType.attack
                 })
                 // 基础暗伤害
                 progress.target.beDamage({
-                    atk: progress.from.darkAttack * progress.damageRateType.dark *
-                        (progress.critical ? progress.from.criticalDamage : 1),
+                    atk: progress.from.darkAttack * progress.damageRateType.dark,
                     type: DamageType.dark,
                     from: progress.from,
                     fromType: FromType.attack
@@ -447,15 +459,15 @@ export class CharacterInstance extends CharacterInstanceProperty {
             this.emitProgress("beforeUseSkill", progress)
                 .then(() => {
                     if (progress.cost.hp > progress.from.hp * progress.from.maxHp) {
-                        progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast , progress)
+                        progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast, progress)
                         return res(false)
                     }
                     if (progress.cost.mp > progress.from.mp * progress.from.maxMp) {
-                        progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast , progress)
+                        progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast, progress)
                         return res(false)
                     }
                     if (progress.coolTime > 0) {
-                        progress.skill.proto.useFail(SkillFailReason.CoolDown , progress)
+                        progress.skill.proto.useFail(SkillFailReason.CoolDown, progress)
                         return res(false)
                     }
                     res(true)
@@ -476,16 +488,16 @@ export class CharacterInstance extends CharacterInstanceProperty {
         this.isSkillAble(option.skill, progress)
             .then(able => {
                 if (!able) return
-                progress.from.reduceMp({ reduce: progress.cost.mp , from: progress.from })
-                progress.from.reduceHp({ 
+                progress.from.reduceMp({ reduce: progress.cost.mp, from: progress.from })
+                progress.from.reduceHp({
                     reduce: progress.cost.hp,
                     type: DamageType.real,
                     from: progress.from,
                     fromType: FromType.skillCost
                 })
                 progress.skill.coolTime = progress.skill.proto.coolTime
-                progress.skill.proto.use({ 
-                    use: progress.from , 
+                progress.skill.proto.use({
+                    use: progress.from,
                 })
                 this.emitProgress("afterUseSkill", progress)
             })

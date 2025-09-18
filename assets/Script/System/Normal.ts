@@ -3,6 +3,7 @@ export class Normal {
 
     public static number(num: number , fixed = 1 , force = false): string {
         let useFixed = fixed
+        if (num === void 0 || num === null) return "0"
         if (num.toString().indexOf(".") === -1) useFixed = 0
         if (force) useFixed = fixed
         if (num < 10000) return num.toFixed(useFixed);

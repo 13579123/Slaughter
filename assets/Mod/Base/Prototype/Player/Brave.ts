@@ -4,7 +4,7 @@ import { CcNative } from "db://assets/Module/CcNative";
 import { LanguageEntry } from "db://assets/Module/Language/LanguageEntry";
 import { LanguageManager, RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManager";
 import { BasePrototypeProperty } from "db://assets/Script/System/Core/Property/BasePrototypeProperty";
-import { CharacterPrototype } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
+import { AnimationConfig, CharacterPrototype } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { RegisterCharacter } from "db://assets/Script/System/Manager/CharacterManager";
 
 @RegisterLanguageEntry("Brave")
@@ -35,7 +35,7 @@ export class Brave extends CharacterPrototype {
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
         maxHp: 150,
         maxMp: 70,
-        physicalAttack: 30,
+        physicalAttack: 35,
         magicAttack: 40,
         physicalDefense: 20,
         magicDefense: 20,
@@ -48,11 +48,27 @@ export class Brave extends CharacterPrototype {
     public growProperty: BasePrototypeProperty = new BasePrototypeProperty({
         maxHp: 30,
         maxMp: 10,
-        physicalAttack: 10,
-        magicAttack: 15,
-        physicalDefense: 7,
-        magicDefense: 7,
+        physicalAttack: 7,
+        magicAttack: 5,
+        physicalDefense: 5,
+        magicDefense: 5,
     })
+
+    public get animation(): AnimationConfig {
+        return {
+            animations: {
+                attack: "Attack01",
+                skill: "Attack02",
+                idle: "Idle",
+                move: "Run",
+                die: "BeAttack"
+            },
+            animationFrameName: {
+                attack: "Attack01",
+                skill: "Attack02",
+            }
+        }
+    }
 
     public icon(): Promise<SpriteFrame> {
         return new Promise(async res => {

@@ -3,7 +3,7 @@ import { Rx } from "../../Rx";
 import { ReactiveEffectOptions, ReactiveEffectRunner } from "../../Rx/reactivity";
 
 export class AutoInterval {
-  timer?: number
+  timer?: number // ms
   count?: number
   complete?: () => void
 }

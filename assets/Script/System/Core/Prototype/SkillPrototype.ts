@@ -4,6 +4,7 @@ import { EquipmentInstance } from "../Instance/EquipmentInstance";
 import { BasePrototypeProperty } from "../Property/BasePrototypeProperty";
 import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgress, HealProgress, SkillProgress } from "../Progress/FightProgress";
 import { CharacterInstance } from "../Instance/CharacterInstance";
+import { SkillInstance } from "../Instance/SkillInstance";
 
 export type SkillDTO = {
     lv: number,
@@ -39,7 +40,8 @@ export class SkillPrototype {
         }
     }
     // 保存对应的实例
-    constructor(public readonly instance: EquipmentInstance) {
+    constructor(public readonly instance: SkillInstance) {
+        setTimeout(() => this.onCreate());
     }
     // 图标信息 Sprite
     public async icon(): Promise<SpriteFrame> {
@@ -58,4 +60,6 @@ export class SkillPrototype {
         use: CharacterInstance,
     }) {
     }
+    // 创建原型实例的回调
+    protected onCreate() {}
 }
