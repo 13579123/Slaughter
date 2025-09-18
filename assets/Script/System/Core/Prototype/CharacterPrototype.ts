@@ -5,6 +5,7 @@ import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgr
 import { EquipmentDTO } from "./EquipmentPrototype";
 import { BuffDTO } from "./BuffPrototype";
 import { SkillDTO } from "./SkillPrototype";
+import { getComponentByPlayer } from "../../../Game/System/PlayerToPrefabMap";
 
 export type CharacterDTO = {
     // 等级
@@ -42,20 +43,13 @@ export enum FromType {
 export type AnimationConfig = {
     // 动画名称
     animations: {
-        attack: string,
         move: string,
         idle: string,
-        skill: string,
         die: string,
-    },
-    // 动画帧生效事件名称
-    animationFrameName: {
-        attack: string,
-        skill: string,
     },
 }
 
-export class CharacterPrototype {
+export class CharacterPrototype implements FightProgress {
     // 名称信息
     public get name(): string { return "Character Name" }
     // 描述信息
@@ -68,15 +62,9 @@ export class CharacterPrototype {
     public get animation(): AnimationConfig {
         return {
             animations: {
-                attack: "Attack01",
                 move: "Run",
                 idle: "Idle",
-                skill: "Attack02",
                 die: "Die"
-            },
-            animationFrameName: {
-                attack: "attack",
-                skill: "skill"
             }
         }
     }
@@ -90,5 +78,24 @@ export class CharacterPrototype {
     // spine动画信息
     public async skeletonData(): Promise<sp.SkeletonData> {
         return Promise.resolve(null);
+    }
+    // 攻击之前
+    private attackAnimationPromise = null
+    beforeAttack(progress: AttackProgress, next: Function) { 
+        const prefab = getComponentByPlayer(this.instance)
+        this.attackAnimationPromise = prefab.playAnimation("Attack01" , {
+            count: 1 , 
+            speed: this.instance.attackSpeed,
+            frameEvent: {
+                name: "Attack01",
+                callback: () => {
+                    next()
+                }
+            }
+        })
+        return
+    }
+    afterAttack(progress: AttackProgress, next: Function): void {
+        if (this.attackAnimationPromise) this.attackAnimationPromise.then(next)
     }
 }

@@ -400,14 +400,17 @@ export class CharacterInstance extends CharacterInstanceProperty {
     // 普通攻击某一个角色
     public attackCharacter(option: {
         target: CharacterInstance,
+        beforeAttack?: (progress: AttackProgress) => void,
+        afterAttack?: (progress: AttackProgress) => void
     }) {
         const progress = new AttackProgress()
         progress.from = this
         progress.target = option.target
         // 是否暴击
         progress.critical = this.criticalRate <= Math.random()
+        option.beforeAttack && option.beforeAttack(progress)
         this.emitProgress("beforeAttack", progress)
-            .then(() => {
+            .then(async () => {
                 // 伤害浮动和暴击伤害
                 const damageRate = (Math.random() * 0.2 + 0.9) * (
                     progress.critical ? progress.from.criticalDamage : 1
@@ -440,7 +443,8 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     from: progress.from,
                     fromType: FromType.attack
                 })
-                return this.emitProgress("afterAttack", progress)
+                await this.emitProgress("afterAttack", progress)
+                option.afterAttack && option.afterAttack(progress)
             })
         return
     }
@@ -486,7 +490,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.cost = progress.skill.proto.cost
         progress.coolTime = progress.skill.coolTime
         this.isSkillAble(option.skill, progress)
-            .then(able => {
+            .then(async able => {
                 if (!able) return
                 progress.from.reduceMp({ reduce: progress.cost.mp, from: progress.from })
                 progress.from.reduceHp({
@@ -499,7 +503,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                 progress.skill.proto.use({
                     use: progress.from,
                 })
-                this.emitProgress("afterUseSkill", progress)
+                await this.emitProgress("afterUseSkill", progress)
             })
         return
     }

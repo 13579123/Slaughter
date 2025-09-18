@@ -18,7 +18,7 @@ export type EquipmentInstanceOption = {
     Proto: Constructor<EquipmentPrototype>,
 }
 
-export class EquipmentInstance extends EquipmentInstanceProperty{
+export class EquipmentInstance extends EquipmentInstanceProperty {
 
     // 对应的角色
     public readonly character: CharacterInstance = null

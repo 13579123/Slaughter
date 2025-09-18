@@ -84,35 +84,33 @@ export class FightPrefab extends ExtensionComponent {
         // 两边角色开始攻击
         const startAttack = async (
             character: CharacterInstance,
-            characterPrefab: FightCharacterPrefab,
             target: CharacterInstance
         ) => {
             return new Promise(res => {
-                this.setAutoInterval(async () => {
-                    await characterPrefab.characterAttack(() => {
-                        character.attackCharacter({ target })
+                let isAttacking = false
+                const stop = this.setAutoInterval(() => {
+                    if (isAttacking) return
+                    isAttacking = true
+                    character.attackCharacter({ 
+                        target ,
+                        afterAttack: () => {
+                            isAttacking = false
+                            if (this.leftCharacter.hasDeath || this.rightCharacter.hasDeath) {
+                                stop()
+                                res(null)
+                            }
+                        }
                     })
-                    if (this.leftCharacter.hasDeath || this.rightCharacter.hasDeath)
-                        res(null)
                 } , {count: -1 , timer: 100})
+                return
             })
         }
         // 两边角色开始攻击
-        await Promise.all([
-            startAttack(this.leftCharacter, this.leftCharacterPrefab, this.rightCharacter),
-            startAttack(this.rightCharacter, this.rightCharacterPrefab, this.leftCharacter)
+        await Promise.race([
+            startAttack(this.leftCharacter , this.rightCharacter),
+            startAttack(this.rightCharacter , this.leftCharacter),
         ])
-        // 播放死亡动画
-        await Promise.all([
-            (async () => {
-                if (this.leftCharacter.hasDeath) await this.leftCharacterPrefab.characterDie()
-                else this.leftCharacterPrefab.characterReady()
-            })(),
-            (async () => {
-                if (this.rightCharacter.hasDeath) await this.rightCharacterPrefab.characterDie()
-                else this.rightCharacterPrefab.characterReady()
-            })()
-        ])
+        console.log('战斗结束')
         // 开始战斗
         return new Promise<"left" | "right"| "none">(async (res) => {
             if (this.leftCharacter.hasDeath && this.rightCharacter.hasDeath) res("none")

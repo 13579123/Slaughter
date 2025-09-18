@@ -16,23 +16,22 @@ const { ccclass, property } = _decorator;
 export class ScenesMainCanvas extends Component {
 
     async start() {
-        // const fightPrefab = await (new CcNative.Asset.AssetManager("PrefabResource"))
-        //     .load("FightPrefab/FightPrefab" , Prefab)
-        // const node = CcNative.instantiate(fightPrefab.value)
-        // this.node.addChild(node)
-        // const leftC = Rx.reactive(createPlayerInstance())
-        // const rightC = Rx.reactive(new CharacterInstance({
-        //     lv: 50,
-        //     Proto: Brave,
-        // }))
-        // console.log(toRaw(leftC) , toRaw(rightC))
-        // const successPos = await node.getComponent(FightPrefab)
-        // .setFightAndStart({
-        //     player: "none",
-        //     leftCharacter: leftC,
-        //     rightCharacter: rightC,
-        // })
-        // console.log(successPos + " 胜利")
+        const fightPrefab = await (new CcNative.Asset.AssetManager("PrefabResource"))
+            .load("FightPrefab/FightPrefab" , Prefab)
+        const node = CcNative.instantiate(fightPrefab.value)
+        this.node.addChild(node)
+        const leftC = Rx.reactive(createPlayerInstance())
+        const rightC = Rx.reactive(new CharacterInstance({
+            lv: 10,
+            Proto: Brave,
+        }))
+        const successPos = await node.getComponent(FightPrefab)
+        .setFightAndStart({
+            player: "none",
+            leftCharacter: leftC,
+            rightCharacter: rightC,
+        })
+        console.log(successPos + " 胜利")
     }
 
 }

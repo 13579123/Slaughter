@@ -1,7 +1,7 @@
 import { _decorator, Button, Color, Component, find, instantiate, Label, Node, Prefab, sp, Sprite, UITransform } from 'cc';
 import { CcNative } from 'db://assets/Module/CcNative';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
-import { SpineAnimation } from 'db://assets/Module/Extension/Component/SpineAnimation';
+import { AnimationOption, SpineAnimation } from 'db://assets/Module/Extension/Component/SpineAnimation';
 import { ModuleProgressPrefab } from 'db://assets/Module/Prefabs/ModuleProgressPrefab';
 import { Rx } from 'db://assets/Module/Rx';
 import { CharacterEvent, CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
@@ -10,6 +10,7 @@ import { Normal } from 'db://assets/Script/System/Normal';
 import { FightBuffItemPrefab } from './FightBuffItemPrefab';
 import { SkillInstance } from 'db://assets/Script/System/Core/Instance/SkillInstance';
 import { DamageType, FromType } from 'db://assets/Script/System/Core/Prototype/CharacterPrototype';
+import { bindPlayerToComponent } from 'db://assets/Script/Game/System/PlayerToPrefabMap';
 const { ccclass, property } = _decorator;
 
 @ccclass('FightCharacterPrefab')
@@ -39,14 +40,16 @@ export class FightCharacterPrefab extends ExtensionComponent {
 
     // 绑定角色数据和状态
     public async bindCharacter(character: CharacterInstance, pos: "left" | "right", isPlayer = true) {
+        // 设置角色数据
+        this.character = Rx.reactive(character)
+        // 绑定角色和预制体组件
+        bindPlayerToComponent(this.character , this)
         // 展示状态
         this.isPlayer = isPlayer
         // 设置位置
         this.pos = pos
         // spine节点
         const spine = this.node.getChildByName("Spine")
-        // 设置角色数据
-        this.character = Rx.reactive(character)
         // 展示角色数值
         this.showNumberMessage()
         // 设置位置
@@ -58,6 +61,10 @@ export class FightCharacterPrefab extends ExtensionComponent {
             this.node.getChildByName("State")
                 .getChildByName("Hp").getChildByName("Progress").setScale(-1, 1)
         }
+        // 角色死亡马上播放动画
+        this.character.on(CharacterEvent.Death , () => {
+            this.characterDie()
+        })
         // 设置等级
         this.node.getChildByName("State").getChildByName("Level")
             .getComponent(Label).string = "Lv : " + character.lv
@@ -216,62 +223,25 @@ export class FightCharacterPrefab extends ExtensionComponent {
         if (this.isPlayer) this.node.getChildByName("State").active = true
     }
 
-    // 播放攻击动画
-    public async characterAttack(attackEffect: Function) {
-        if (!this.isReady) return
-        if (this.isSkilling) return
-        this.isSkilling = true
-        // 播放攻击动画
+    // 播放动画
+    public async playAnimation(animationName: string , option: {
+        count?: number , 
+        speed?: number , 
+        frameEvent?: {name: string , callback: () => void}
+    }) {
         const spine = this.node.getChildByName("Spine").getComponent(SpineAnimation)
-        // 攻击生效
-        const attackEffectCallback = (e: sp.spine.Event) => {
-            attackEffect()
-            // 移除攻击生效回调
-            spine.removeFrameEvent(
-                this.character.proto.animation.animationFrameName.attack,
-                attackEffectCallback
-            )
-        }
-        spine.listenFrameEvent(this.character.proto.animation.animationFrameName.attack, attackEffectCallback)
-        // 工具攻击速度来设置攻击动画的播放速度
-        return new Promise<void>(res => {
-            spine.playAnimation(
-                this.character.proto.animation.animations.attack,
-                { count: 1, speed: this.character.attackSpeed }
-            ).then(() => {
-                this.isSkilling = false
-                res()
-            })
-        })
-    }
-
-    // 播放技能动画
-    public async characterSkill(skillEffect: Function) {
-        if (!this.isReady) return
-        this.isSkilling = true
-        // 播放技能动画
-        const spine = this.node.getChildByName("Spine").getComponent(SpineAnimation)
-        return new Promise<void>(res => {
-            spine.playAnimation(this.character.proto.animation.animations.skill, { count: 1 })
-                .then(() => {
-                    this.isSkilling = false
-                    res()
-                })
-            const skillEffectCallback = () => {
-                // 技能生效
-                skillEffect()
-                spine.removeFrameEvent(
-                    this.character.proto.animation.animationFrameName.skill,
-                    skillEffectCallback
-                )
+        if (option.frameEvent) {
+            const frameCall = () => {
+                option.frameEvent.callback()
+                spine.removeFrameEvent(option.frameEvent.name , frameCall)
             }
-            spine.listenFrameEvent(this.character.proto.animation.animationFrameName.skill, skillEffectCallback)
-        })
+            spine.listenFrameEvent(option.frameEvent.name , frameCall)
+        }
+        await spine.playAnimation(animationName , option)
     }
 
     // 播放死亡动画
     public async characterDie() {
-        if (!this.isReady) return
         // 播放死亡动画
         const spine = this.node.getChildByName("Spine").getComponent(SpineAnimation)
         await spine.playAnimation(this.character.proto.animation.animations.die, { count: 1 })
