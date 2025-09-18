@@ -22,7 +22,7 @@ export class ScenesMainCanvas extends Component {
         this.node.addChild(node)
         const leftC = Rx.reactive(createPlayerInstance())
         const rightC = Rx.reactive(new CharacterInstance({
-            lv: 10,
+            lv: 1,
             Proto: Brave,
         }))
         const successPos = await node.getComponent(FightPrefab)
@@ -31,7 +31,7 @@ export class ScenesMainCanvas extends Component {
             leftCharacter: leftC,
             rightCharacter: rightC,
         })
-        console.log(successPos + " 胜利")
+        console.log(successPos + " 胜利" , leftC , rightC)
     }
 
 }

@@ -50,8 +50,6 @@ export class FightCharacterPrefab extends ExtensionComponent {
         this.pos = pos
         // spine节点
         const spine = this.node.getChildByName("Spine")
-        // 展示角色数值
-        this.showNumberMessage()
         // 设置位置
         if (pos === "left") spine.setScale(1, 1)
         else if (pos === "right") {
@@ -61,10 +59,6 @@ export class FightCharacterPrefab extends ExtensionComponent {
             this.node.getChildByName("State")
                 .getChildByName("Hp").getChildByName("Progress").setScale(-1, 1)
         }
-        // 角色死亡马上播放动画
-        this.character.on(CharacterEvent.Death , () => {
-            this.characterDie()
-        })
         // 设置等级
         this.node.getChildByName("State").getChildByName("Level")
             .getComponent(Label).string = "Lv : " + character.lv
@@ -72,6 +66,9 @@ export class FightCharacterPrefab extends ExtensionComponent {
         this.character.proto.skeletonData().then(sk => {
             spine.getComponent(SpineAnimation).skeletonData = sk
         })
+        // 绑定模板消息节点
+        this.messageTempNode = this.node.getChildByName("Message").getChildByName("Temp")
+        this.node.getChildByName("Message").removeAllChildren()
         // 右侧mp位置为 25px
         const mpNode = this.node.getChildByName("State").getChildByName("Mp")
         mpNode.setPosition(pos === "right" ? 25 : -25, mpNode.position.y)
@@ -106,38 +103,21 @@ export class FightCharacterPrefab extends ExtensionComponent {
         })
     }
 
-    // 展示角色受伤或者回复数值
-    public showNumberMessage() {
-        const messageContainer = this.node.getChildByName("Message")
-        const tempNode = messageContainer.getChildByName("Temp")
-        messageContainer.removeAllChildren()
-        // 监听扣血事件
-        this.character.on(CharacterEvent.ReduceHp , (progress: {
-            reduce: number,
-            type: DamageType,
-            from: CharacterInstance,
-            fromType: FromType
-        }) => {
-            if (progress.reduce <= 0) return
-            let color = new Color(255, 255, 255)
-            if (progress.type === DamageType.real) color = new Color(255, 255, 255)
-            if (progress.type === DamageType.physic) color = new Color(250, 15, 15)
-            if (progress.type === DamageType.magic) color = new Color(10, 50, 200)
-            if (progress.type === DamageType.light) color = new Color(230, 150, 15)
-            if (progress.type === DamageType.dark) color = new Color(125, 10, 230)
-            showMessage(`-${Normal.number(progress.reduce)}` , color)
-        })
-        // 监听回复事件
-        this.character.on(CharacterEvent.IncreaseHp , (progress: {
-            increase: number,
-            from?: CharacterInstance,
-            fromType?: FromType
-        }) => {
-            showMessage(`+${Normal.number(progress.increase)}` , new Color(85, 225 , 0))
-        })
-        // 创建节点
-        const createNumberNode = (s: string , color: Color) => {
-            const node = instantiate(tempNode)
+    // 队伍列表
+    protected showMessageQueue: {s: string , color: Color}[] = []
+
+    protected messageTempNode: Node
+
+    protected isClearingMessage = false
+
+    // 添加到伤害数据到队列
+    public showMessage(s: string , color: Color) {
+        this.showMessageQueue.push({s , color})
+        if (this.isClearingMessage) return
+        this.isClearingMessage = true
+        const messageContainer = this.node.getChildByName('Message')
+         const createNumberNode = (s: string , color: Color) => {
+            const node = instantiate(this.messageTempNode)
             const label = node.getComponent(Label)
             label.string = s
             label.color = color
@@ -150,30 +130,17 @@ export class FightCharacterPrefab extends ExtensionComponent {
             } , {count: 20 , complete() { node.parent = null;node.destroy() } , timer: 25})
             return node
         }
-        // 是否正在清理队列
-        let isClearing = false
-        // 队伍列表
-        const showMessageQueue: {s: string , color: Color}[] = []
-        // 展示伤害和回复信息
-        // 每次信息展示间隔不低于 100 ms
-        const showMessage = (s: string , color: Color) => {
-            showMessageQueue.push({s , color})
-            if (isClearing) return
-            // 开始清理队列
-            isClearing = true
-            clearQueue()
-        }
-        // 清理队列
         const clearQueue = async () => {
-            while (showMessageQueue.length > 0) { 
-                const dto = showMessageQueue.shift()
+            while (this.showMessageQueue.length > 0) { 
+                const dto = this.showMessageQueue.shift()
                 const node = createNumberNode(dto.s , dto.color)
                 messageContainer.addChild(node)
                 await new Promise(resolve => setTimeout(resolve , 100))
             }
-            isClearing = false
+            this.isClearingMessage = false
             return
         }
+        clearQueue()
     }
 
     // 播放角色入场动画

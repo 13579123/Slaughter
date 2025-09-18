@@ -1,9 +1,11 @@
-import { _decorator, Component, Node, Prefab } from 'cc';
+import { _decorator, Color, Component, Node, Prefab } from 'cc';
 import { CcNative } from 'db://assets/Module/CcNative';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { CharacterEvent, CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
 import { FightCharacterPrefab } from './FightCharacterPrefab';
 import { Rx } from 'db://assets/Module/Rx';
+import { DamageType, FromType } from 'db://assets/Script/System/Core/Prototype/CharacterPrototype';
+import { Normal } from 'db://assets/Script/System/Normal';
 const { ccclass, property } = _decorator;
 
 type FightOption = {
@@ -80,7 +82,38 @@ export class FightPrefab extends ExtensionComponent {
         await Promise.all([
             this.leftCharacterPrefab.characterReady(),
             this.rightCharacterPrefab.characterReady()
-        ])
+        ]);
+        // 绑定回血扣血回调
+        [
+            {character: this.leftCharacter , prefab: this.leftCharacterPrefab},
+            {character: this.rightCharacter , prefab: this.rightCharacterPrefab}
+        ].forEach(async ({character, prefab , }) => {
+            character.on(CharacterEvent.ReduceHp, (progress: {
+                reduce: number,
+                type: DamageType,
+                from: CharacterInstance,
+                fromType: FromType,
+                critical: boolean,
+            }) => {
+                if (progress.reduce <= 0) return
+                let color = new Color(255, 255, 255)
+                if (progress.type === DamageType.real) color = new Color(255, 255, 255)
+                if (progress.type === DamageType.physic) color = new Color(250, 15, 15)
+                if (progress.type === DamageType.magic) color = new Color(10, 50, 200)
+                if (progress.type === DamageType.light) color = new Color(230, 150, 15)
+                if (progress.type === DamageType.dark) color = new Color(125, 10, 230)
+                prefab.showMessage(
+                    (progress.critical ? "暴击" : "") + `-${Normal.number(progress.reduce)}` , color
+                )
+            })
+            character.on(CharacterEvent.IncreaseHp , (progress: {
+                increase: number,
+                from?: CharacterInstance,
+                fromType?: FromType
+            }) => {
+                prefab.showMessage(`+${Normal.number(progress.increase)}` , new Color(85, 225 , 0))
+            })
+        })
         // 两边角色开始攻击
         const startAttack = async (
             character: CharacterInstance,
@@ -91,28 +124,35 @@ export class FightPrefab extends ExtensionComponent {
                 const stop = this.setAutoInterval(() => {
                     if (isAttacking) return
                     isAttacking = true
-                    character.attackCharacter({ 
-                        target ,
-                        afterAttack: () => {
-                            isAttacking = false
-                            if (this.leftCharacter.hasDeath || this.rightCharacter.hasDeath) {
-                                stop()
-                                res(null)
-                            }
-                        }
+                    character.attackCharacter({
+                        target , afterAttack: () => isAttacking = false
                     })
-                } , {count: -1 , timer: 100})
+                }, { count: -1, timer: 600 / character.attackSpeed })
+                character.on(CharacterEvent.Death, () => {
+                    stop()
+                    res(null)
+                })
+                target.on(CharacterEvent.Death, () => {
+                    stop()
+                    res(null)
+                })
                 return
             })
         }
         // 两边角色开始攻击
         await Promise.race([
-            startAttack(this.leftCharacter , this.rightCharacter),
-            startAttack(this.rightCharacter , this.leftCharacter),
+            startAttack(this.leftCharacter, this.rightCharacter),
+            startAttack(this.rightCharacter, this.leftCharacter),
         ])
-        console.log('战斗结束')
+        if (!this.leftCharacter.hasDeath) this.leftCharacterPrefab.characterReady()
+        if (!this.rightCharacter.hasDeath) this.rightCharacterPrefab.characterReady()
+        // 死亡角色播放死亡动画
+        await Promise.all([
+            this.leftCharacter.hasDeath ? this.leftCharacterPrefab.characterDie() : null,
+            this.rightCharacter.hasDeath ? this.rightCharacterPrefab.characterDie() : null,
+        ].filter(v => v))
         // 开始战斗
-        return new Promise<"left" | "right"| "none">(async (res) => {
+        return new Promise<"left" | "right" | "none">(async (res) => {
             if (this.leftCharacter.hasDeath && this.rightCharacter.hasDeath) res("none")
             if (this.leftCharacter.hasDeath) res("right")
             else if (this.rightCharacter.hasDeath) res("left")

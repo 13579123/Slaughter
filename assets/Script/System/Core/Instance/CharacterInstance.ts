@@ -254,7 +254,8 @@ export class CharacterInstance extends CharacterInstanceProperty {
         reduce: number,
         type: DamageType,
         from: CharacterInstance,
-        fromType: FromType
+        fromType: FromType,
+        critical: boolean,
     }) {
         this.hp = ((this.maxHp * this.hp) - option.reduce) / this.maxHp
         this.emit(CharacterEvent.ReduceHp, option)
@@ -304,6 +305,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         type: DamageType,
         from: CharacterInstance,
         fromType: FromType,
+        critical: boolean,
     }) {
         const progress = new DamageProgress()
         progress.damage = option.atk
@@ -312,11 +314,12 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.fromType = option.fromType
         progress.damageType = option.type
         progress.damageRate = 1.0
+        progress.critical = option.critical
         this.emitProgress("beforeDamage", progress)
             .then(() => {
                 const damage = progress.damage * progress.damageRate
                 if (progress.damageType === DamageType.physic) {
-                    this.reduceHp({
+                    progress.target.reduceHp({
                         reduce: physicalDamage(
                             damage,
                             progress.from.physicalPenetration,
@@ -324,10 +327,11 @@ export class CharacterInstance extends CharacterInstanceProperty {
                         ),
                         from: progress.from,
                         type: progress.damageType,
-                        fromType: progress.fromType
+                        fromType: progress.fromType,
+                        critical: progress.critical
                     })
                 } else if (progress.damageType === DamageType.magic) {
-                    this.reduceHp({
+                    progress.target.reduceHp({
                         reduce: magicDamage(
                             damage,
                             progress.from.magicPenetration,
@@ -335,21 +339,23 @@ export class CharacterInstance extends CharacterInstanceProperty {
                         ),
                         from: progress.from,
                         type: progress.damageType,
-                        fromType: progress.fromType
+                        fromType: progress.fromType,
+                        critical: progress.critical
                     })
                 } else if (progress.damageType === DamageType.light) {
-                    this.reduceHp({
+                    progress.target.reduceHp({
                         reduce: lightDamage(
                             damage,
                             progress.target.lightResistance,
-                            progress.target.darkResistance
+                            progress.target.darkResistance,
                         ),
                         from: progress.from,
                         type: progress.damageType,
-                        fromType: progress.fromType
+                        fromType: progress.fromType,
+                        critical: progress.critical
                     })
                 } else if (progress.damageType === DamageType.dark) {
-                    this.reduceHp({
+                    progress.target.reduceHp({
                         reduce: darkDamage(
                             damage,
                             progress.target.darkResistance,
@@ -357,14 +363,16 @@ export class CharacterInstance extends CharacterInstanceProperty {
                         ),
                         from: progress.from,
                         type: progress.damageType,
-                        fromType: progress.fromType
+                        fromType: progress.fromType,
+                        critical: progress.critical
                     })
                 } else if (progress.damageType === DamageType.real) {
-                    this.reduceHp({
+                    progress.target.reduceHp({
                         reduce: damage,
                         from: progress.from,
                         type: progress.damageType,
-                        fromType: progress.fromType
+                        fromType: progress.fromType,
+                        critical: progress.critical
                     })
                 }
                 this.emit(CharacterEvent.BeDamage, progress)
@@ -407,7 +415,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.from = this
         progress.target = option.target
         // 是否暴击
-        progress.critical = this.criticalRate <= Math.random()
+        progress.critical = this.criticalRate > Math.random()
         option.beforeAttack && option.beforeAttack(progress)
         this.emitProgress("beforeAttack", progress)
             .then(async () => {
@@ -420,28 +428,32 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     atk: (progress.from.physicalAttack * progress.damageRateType.physic) * damageRate,
                     type: DamageType.physic,
                     from: progress.from,
-                    fromType: FromType.attack
+                    fromType: FromType.attack,
+                    critical: progress.critical
                 })
                 // 基础魔法伤害
                 progress.target.beDamage({
                     atk: progress.from.magicAttack * progress.damageRateType.magic * damageRate,
                     type: DamageType.magic,
                     from: progress.from,
-                    fromType: FromType.attack
+                    fromType: FromType.attack,
+                    critical: progress.critical
                 })
                 // 基础光伤害
                 progress.target.beDamage({
                     atk: progress.from.lightAttack * progress.damageRateType.light,
                     type: DamageType.light,
                     from: progress.from,
-                    fromType: FromType.attack
+                    fromType: FromType.attack,
+                    critical: false
                 })
                 // 基础暗伤害
                 progress.target.beDamage({
                     atk: progress.from.darkAttack * progress.damageRateType.dark,
                     type: DamageType.dark,
                     from: progress.from,
-                    fromType: FromType.attack
+                    fromType: FromType.attack,
+                    critical: false
                 })
                 await this.emitProgress("afterAttack", progress)
                 option.afterAttack && option.afterAttack(progress)
@@ -497,7 +509,8 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     reduce: progress.cost.hp,
                     type: DamageType.real,
                     from: progress.from,
-                    fromType: FromType.skillCost
+                    fromType: FromType.skillCost,
+                    critical: false
                 })
                 progress.skill.coolTime = progress.skill.proto.coolTime
                 progress.skill.proto.use({

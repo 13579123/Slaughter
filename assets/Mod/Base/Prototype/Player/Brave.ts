@@ -57,16 +57,10 @@ export class Brave extends CharacterPrototype {
     public get animation(): AnimationConfig {
         return {
             animations: {
-                attack: "Attack01",
-                skill: "Attack02",
                 idle: "Idle",
                 move: "Run",
                 die: "BeAttack"
             },
-            animationFrameName: {
-                attack: "Attack01",
-                skill: "Attack02",
-            }
         }
     }
 

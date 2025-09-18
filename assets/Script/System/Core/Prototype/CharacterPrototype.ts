@@ -1,7 +1,7 @@
 import { sp, SpriteFrame } from "cc";
 import { CharacterEquipmentDTO, CharacterInstance } from "../Instance/CharacterInstance";
 import { BasePrototypeProperty } from "../Property/BasePrototypeProperty";
-import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgress, HealProgress } from "../Progress/FightProgress";
+import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgress, HealProgress, SkillProgress } from "../Progress/FightProgress";
 import { EquipmentDTO } from "./EquipmentPrototype";
 import { BuffDTO } from "./BuffPrototype";
 import { SkillDTO } from "./SkillPrototype";
@@ -79,18 +79,23 @@ export class CharacterPrototype implements FightProgress {
     public async skeletonData(): Promise<sp.SkeletonData> {
         return Promise.resolve(null);
     }
-    // 攻击之前
+    // 是否在技能动画中
+    private isSkillAnimation = false
+    // 攻击动画Promise会在攻击动作计算完成后resolve
     private attackAnimationPromise = null
+    private skilAniamtionPromise = null
+
     beforeAttack(progress: AttackProgress, next: Function) { 
+        // 正在技能动画中则不执行
+        if (this.isSkillAnimation) return
         const prefab = getComponentByPlayer(this.instance)
+        if (!prefab) return next()
         this.attackAnimationPromise = prefab.playAnimation("Attack01" , {
             count: 1 , 
             speed: this.instance.attackSpeed,
             frameEvent: {
                 name: "Attack01",
-                callback: () => {
-                    next()
-                }
+                callback: () => next()
             }
         })
         return
@@ -98,4 +103,27 @@ export class CharacterPrototype implements FightProgress {
     afterAttack(progress: AttackProgress, next: Function): void {
         if (this.attackAnimationPromise) this.attackAnimationPromise.then(next)
     }
+    beforeUseSkill(progress: SkillProgress, next: Function) {
+        // 正在技能动画中则不执行
+        if (this.isSkillAnimation) return
+        const prefab = getComponentByPlayer(this.instance)
+        if (!prefab) return next()
+        this.isSkillAnimation = true
+        this.attackAnimationPromise = prefab.playAnimation("Attack02" , {
+            count: 1 , 
+            speed: this.instance.attackSpeed,
+            frameEvent: {
+                name: "Attack02",
+                callback: () => next()
+            }
+        })
+    }
+    afterUseSkill(progress: SkillProgress, next: Function): void {
+        if (this.attackAnimationPromise) 
+            this.attackAnimationPromise.then(() => {
+                this.isSkillAnimation = false
+                next()
+            })
+    }
+
 }

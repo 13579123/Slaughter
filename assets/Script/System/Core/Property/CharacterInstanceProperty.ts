@@ -200,7 +200,6 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
     // 暴击率 0 - 1
     public get criticalRate(): number {
         const base = this.proto.baseProperty.criticalRate
-        const grow = Math.floor(this.lv / 3)
         const extra = this.extraProperty.criticalRate || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
@@ -209,19 +208,18 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             } , 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.criticalRate ? sum + bf.extraProperty.criticalRate : sum, 0)
-        return base + grow + extra + equip + buff
+        return base + extra + equip + buff
     }
     // 暴击伤害
     public get criticalDamage(): number {
         const base = this.proto.baseProperty.criticalDamage 
-        const grow = this.proto.growProperty.criticalDamage * (this.lv - 1)
         const extra = this.extraProperty.criticalDamage || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
             .reduce((sum, eq) => eq ? sum + eq.criticalDamage : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.criticalDamage ? sum + bf.extraProperty.criticalDamage : sum , 0)
-        return base + grow + extra + equip + buff
+        return base + extra + equip + buff
     }
     // 攻击速度
     public get attackSpeed(): number {

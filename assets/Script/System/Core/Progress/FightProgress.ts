@@ -42,6 +42,8 @@ export class DamageProgress extends Progress {
 
     public damageRate: number = 1.0
 
+    public critical: boolean = false
+
 }
 
 export class BuffProgress extends Progress {

@@ -65,7 +65,7 @@ export class Spear extends EquipmentPrototype {
             }: +15${this.suitCount >= oneSuit ? `</color>` : ""}\n`
         res += `${this.suitCount >= twoSuit ? `<color=#00ff00>` : ""}${suitEntryStr}(${twoSuit}): ${LanguageManager.getEntry("attackSpeed")
                 .getValue(settingManager.data.language)
-            }: +0.1${this.suitCount >= twoSuit ? `</color>` : ""}\n`
+            }: +0.15${this.suitCount >= twoSuit ? `</color>` : ""}\n`
 
         return res
     }
@@ -77,7 +77,7 @@ export class Spear extends EquipmentPrototype {
     }).setProperty("physicalAttack", (atk) => {
         return atk + (this.suitCount >= oneSuit ? 15 : 0)
     }).setProperty("attackSpeed", (speed) => {
-        return speed + (this.suitCount >= twoSuit ? 0.1 : 0)
+        return speed + (this.suitCount >= twoSuit ? 0.15 : 0)
     })
 
     // 成长属性
