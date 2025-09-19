@@ -497,3 +497,19 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
         }
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Escape")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "逃离"
+        }
+
+        public get eng(): string {
+            return "Escape"
+        }
+
+        public get jpn(): string {
+            return "逃げる"
+        }
+    }
+})();

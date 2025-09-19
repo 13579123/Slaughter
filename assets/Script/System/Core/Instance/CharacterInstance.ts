@@ -121,10 +121,10 @@ export class CharacterInstance extends CharacterInstanceProperty {
         const list = skills.map(dto => {
             const Proto = getSkillPrototype(dto.prototype)
             if (Proto) {
-                return new SkillInstance({ 
-                    characterInstance: this, 
-                    lv: dto.lv, 
-                    Proto 
+                return new SkillInstance({
+                    characterInstance: this,
+                    lv: dto.lv,
+                    Proto
                 })
             }
             else warn(`Can not found skill by prototype key: ${dto.prototype}`)
@@ -134,38 +134,45 @@ export class CharacterInstance extends CharacterInstanceProperty {
 
     // 触发战斗流程事件
     protected async emitProgress(e: keyof FightProgress, progress: Progress) {
-        const promises: Promise<any>[] = []
-        // 装备生效
-        const keys = Object.keys(this.equipments) as (keyof CharacterEquipmentDTO)[]
-        for (let i = 0; i < keys.length; i++) {
-            const equipment = this.equipments[keys[i]];
-            if (equipment) {
-                const promise = new Promise(res => {
-                    const callback = equipment.proto[e]
+        return new Promise(async res => {
+            let hasNext = false
+            progress.next = () => {
+                hasNext = true
+                res(null)
+            }
+            // 角色生效
+            if (!hasNext) {
+                await new Promise(res => {
+                    if (this.proto[e])
+                        this.proto[e](progress as any, res)
+                    else res(null)
+                })
+            }
+            // 装备生效
+            const keys = Object.keys(this.equipments) as (keyof CharacterEquipmentDTO)[]
+            for (let i = 0; i < keys.length; i++) {
+                if (hasNext) break
+                const equipment = this.equipments[keys[i]];
+                if (equipment) {
+                    await new Promise(res => {
+                        const callback = equipment.proto[e]
+                        if (callback) callback(progress as any, res)
+                        else res(null)
+                    })
+                }
+            }
+            // buff 生效
+            for (let i = 0; i < this.buffs.length; i++) {
+                if (hasNext) break
+                const buff = this.buffs[i]
+                await new Promise(res => {
+                    const callback = buff.proto[e]
                     if (callback) callback(progress as any, res)
                     else res(null)
                 })
-                promises.push(promise)
             }
-        }
-        // buff 生效
-        for (let i = 0; i < this.buffs.length; i++) {
-            const buff = this.buffs[i]
-            const promise = new Promise(res => {
-                const callback = buff.proto[e]
-                if (callback) callback(progress as any, res)
-                else res(null)
-            })
-            promises.push(promise)
-        }
-        // 角色生效
-        const promise = new Promise(res => {
-            if (this.proto[e])
-                this.proto[e](progress as any, res)
-            else res(null)
+            res(null)
         })
-        promises.push(promise)
-        return Promise.all(promises)
     }
 
     // 是否已经死亡
@@ -174,20 +181,30 @@ export class CharacterInstance extends CharacterInstanceProperty {
         return this._hasDeath
     }
 
+    // 进入预死亡阶段
+    public _preDeath = false
+
     // 尝试死亡
     public death(option: {
         damage: number,
         from: CharacterInstance,
     }) {
+        if (this._hasDeath || this._preDeath) return
+        this._preDeath = true
         const progress = new DeathProgress()
         progress.from = option.from
         progress.damage = option.damage
         this.emitProgress("beforeDeath", progress)
-            .then(() => {
+            .then(async () => {
+                this._preDeath = false
                 if (this.hp > 0) return
-                this._hasDeath = true
-                this.emit(CharacterEvent.Death)
-                this.emitProgress("afterDeath", progress)
+                this._hasDeath = true;
+                (new Promise(res => {
+                    this.proto.playDieAnimation(progress , () => {} , res)
+                })).then(async () => {
+                    this.emit(CharacterEvent.Death , option) 
+                })
+                await this.emitProgress("afterDeath", progress)
             })
     }
 
@@ -199,11 +216,12 @@ export class CharacterInstance extends CharacterInstanceProperty {
         extraProperty?: Partial<BaseInstanceProperty>,
         Proto: Constructor<BuffPrototype>
     }) {
+        if (this._hasDeath || this._preDeath) return
         const progress = new BuffProgress()
         progress.target = option.target || this
         progress.from = option.from || this
         progress.buff.push(option.Proto)
-        progress.target.emitProgress("beforeAddBuff", progress).then(() => {
+        progress.target.emitProgress("beforeAddBuff", progress).then(async () => {
             progress.buff.forEach(proto => {
                 const buff = new BuffInstance({
                     Proto: proto,
@@ -217,7 +235,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                 progress.target.buffs.push(buff)
                 buff.proto.onAdd()
             })
-            return progress.target.emitProgress("afterAddBuff", progress)
+            await progress.target.emitProgress("afterAddBuff", progress)
         })
         return
     }
@@ -228,6 +246,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         from?: CharacterInstance,
         Proto: Constructor<BuffPrototype>,
     }) {
+        if (this._hasDeath || this._preDeath) return
         const progress = new BuffProgress()
         progress.target = option.target || this
         progress.from = option.from || this
@@ -245,6 +264,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     }
                 })
                 return progress.target.emitProgress("afterRemoveBuff", progress)
+            }).finally(() => {
             })
         return
     }
@@ -257,15 +277,14 @@ export class CharacterInstance extends CharacterInstanceProperty {
         fromType: FromType,
         critical: boolean,
     }) {
+        if (this._hasDeath || this._preDeath) return
         this.hp = ((this.maxHp * this.hp) - option.reduce) / this.maxHp
         this.emit(CharacterEvent.ReduceHp, option)
         if (this.hp <= 0) {
             this.hp = 0
-            this.emit(CharacterEvent.HpToZero)
-        }
-        if (this.hp <= 0) {
-            this.hp = 0
-            this.death({ from: option.from, damage: option.reduce })
+            this.emit(CharacterEvent.HpToZero, option)
+            // 尝试死亡
+            this.death({ from: option.from , damage: option.reduce })
         }
     }
 
@@ -275,10 +294,11 @@ export class CharacterInstance extends CharacterInstanceProperty {
         from?: CharacterInstance,
         fromType?: FromType
     }) {
+        if (this._hasDeath || this._preDeath) return
         option.from = option.from || this
         option.fromType = option.fromType || FromType.skill
         this.hp = ((this.maxHp * this.hp) + option.increase) / this.maxHp
-        this.emit(CharacterEvent.ReduceHp, option)
+        this.emit(CharacterEvent.IncreaseHp, option)
     }
 
     // 减少生魔法值(纯粹减少)
@@ -286,6 +306,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         reduce: number,
         from: CharacterInstance,
     }) {
+        if (this._hasDeath || this._preDeath) return
         this.mp = ((this.maxMp * this.mp) - option.reduce) / this.maxMp
         this.emit(CharacterEvent.ReduceMp, option)
     }
@@ -295,8 +316,9 @@ export class CharacterInstance extends CharacterInstanceProperty {
         increase: number,
         from: CharacterInstance,
     }) {
+        if (this._hasDeath || this._preDeath) return
         this.mp = ((this.maxMp * this.mp) + option.increase) / this.maxMp
-        this.emit(CharacterEvent.ReduceMp, option)
+        this.emit(CharacterEvent.IncreaseMp, option)
     }
 
     // 伤害角色
@@ -307,6 +329,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         fromType: FromType,
         critical: boolean,
     }) {
+        if (this._hasDeath || this._preDeath) return
         const progress = new DamageProgress()
         progress.damage = option.atk
         progress.from = option.from
@@ -316,7 +339,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.damageRate = 1.0
         progress.critical = option.critical
         this.emitProgress("beforeDamage", progress)
-            .then(() => {
+            .then(async () => {
                 const damage = progress.damage * progress.damageRate
                 if (progress.damageType === DamageType.physic) {
                     progress.target.reduceHp({
@@ -376,7 +399,8 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     })
                 }
                 this.emit(CharacterEvent.BeDamage, progress)
-                this.emitProgress("afterDamage", progress)
+                await this.emitProgress("afterDamage", progress)
+            }).finally(() => {
             })
         return
     }
@@ -387,6 +411,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         from: CharacterInstance,
         fromType: FromType
     }) {
+        if (this._hasDeath || this._preDeath) return
         const progress = new HealProgress()
         progress.heal = option.heal
         progress.from = option.from
@@ -405,20 +430,37 @@ export class CharacterInstance extends CharacterInstanceProperty {
             })
     }
 
+    // 使用攻击中
+    protected _isAttacking = false
+    public get isAttacking() {
+        return this._isAttacking
+    }
+
     // 普通攻击某一个角色
     public attackCharacter(option: {
         target: CharacterInstance,
         beforeAttack?: (progress: AttackProgress) => void,
-        afterAttack?: (progress: AttackProgress) => void
+        afterAttack?: (progress: AttackProgress) => void,
+        attackAnimationComplete?: (progress: AttackProgress) => void
     }) {
+        if (this._hasDeath || this._preDeath) return
+        if (this._isAttacking || this._isSkilling) return
+        // 流程
         const progress = new AttackProgress()
         progress.from = this
         progress.target = option.target
+        progress.from._isAttacking = true
         // 是否暴击
         progress.critical = this.criticalRate > Math.random()
         option.beforeAttack && option.beforeAttack(progress)
-        this.emitProgress("beforeAttack", progress)
+        return this.emitProgress("beforeAttack", progress)
             .then(async () => {
+                await new Promise(res => {
+                    progress.from.proto.playAttackAnimation(progress , () => {
+                        progress.from._isAttacking = false
+                        option.attackAnimationComplete && option.attackAnimationComplete(progress)
+                    } , res)
+                })
                 // 伤害浮动和暴击伤害
                 const damageRate = (Math.random() * 0.2 + 0.9) * (
                     progress.critical ? progress.from.criticalDamage : 1
@@ -458,11 +500,11 @@ export class CharacterInstance extends CharacterInstanceProperty {
                 await this.emitProgress("afterAttack", progress)
                 option.afterAttack && option.afterAttack(progress)
             })
-        return
     }
 
     // 判断技能是否可用
-    public isSkillAble(skill: SkillInstance, progress?: SkillProgress): Promise<boolean> {
+    public async isSkillAble(skill: SkillInstance, progress?: SkillProgress): Promise<boolean> {
+        // 流程
         if (!progress) {
             progress = new SkillProgress()
             progress.from = this
@@ -491,10 +533,18 @@ export class CharacterInstance extends CharacterInstanceProperty {
         })
     }
 
+    // 使用技能中
+    protected _isSkilling = false
+    public get isSkilling() {
+        return this._isSkilling
+    }
+
     // 使用技能
     public useSkill(option: {
         skill: SkillInstance,
     }) {
+        if (this._hasDeath || this._preDeath) return
+        if (this._isSkilling) return
         const progress = new SkillProgress()
         progress.from = this
         progress.skill = option.skill
@@ -504,6 +554,13 @@ export class CharacterInstance extends CharacterInstanceProperty {
         this.isSkillAble(option.skill, progress)
             .then(async able => {
                 if (!able) return
+                progress.from._isSkilling = true
+                await new Promise(res => {
+                    progress.from.proto.playSkillAnimation(progress , () => {
+                        progress.from._isSkilling = false
+                        progress.from._isAttacking = false
+                    } , res)
+                })
                 progress.from.reduceMp({ reduce: progress.cost.mp, from: progress.from })
                 progress.from.reduceHp({
                     reduce: progress.cost.hp,

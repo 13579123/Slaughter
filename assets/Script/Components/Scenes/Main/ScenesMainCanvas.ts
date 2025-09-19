@@ -27,11 +27,12 @@ export class ScenesMainCanvas extends Component {
         }))
         const successPos = await node.getComponent(FightPrefab)
         .setFightAndStart({
-            player: "none",
+            player: "left",
             leftCharacter: leftC,
             rightCharacter: rightC,
         })
-        console.log(successPos + " 胜利" , leftC , rightC)
+        this.node.removeChild(node)
+        console.log(successPos + " 胜利" )
     }
 
 }

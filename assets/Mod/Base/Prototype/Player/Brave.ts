@@ -6,6 +6,8 @@ import { LanguageManager, RegisterLanguageEntry } from "db://assets/Module/Langu
 import { BasePrototypeProperty } from "db://assets/Script/System/Core/Property/BasePrototypeProperty";
 import { AnimationConfig, CharacterPrototype } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { RegisterCharacter } from "db://assets/Script/System/Manager/CharacterManager";
+import { getComponentByPlayer } from "db://assets/Script/Game/System/PlayerToPrefabMap";
+import { AttackProgress, DeathProgress, SkillProgress } from "db://assets/Script/System/Core/Progress/FightProgress";
 
 @RegisterLanguageEntry("Brave")
 class Brave_Entry extends LanguageEntry {
@@ -33,9 +35,9 @@ export class Brave extends CharacterPrototype {
     }
 
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
-        maxHp: 150,
+        maxHp: 1000,
         maxMp: 70,
-        physicalAttack: 35,
+        physicalAttack: 120,
         magicAttack: 40,
         physicalDefense: 20,
         magicDefense: 20,
@@ -59,7 +61,6 @@ export class Brave extends CharacterPrototype {
             animations: {
                 idle: "Idle",
                 move: "Run",
-                die: "BeAttack"
             },
         }
     }
@@ -67,16 +68,58 @@ export class Brave extends CharacterPrototype {
     public icon(): Promise<SpriteFrame> {
         return new Promise(async res => {
             const assets = new CcNative.Asset.AssetManager("ModBaseResource")
-            res((await assets.load("Texture/Player/Brave/spriteFrame" , SpriteFrame , true)).value)
+            res((await assets.load("Texture/Player/Brave/spriteFrame", SpriteFrame, true)).value)
         })
     }
 
     public skeletonData(): Promise<sp.SkeletonData> {
         return new Promise(async res => {
             const assets = new CcNative.Asset.AssetManager("ModBaseResource")
-            res((await assets.load("Spine/Player/hero0001" , sp.SkeletonData , true)).value)
+            res((await assets.load("Spine/Player/hero0001", sp.SkeletonData, true)).value)
         })
     }
+
+    // 攻击动画Promise会在攻击动作计算完成后resolve
+    playAttackAnimation(progress: AttackProgress, endCallback: Function, next: Function) {
+        const prefab = getComponentByPlayer(this.instance)
+        if (!prefab) return next()
+        prefab.playAnimation("Attack01", {
+            count: 1,
+            speed: this.instance.attackSpeed,
+            frameEvent: {
+                name: "Attack01",
+                callback: () => next()
+            },
+            complete: () => endCallback()
+        })
+        return
+    }
+    playSkillAnimation(progress: SkillProgress, endCallback: Function, next: Function) {
+        const prefab = getComponentByPlayer(this.instance)
+        if (!prefab) return next()
+        prefab.playAnimation("Attack02", {
+            count: 1,
+            speed: 1,
+            frameEvent: {
+                name: "Attack02",
+                callback: () => next()
+            },
+            complete: () => endCallback()
+        })
+    }
+    public playDieAnimation(progress: DeathProgress, endCallback: Function , next: Function): void {
+        const prefab = getComponentByPlayer(this.instance)
+        if (!prefab) return
+        prefab.playAnimation("BeAttack", {
+            count: 1,
+            speed: 1,
+            complete: () => {
+                endCallback() 
+                next()
+            }
+        })
+    }
+
 
 }
 

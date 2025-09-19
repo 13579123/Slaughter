@@ -25,7 +25,7 @@ export function getCharacterPrototype(key: string): Constructor<CharacterPrototy
 }
 
 // 根据装备原型或者实例获取key
-export function getCharacterKey(proto: Constructor<CharacterPrototype>): string | undefined {
+export function getCharacterKey(proto: Constructor<CharacterPrototype>|CharacterPrototype): string | undefined {
     if (proto instanceof CharacterPrototype) {
         // @ts-ignore
         return registryReverse.get(proto.constructor);

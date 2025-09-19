@@ -8,6 +8,8 @@ import { BuffPrototype } from "../Prototype/BuffPrototype"
 export class Progress {
     // 数据
     data: Map<string, any> = new Map
+    // 跳过当前阶段
+    next: Function
 }
 
 export class AttackProgress extends Progress {

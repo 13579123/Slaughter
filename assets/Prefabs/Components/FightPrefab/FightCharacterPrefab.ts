@@ -155,13 +155,10 @@ export class FightCharacterPrefab extends ExtensionComponent {
             xMove = -2
         }
         // 隐藏状态
-        this.node.getChildByName("State").active = false
+        // this.node.getChildByName("State").active = false
         // 播放动画
+        this.playAnimation(this.character.proto.animation.animations.move , {count: -1})
         const spine = this.node.getChildByName("Spine")
-        spine.setPosition(startPosx, spine.y)
-        spine.getComponent(SpineAnimation).playAnimation(
-            this.character.proto.animation.animations.move
-        )
         // 移动到指定位置
         const promise = new Promise((res) => {
             const close = this.setAutoInterval(() => {
@@ -179,23 +176,25 @@ export class FightCharacterPrefab extends ExtensionComponent {
     // 角色准备
     public characterReady() {
         // 播放idle动画
-        const spine = this.node.getChildByName("Spine")
-        spine.getComponent(SpineAnimation).playAnimation(
-            this.character.proto.animation.animations.idle,
-            { count: -1 }
-        )
+        this.playAnimation(this.character.proto.animation.animations.idle , {count: -1})
         // 准备
         this.isReady = true
         // 展示状态信息
         if (this.isPlayer) this.node.getChildByName("State").active = true
     }
 
+    // 当前播放的动画
+    private currentAnimation: string = ""
+
     // 播放动画
     public async playAnimation(animationName: string , option: {
         count?: number , 
         speed?: number , 
+        complete?: () => void
         frameEvent?: {name: string , callback: () => void}
     }) {
+        if (this.currentAnimation === animationName) return
+        this.currentAnimation = animationName
         const spine = this.node.getChildByName("Spine").getComponent(SpineAnimation)
         if (option.frameEvent) {
             const frameCall = () => {
@@ -205,13 +204,10 @@ export class FightCharacterPrefab extends ExtensionComponent {
             spine.listenFrameEvent(option.frameEvent.name , frameCall)
         }
         await spine.playAnimation(animationName , option)
-    }
-
-    // 播放死亡动画
-    public async characterDie() {
-        // 播放死亡动画
-        const spine = this.node.getChildByName("Spine").getComponent(SpineAnimation)
-        await spine.playAnimation(this.character.proto.animation.animations.die, { count: 1 })
+        this.currentAnimation = ""
+        if (option.complete) {
+            option.complete()
+        }
     }
 
     // 帧间事件
