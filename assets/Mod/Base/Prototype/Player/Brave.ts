@@ -35,7 +35,7 @@ export class Brave extends CharacterPrototype {
     }
 
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
-        maxHp: 1000,
+        maxHp: 1300,
         maxMp: 70,
         physicalAttack: 120,
         magicAttack: 40,

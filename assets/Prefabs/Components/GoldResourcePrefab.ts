@@ -11,9 +11,9 @@ export class GoldResourcePrefab extends ExtensionComponent {
     protected GoldNumberLabel: Label
 
     protected start(): void {
-        this.effect(() => 
+        this.effect(() => {
             this.GoldNumberLabel.string = Normal.number(resourceManager.data.gold)
-        )
+        })
     }
 
 }

@@ -41,7 +41,6 @@ export class SkillPrototype {
     }
     // 保存对应的实例
     constructor(public readonly instance: SkillInstance) {
-        setTimeout(() => this.onCreate());
     }
     // 图标信息 Sprite
     public async icon(): Promise<SpriteFrame> {
@@ -61,5 +60,5 @@ export class SkillPrototype {
     }) {
     }
     // 创建原型实例的回调
-    protected onCreate() {}
+    public onCreate() {}
 }

@@ -11,6 +11,7 @@ import { FightBuffItemPrefab } from './FightBuffItemPrefab';
 import { SkillInstance } from 'db://assets/Script/System/Core/Instance/SkillInstance';
 import { DamageType, FromType } from 'db://assets/Script/System/Core/Prototype/CharacterPrototype';
 import { bindPlayerToComponent } from 'db://assets/Script/Game/System/PlayerToPrefabMap';
+import { FightPrefab } from './FightPrefab';
 const { ccclass, property } = _decorator;
 
 @ccclass('FightCharacterPrefab')
@@ -26,6 +27,9 @@ export class FightCharacterPrefab extends ExtensionComponent {
     // 是否在释放技能行动状态
     public isSkilling: boolean = false;
 
+    // 是否在释放攻击行动状态
+    public isAttacking: boolean = false;
+
     // 展示状态
     public isPlayer: boolean = false;
 
@@ -37,6 +41,8 @@ export class FightCharacterPrefab extends ExtensionComponent {
 
     // 帧事件监听
     public frameEvent: Array<(event: sp.spine.Event) => void> = []
+
+    public fightPrefab: FightPrefab = null;
 
     // 绑定角色数据和状态
     public async bindCharacter(character: CharacterInstance, pos: "left" | "right", isPlayer = true) {
@@ -181,6 +187,49 @@ export class FightCharacterPrefab extends ExtensionComponent {
         this.isReady = true
         // 展示状态信息
         if (this.isPlayer) this.node.getChildByName("State").active = true
+    }
+
+    // 取消攻击
+    protected cancelAttackCallback: () => void = null
+
+    // 角色攻击
+    public async characterAttack(target: CharacterInstance) {
+        if (this.isAttacking || this.isSkilling) return
+        return new Promise((res) => {
+            this.cancelAttackCallback = () => {
+                this.isAttacking = false
+                res(null)
+            }
+            this.character.attackCharacter({
+                target,
+                animationComplete: () => {
+                    if (this.cancelAttackCallback)
+                        this.cancelAttackCallback()
+                    this.cancelAttackCallback = null
+                }
+            })
+        })
+    }
+
+    // 角色释放技能
+    public async characterUseSkill(skill: SkillInstance) {
+        if (this.isSkilling) return
+        return new Promise((res) => {
+            this.character.useSkill({
+                skill,
+                useAble: () => {
+                    this.isSkilling = true
+                },
+                animationComplete: () => {
+                    this.isSkilling = false
+                    this.isAttacking = false
+                    if (this.cancelAttackCallback)
+                        this.cancelAttackCallback()
+                    this.cancelAttackCallback = null
+                    res(null)
+                }
+            })
+        })
     }
 
     // 当前播放的动画

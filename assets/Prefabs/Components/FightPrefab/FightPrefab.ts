@@ -44,9 +44,6 @@ export class FightPrefab extends ExtensionComponent {
     protected leftCharacterPrefab: FightCharacterPrefab;
     protected rightCharacterPrefab: FightCharacterPrefab;
 
-    // 战斗等待
-    protected fightWait: Function = null
-
     // 设置战斗数据并且开始战斗
     public async setFightAndStart(option: FightOption) {
         if (this.hasStart) return;
@@ -113,7 +110,15 @@ export class FightPrefab extends ExtensionComponent {
             // 绑定点击按钮
             skillNode.getChildByName("Icon").on(
                 Button.EventType.CLICK , 
-                () => playerData.character.useSkill({skill})
+                () => {
+                    playerData.characterPrefab.characterUseSkill(skill)
+                    // playerData.character.useSkill({
+                    //     skill,
+                    //     animationComplete: () => {
+
+                    //     },
+                    // })
+                }
             )
             skillPanel.getChildByName("SkillContainer").addChild(skillNode)
             index++
@@ -130,12 +135,14 @@ export class FightPrefab extends ExtensionComponent {
         await leftCharacterPrefab.bindCharacter(this.leftCharacter, "left", playerPos !== "left")
         this.node.getChildByName("LeftCharacterContainer").addChild(leftNode)
         this.leftCharacterPrefab = leftCharacterPrefab
+        leftCharacterPrefab.fightPrefab = this
         // 右侧
         const rightNode = CcNative.instantiate(this.CharacterPrefab)
         const rightCharacterPrefab = rightNode.getComponent(FightCharacterPrefab)
         await rightCharacterPrefab.bindCharacter(this.rightCharacter, "right", playerPos !== "right")
         this.node.getChildByName("RightCharacterContainer").addChild(rightNode)
         this.rightCharacterPrefab = rightCharacterPrefab
+        rightCharacterPrefab.fightPrefab = this
     }
 
     // 开始战斗逻辑
@@ -180,18 +187,20 @@ export class FightPrefab extends ExtensionComponent {
             target: CharacterInstance,
             characterPrefab: FightCharacterPrefab,
             targetPrefab: FightCharacterPrefab,
+            pos: string
         ) => {
             return new Promise(async res => {
                 let stop = false
-                character.on(CharacterEvent.Death, () => (stop = true) && res(null))
-                target.on(CharacterEvent.Death, () => (stop = true) && res(null))
+                character.on(CharacterEvent.Death, () => {
+                    (stop = true);
+                    res(null)
+                })
+                target.on(CharacterEvent.Death, () => {
+                    (stop = true) ; 
+                    res(null)
+                })
                 while(!stop) {
-                    await new Promise(resolve => {
-                        character.attackCharacter({ 
-                            target , 
-                            attackAnimationComplete: () => { resolve(null); }
-                        })
-                    })
+                    await characterPrefab.characterAttack(target)
                     characterPrefab.characterReady()
                     await new Promise(
                         resolve => this.setAutoInterval(() => resolve(null) , {count: 1 , timer: 1000 / character.attackSpeed})
@@ -200,17 +209,15 @@ export class FightPrefab extends ExtensionComponent {
                 return
             })
         }
-
         // 两边角色开始攻击
         await Promise.all([
-            startAttack(this.leftCharacter, this.rightCharacter , this.leftCharacterPrefab , this.rightCharacterPrefab),
-            startAttack(this.rightCharacter, this.leftCharacter , this.rightCharacterPrefab , this.leftCharacterPrefab),
+            startAttack(this.leftCharacter, this.rightCharacter , this.leftCharacterPrefab , this.rightCharacterPrefab , "left"),
+            startAttack(this.rightCharacter, this.leftCharacter , this.rightCharacterPrefab , this.leftCharacterPrefab , "right"),
         ])
         if (!this.leftCharacter.hasDeath) this.leftCharacterPrefab.characterReady()
         if (!this.rightCharacter.hasDeath) this.rightCharacterPrefab.characterReady()
-        // 开始战斗
+        // 战斗结算
         return new Promise<"left" | "right" | "none">(async (res) => {
-            this.fightWait = res
             if (this.leftCharacter.hasDeath && this.rightCharacter.hasDeath) res("none")
             if (this.leftCharacter.hasDeath) res("right")
             else if (this.rightCharacter.hasDeath) res("left")

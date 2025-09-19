@@ -8,7 +8,6 @@ import { CharacterInstance } from "db://assets/Script/System/Core/Instance/Chara
 import { FromType } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { SkillFailReason, SkillPrototype } from "db://assets/Script/System/Core/Prototype/SkillPrototype";
 import { RegisterSkill } from "db://assets/Script/System/Manager/SkillManager";
-import { DefenseUp } from "../Buff/DefenseUp";
 import { Rx } from "db://assets/Module/Rx";
 import { SkillProgress } from "db://assets/Script/System/Core/Progress/FightProgress";
 import { message } from "db://assets/Script/Game/Message/Message";
@@ -34,17 +33,17 @@ class Iatrotechnics_Name extends LanguageEntry {
 class Iatrotechnics_Description extends LanguageEntry {
 
     public get chs(): string {
-        return `<color=0E70FB>消耗: ${ this.data.lv * 10 + 30 } 魔法值</color>\n` + 
+        return `<color=0E70FB>消耗: ${ Math.max(0 , this.data.lv - 1) * 20 + 40 } 魔法值</color>\n` + 
         `恢复 ${ (this.data.lv - 1) * 3 + 5 }% 最大生命值 ，最低回复 ${ (this.data.lv - 1) * 10 + 50 } 生命值`
     }
 
     public get eng(): string {
-        return `<color=0E70FB>Cost: ${ this.data.lv * 10 + 30 } MP</color>\n` + 
+        return `<color=0E70FB>Cost: ${ Math.max(0 , this.data.lv - 1) * 20 + 40 } MP</color>\n` + 
         `Restore ${ (this.data.lv - 1) * 3 + 5 }% max HP, minimum ${ (this.data.lv - 1) * 10 + 50 } HP`
     }
 
     public get jpn(): string {
-        return `<color=0E70FB>消費: ${ this.data.lv * 10 + 30 } MP</color>\n` +
+        return `<color=0E70FB>消費: ${ Math.max(0 , this.data.lv - 1) * 20 + 40 } MP</color>\n` +
         `最大体力値 ${ (this.data.lv - 1) * 3 + 5 }% 回復、最低 ${ (this.data.lv - 1) * 10 + 50 } 生命値 回復`
     }
 
@@ -80,7 +79,7 @@ export class Iatrotechnics extends SkillPrototype {
     }
 
     public get cost(): { hp: number; mp: number; } {
-        return { hp: 0, mp: this.instance.lv * 20 + 40 }
+        return { hp: 0, mp: Math.max(0 , this.instance.lv - 1) * 20 + 40 }
     }
 
     public get coolTime(): number {

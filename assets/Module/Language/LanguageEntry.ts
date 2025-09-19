@@ -29,7 +29,7 @@ export class LanguageEntry<T = {[key: string]: any}> {
     public getValue(lan: LanguageType = "chs" , data?: T) {
         this.data = data
         let result = this[lan]
-        if (!this[lan]) {
+        if (!this[lan] && this[lan] !== "") {
             error("This language is not supported or there is no corresponding translation for this language : " + lan)
             return this.key
         }

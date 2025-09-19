@@ -74,7 +74,9 @@ export class DetailInfoPrefab extends ExtensionComponent {
             container.buttons.forEach((item, index) => {
                 if (!item) return
                 const button = instantiate(temp)
-                button.on(Button.EventType.CLICK, () => item.callback(this.closeDetail))
+                button.on(Button.EventType.CLICK, () => {
+                    item.callback(this.closeDetail)
+                })
                 button.getChildByName("Label").getComponent(Label).string = item.label
                 buttonsNode.addChild(button)
             })

@@ -121,11 +121,13 @@ export class CharacterInstance extends CharacterInstanceProperty {
         const list = skills.map(dto => {
             const Proto = getSkillPrototype(dto.prototype)
             if (Proto) {
-                return new SkillInstance({
+                const skill = new SkillInstance({
                     characterInstance: this,
                     lv: dto.lv,
                     Proto
                 })
+                setTimeout(() => skill.proto.onCreate())
+                return skill
             }
             else warn(`Can not found skill by prototype key: ${dto.prototype}`)
         })
@@ -430,35 +432,24 @@ export class CharacterInstance extends CharacterInstanceProperty {
             })
     }
 
-    // 使用攻击中
-    protected _isAttacking = false
-    public get isAttacking() {
-        return this._isAttacking
-    }
-
     // 普通攻击某一个角色
     public attackCharacter(option: {
         target: CharacterInstance,
-        beforeAttack?: (progress: AttackProgress) => void,
-        afterAttack?: (progress: AttackProgress) => void,
-        attackAnimationComplete?: (progress: AttackProgress) => void
+        animationComplete?: (progress: AttackProgress) => void
     }) {
         if (this._hasDeath || this._preDeath) return
-        if (this._isAttacking || this._isSkilling) return
         // 流程
         const progress = new AttackProgress()
         progress.from = this
         progress.target = option.target
-        progress.from._isAttacking = true
+
         // 是否暴击
         progress.critical = this.criticalRate > Math.random()
-        option.beforeAttack && option.beforeAttack(progress)
         return this.emitProgress("beforeAttack", progress)
             .then(async () => {
                 await new Promise(res => {
                     progress.from.proto.playAttackAnimation(progress , () => {
-                        progress.from._isAttacking = false
-                        option.attackAnimationComplete && option.attackAnimationComplete(progress)
+                        option.animationComplete && option.animationComplete(progress)
                     } , res)
                 })
                 // 伤害浮动和暴击伤害
@@ -498,7 +489,6 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     critical: false
                 })
                 await this.emitProgress("afterAttack", progress)
-                option.afterAttack && option.afterAttack(progress)
             })
     }
 
@@ -520,6 +510,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                         progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast, progress)
                         return res(false)
                     }
+                    // console.log(progress.cost.mp , progress.from.mp * progress.from.maxMp)
                     if (progress.cost.mp > progress.from.mp * progress.from.maxMp) {
                         progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast, progress)
                         return res(false)
@@ -533,18 +524,13 @@ export class CharacterInstance extends CharacterInstanceProperty {
         })
     }
 
-    // 使用技能中
-    protected _isSkilling = false
-    public get isSkilling() {
-        return this._isSkilling
-    }
-
     // 使用技能
     public useSkill(option: {
         skill: SkillInstance,
+        useAble?: () => void,
+        animationComplete?: () => void
     }) {
         if (this._hasDeath || this._preDeath) return
-        if (this._isSkilling) return
         const progress = new SkillProgress()
         progress.from = this
         progress.skill = option.skill
@@ -554,11 +540,10 @@ export class CharacterInstance extends CharacterInstanceProperty {
         this.isSkillAble(option.skill, progress)
             .then(async able => {
                 if (!able) return
-                progress.from._isSkilling = true
+                if (option.useAble) option.useAble()
                 await new Promise(res => {
                     progress.from.proto.playSkillAnimation(progress , () => {
-                        progress.from._isSkilling = false
-                        progress.from._isAttacking = false
+                        option.animationComplete && option.animationComplete()
                     } , res)
                 })
                 progress.from.reduceMp({ reduce: progress.cost.mp, from: progress.from })
@@ -570,9 +555,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     critical: false
                 })
                 progress.skill.coolTime = progress.skill.proto.coolTime
-                progress.skill.proto.use({
-                    use: progress.from,
-                })
+                progress.skill.proto.use({ use: progress.from })
                 await this.emitProgress("afterUseSkill", progress)
             })
         return
