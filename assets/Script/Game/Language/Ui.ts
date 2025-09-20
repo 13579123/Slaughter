@@ -531,7 +531,7 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
 })();
 
 (function() {
-    @RegisterLanguageEntry("GetReword")
+    @RegisterLanguageEntry("GetReward")
     class _ extends LanguageEntry {
         public get chs(): string {
             return "获得奖励"

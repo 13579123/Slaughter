@@ -1,7 +1,7 @@
 
 export class Normal {
 
-    public static number(num: number , fixed = 1 , force = false): string {
+    public static number(num: number , fixed = 0 , force = false): string {
         let useFixed = fixed
         if (num === void 0 || num === null) return "0"
         // if (num.toString().indexOf(".") === -1) useFixed = 0

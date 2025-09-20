@@ -17,6 +17,9 @@ export class ScenesMainCanvasUi extends Component {
     @property(Node)
     protected skillNode: Node = null;
 
+    @property(Node)
+    protected achivementNode: Node = null;
+
     // 初始化
     protected start(): void {
         this.levelSelectNode.active = false;
@@ -48,7 +51,7 @@ export class ScenesMainCanvasUi extends Component {
 
     // 开启成就界面
     protected async openAchievement() {
-        
+        this.achivementNode.active = true
     }
 
 }

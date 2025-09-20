@@ -25,6 +25,15 @@ export const getAchivement = (key: string) => {
     return AllAchivements.get(key);
 }
 
+// 获取成就key
+export const getAchivementKey = (achivement: AchivementPrototype) => {
+    for (let [key, value] of AllAchivements) {
+        if (value === achivement) {
+            return key;
+        }
+    }
+}
+
 // 获取所有每日任务
 export const getAllDayTaskAchivements = () => {
     return AllDayTaskAchivements.values();
