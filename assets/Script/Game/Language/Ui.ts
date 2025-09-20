@@ -513,3 +513,36 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
         }
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Achivement")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "成就"
+        }
+
+        public get eng(): string {
+            return "Achivement"
+        }
+
+        public get jpn(): string {
+            return "成績"
+        }
+    }
+})();
+
+(function() {
+    @RegisterLanguageEntry("GetReword")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "获得奖励"
+        }
+
+        public get eng(): string {
+            return "Get Reward"
+        }
+
+        public get jpn(): string {
+            return "報酬を得る"
+        }
+    }
+})();

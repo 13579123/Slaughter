@@ -23,8 +23,14 @@ export class ExtraProperty extends SkillPrototype {
     }
 
     public get description(): string {
-        console.log(this.instance.characterInstance)
-        return ""
+        const character = this.instance.characterInstance
+        if (!character) return ""
+        return LanguageManager.getEntry("ExtraProperty Description")
+            .getValue(settingManager.data.language , {
+                physicalAttack: character.physicalAttack * 0.1 * this.instance.lv,
+                magicAttack: character.magicAttack * 0.1 * this.instance.lv,
+                attackSpeed: character.attackSpeed * 0.1 * this.instance.lv,
+            })
     }
 
     public icon(): Promise<SpriteFrame> {

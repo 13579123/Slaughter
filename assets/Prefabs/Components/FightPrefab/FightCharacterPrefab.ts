@@ -24,12 +24,6 @@ export class FightCharacterPrefab extends ExtensionComponent {
     // 位置
     public pos: "left" | "right";
 
-    // 是否在释放技能行动状态
-    public isSkilling: boolean = false;
-
-    // 是否在释放攻击行动状态
-    public isAttacking: boolean = false;
-
     // 展示状态
     public isPlayer: boolean = false;
 
@@ -49,7 +43,7 @@ export class FightCharacterPrefab extends ExtensionComponent {
         // 设置角色数据
         this.character = Rx.reactive(character)
         // 绑定角色和预制体组件
-        bindPlayerToComponent(this.character , this)
+        bindPlayerToComponent(this.character, this)
         // 展示状态
         this.isPlayer = isPlayer
         // 设置位置
@@ -110,19 +104,19 @@ export class FightCharacterPrefab extends ExtensionComponent {
     }
 
     // 队伍列表
-    protected showMessageQueue: {s: string , color: Color}[] = []
+    protected showMessageQueue: { s: string, color: Color }[] = []
 
     protected messageTempNode: Node
 
     protected isClearingMessage = false
 
     // 添加到伤害数据到队列
-    public showMessage(s: string , color: Color) {
-        this.showMessageQueue.push({s , color})
+    public showMessage(s: string, color: Color) {
+        this.showMessageQueue.push({ s, color })
         if (this.isClearingMessage) return
         this.isClearingMessage = true
         const messageContainer = this.node.getChildByName('Message')
-         const createNumberNode = (s: string , color: Color) => {
+        const createNumberNode = (s: string, color: Color) => {
             const node = instantiate(this.messageTempNode)
             const label = node.getComponent(Label)
             label.string = s
@@ -131,17 +125,17 @@ export class FightCharacterPrefab extends ExtensionComponent {
             this.setAutoInterval(() => {
                 const label = node.getComponent(Label)
                 const color = label.color
-                node.setPosition(node.position.x , node.position.y + 5)
-                label.color = new Color(color.r , color.g , color.b , color.a - 3)
-            } , {count: 20 , complete() { node.parent = null;node.destroy() } , timer: 25})
+                node.setPosition(node.position.x, node.position.y + 5)
+                label.color = new Color(color.r, color.g, color.b, color.a - 3)
+            }, { count: 20, complete() { node.parent = null; node.destroy() }, timer: 25 })
             return node
         }
         const clearQueue = async () => {
-            while (this.showMessageQueue.length > 0) { 
+            while (this.showMessageQueue.length > 0) {
                 const dto = this.showMessageQueue.shift()
-                const node = createNumberNode(dto.s , dto.color)
+                const node = createNumberNode(dto.s, dto.color)
                 messageContainer.addChild(node)
-                await new Promise(resolve => setTimeout(resolve , 100))
+                await new Promise(resolve => setTimeout(resolve, 100))
             }
             this.isClearingMessage = false
             return
@@ -163,7 +157,7 @@ export class FightCharacterPrefab extends ExtensionComponent {
         // 隐藏状态
         // this.node.getChildByName("State").active = false
         // 播放动画
-        this.playAnimation(this.character.proto.animation.animations.move , {count: -1})
+        this.playAnimation(this.character.proto.animation.animations.move, { count: -1 })
         const spine = this.node.getChildByName("Spine")
         // 移动到指定位置
         const promise = new Promise((res) => {
@@ -182,51 +176,47 @@ export class FightCharacterPrefab extends ExtensionComponent {
     // 角色准备
     public characterReady() {
         // 播放idle动画
-        this.playAnimation(this.character.proto.animation.animations.idle , {count: -1})
+        this.playAnimation(this.character.proto.animation.animations.idle, { count: -1 })
         // 准备
         this.isReady = true
         // 展示状态信息
         if (this.isPlayer) this.node.getChildByName("State").active = true
     }
 
-    // 取消攻击
-    protected cancelAttackCallback: () => void = null
+    // 释放的技能队列
+    protected skillQueue: SkillInstance[] = []
 
-    // 角色攻击
-    public async characterAttack(target: CharacterInstance) {
-        if (this.isAttacking || this.isSkilling) return
+    // 角色释放技能
+    public characterUseSkill(skill: SkillInstance) {
+        if (this.skillQueue.indexOf(skill) !== -1) return
+        this.skillQueue.push(skill)
+    }
+
+    // 行动中
+    protected isAction = false
+
+    // 角色行动
+    public async characterAction(target: CharacterInstance) {
+        if (this.isAction) return
+        this.isAction = true
+        const skill = this.skillQueue.shift()
+        if (skill) {
+            return new Promise((res) => {
+                this.character.useSkill({
+                    skill,
+                    animationComplete: () => {
+                        res(null)
+                        this.isAction = false
+                    }
+                })
+            })
+        }
         return new Promise((res) => {
-            this.cancelAttackCallback = () => {
-                this.isAttacking = false
-                res(null)
-            }
             this.character.attackCharacter({
                 target,
                 animationComplete: () => {
-                    if (this.cancelAttackCallback)
-                        this.cancelAttackCallback()
-                    this.cancelAttackCallback = null
-                }
-            })
-        })
-    }
-
-    // 角色释放技能
-    public async characterUseSkill(skill: SkillInstance) {
-        if (this.isSkilling) return
-        return new Promise((res) => {
-            this.character.useSkill({
-                skill,
-                useAble: () => {
-                    this.isSkilling = true
-                },
-                animationComplete: () => {
-                    this.isSkilling = false
-                    this.isAttacking = false
-                    if (this.cancelAttackCallback)
-                        this.cancelAttackCallback()
-                    this.cancelAttackCallback = null
                     res(null)
+                    this.isAction = false
                 }
             })
         })
@@ -236,11 +226,11 @@ export class FightCharacterPrefab extends ExtensionComponent {
     private currentAnimation: string = ""
 
     // 播放动画
-    public async playAnimation(animationName: string , option: {
-        count?: number , 
-        speed?: number , 
+    public async playAnimation(animationName: string, option: {
+        count?: number,
+        speed?: number,
         complete?: () => void
-        frameEvent?: {name: string , callback: () => void}
+        frameEvent?: { name: string, callback: () => void }
     }) {
         if (this.currentAnimation === animationName) return
         this.currentAnimation = animationName
@@ -248,11 +238,11 @@ export class FightCharacterPrefab extends ExtensionComponent {
         if (option.frameEvent) {
             const frameCall = () => {
                 option.frameEvent.callback()
-                spine.removeFrameEvent(option.frameEvent.name , frameCall)
+                spine.removeFrameEvent(option.frameEvent.name, frameCall)
             }
-            spine.listenFrameEvent(option.frameEvent.name , frameCall)
+            spine.listenFrameEvent(option.frameEvent.name, frameCall)
         }
-        await spine.playAnimation(animationName , option)
+        await spine.playAnimation(animationName, option)
         this.currentAnimation = ""
         if (option.complete) {
             option.complete()

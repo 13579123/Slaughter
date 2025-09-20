@@ -1,5 +1,6 @@
 import { BaseEventManagerData, Manager } from "../../System/Manager";
 import { Config } from "../Config";
+import { achivementManager } from "./AchivementManager";
 
 type EventType = "goldChange" | "diamondChange"
 
@@ -9,16 +10,10 @@ class ResourcecDTO {
 
     diamond: number = 0
 
-    // 历史获取资源
-    public history = { 
-        addGold: 0 , reduceGold: 0 , addDiamond: 0 , reduceDiamond: 0
-    }
-
     constructor(data?: ResourcecData) {
         if (data) {
             this.gold = data.gold
             this.diamond = data.diamond
-            this.history = data.history
         }
     }
 }
@@ -37,26 +32,12 @@ class ResourcecData extends BaseEventManagerData<EventType> {
         return this._diamond
     }
 
-    // 历史获取资源
-    public history = { 
-        addGold: 0 , reduceGold: 0 , addDiamond: 0 , reduceDiamond: 0 
-    }
-
     constructor(data?: ResourcecDTO) {
         super()
         if (data) {
             this._gold = data.gold
             this._diamond = data.diamond 
-            this.history = data.history
         }
-        this.on("goldChange" , (num) => {
-            if (num > 0) this.history.addGold += num
-            else this.history.reduceGold -= num
-        })
-        this.on("diamondChange" , (num) => {
-            if (num > 0) this.history.addDiamond += num
-            else this.history.reduceDiamond -= num
-        })
     }
 
     addGold(value: number) {

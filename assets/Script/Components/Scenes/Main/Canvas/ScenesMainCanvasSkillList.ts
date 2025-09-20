@@ -312,7 +312,7 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
         const maskNode = resultNode.getChildByName("Mask")
         if (maskType === "learn") {
             maskNode.active = true
-            maskNode.getComponent(Sprite).color = new Color(0,0,0,80)
+            maskNode.getComponent(Sprite).color = new Color(0,0,0,200)
         } else if (maskType === "unLearn") {
             maskNode.active = true
             maskNode.addComponent(Button)

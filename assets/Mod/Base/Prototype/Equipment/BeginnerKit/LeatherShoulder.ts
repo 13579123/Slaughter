@@ -53,6 +53,9 @@ export class LeatherShoulder extends EquipmentPrototype {
         }: <color=${getQualityColor(this.instance.quality)}>${
             LanguageManager.getEntry(getQualityName(this.instance.quality)).getValue(settingManager.data.language)
         }</color>\n`
+        res += `${LanguageManager.getEntry("maxMp")
+            .getValue(settingManager.data.language)
+            }: ${(this.instance.maxMp).toFixed(0)}\n`
         res += `${LanguageManager.getEntry("physicalPenetration")
             .getValue(settingManager.data.language)
             }: ${this.instance.physicalPenetration.toFixed(2)}\n`
@@ -75,6 +78,7 @@ export class LeatherShoulder extends EquipmentPrototype {
 
     // 基础属性
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
+        maxMp: 30,
         criticalRate: 0.05,
         physicalPenetration: 5,
     }).setProperty("criticalRate", (critical) => {
@@ -89,6 +93,7 @@ export class LeatherShoulder extends EquipmentPrototype {
     // 成长属性
     public growProperty: BasePrototypeProperty = new BasePrototypeProperty({
         physicalPenetration: 2,
+        maxMp: 5,
     })
 
     // icon图标

@@ -105,19 +105,14 @@ export class FightPrefab extends ExtensionComponent {
             this.effect(() => {
                 if (skill.coolTime !== 0) coollingNode.active = true
                 else coollingNode.active = false
-                coollingNode.getChildByName("CoollingTime").getComponent(Label).string = `${(skill.coolTime / 1000).toFixed(2)}s`
+                coollingNode.getChildByName("CoollingTime").getComponent(Label).string = `${(skill.coolTime / 1000).toFixed(1)}s`
             })
             // 绑定点击按钮
             skillNode.getChildByName("Icon").on(
                 Button.EventType.CLICK , 
-                () => {
-                    playerData.characterPrefab.characterUseSkill(skill)
-                    // playerData.character.useSkill({
-                    //     skill,
-                    //     animationComplete: () => {
-
-                    //     },
-                    // })
+                async () => {
+                    if (await playerData.character.isSkillAble(skill))
+                        playerData.characterPrefab.characterUseSkill( skill )
                 }
             )
             skillPanel.getChildByName("SkillContainer").addChild(skillNode)
@@ -200,7 +195,7 @@ export class FightPrefab extends ExtensionComponent {
                     res(null)
                 })
                 while(!stop) {
-                    await characterPrefab.characterAttack(target)
+                    await characterPrefab.characterAction(target)
                     characterPrefab.characterReady()
                     await new Promise(
                         resolve => this.setAutoInterval(() => resolve(null) , {count: 1 , timer: 1000 / character.attackSpeed})

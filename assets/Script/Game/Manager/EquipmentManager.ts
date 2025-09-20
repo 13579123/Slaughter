@@ -1,9 +1,11 @@
 import { EquipmentDTO, EquipmentQuality } from "../../System/Core/Prototype/EquipmentPrototype";
-import { Manager } from "../../System/Manager";
+import { BaseEventManagerData, Manager } from "../../System/Manager";
 import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
 import { createId } from "../Share";
 import { EquipmentInstance } from "../../System/Core/Instance/EquipmentInstance";
+
+type EventType = "addEquipment"
 
 class EquipmentManagerDTO {
 
@@ -30,7 +32,7 @@ class EquipmentManagerDTO {
 
 }
 
-class EquipmentData {
+class EquipmentData extends BaseEventManagerData<EventType> {
 
     public equipment: {
         weapon: EquipmentDTO,
@@ -49,6 +51,7 @@ class EquipmentData {
     ]
 
     constructor(data?: EquipmentManagerDTO) {
+        super()
         if (data) {
             Object.keys(data.equipment).forEach(k => this.equipment[k] = data.equipment[k])
             this.equipments = data.equipments
@@ -79,6 +82,7 @@ class EquipmentData {
 
     // 添加装备
     public addEquipment(prototype: string , quality?: EquipmentQuality) {
+        this.emit("addEquipment" , {prototype , quality: quality || EquipmentQuality.Ordinary})
         this.equipments.push({ 
             id: createId(),
             prototype,

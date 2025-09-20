@@ -1,7 +1,9 @@
-import { Manager } from "../../System/Manager";
+import { BaseEventManagerData, Manager } from "../../System/Manager";
 import { Config } from "../Config";
 import { ItemDTO } from "../../System/Core/Prototype/ItemPrototype";
 import { ItemInstance } from "../../System/Core/Instance/ItemInstance";
+
+type EventType = "addItem"|"reduceItem"
 
 class BackpackDTO {
 
@@ -15,13 +17,14 @@ class BackpackDTO {
 
 }
 
-class BackpackData {
+class BackpackData extends BaseEventManagerData<EventType> {
 
     public items: ItemDTO[] = [
         {prototype: "Stone" , count: 25}
     ]
 
     constructor(data?: BackpackDTO) {
+        super()
         if (data) {
             this.items = data.items
         }
@@ -36,14 +39,17 @@ class BackpackData {
             const item = this.items[i];
             if (item.prototype === itemKey) {
                 item.count -= count
-                if (item.count <= 0) item.count = 0
+                if (item.count <= 0) {
+                    item.count = 0
+                }
+                this.emit("reduceItem" , {prototype: itemKey , count: count})
                 return
             }
         }
         return
     }
 
-    public addCount(itemKey: string , count: number) {
+    public addItem(itemKey: string , count: number) {
         for (let i = 0; i < this.items.length; i++) {
             const item = this.items[i];
             if (item.prototype === itemKey) {
@@ -52,6 +58,7 @@ class BackpackData {
             }
         }
         this.items.push({prototype: itemKey , count: count})
+        this.emit("addItem" , {prototype: itemKey , count: count})
     }
 
 }

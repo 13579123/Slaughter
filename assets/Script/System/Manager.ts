@@ -46,13 +46,13 @@ export class Manager<T> {
 export class BaseEventManagerData<T> {
     
     protected eventMap = new Map<T , Array<Function>>()
-    public on(e: T , callback: (num: number) => void) {
+    public on(e: T , callback: (...any: any) => void) {
         if (!this.eventMap.has(e)) {
             this.eventMap.set(e , [])
         }
         this.eventMap.get(e)!.push(callback)
     }
-    public off(e: T , callback?: (num: number) => void) {
+    public off(e: T , callback?: (...any: any) => void) {
         if (!this.eventMap.has(e)) return
         if (callback) this.eventMap.set(e , this.eventMap.get(e).filter((cb) => cb !== callback) )
         else this.eventMap.set(e , [])

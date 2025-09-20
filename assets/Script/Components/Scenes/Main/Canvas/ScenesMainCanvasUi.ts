@@ -46,6 +46,11 @@ export class ScenesMainCanvasUi extends Component {
         this.skillNode.active = true
     }
 
+    // 开启成就界面
+    protected async openAchievement() {
+        
+    }
+
 }
 
 

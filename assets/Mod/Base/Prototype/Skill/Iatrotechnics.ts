@@ -34,17 +34,17 @@ class Iatrotechnics_Description extends LanguageEntry {
 
     public get chs(): string {
         return `<color=0E70FB>消耗: ${ Math.max(0 , this.data.lv - 1) * 20 + 40 } 魔法值</color>\n` + 
-        `恢复 ${ (this.data.lv - 1) * 3 + 5 }% 最大生命值 ，最低回复 ${ (this.data.lv - 1) * 10 + 50 } 生命值`
+        `恢复 ${ (this.data.lv - 1) * 3 + 5 }% 最大生命值 ，最低回复 ${ (this.data.lv - 1) * 50 + 50 } 生命值`
     }
 
     public get eng(): string {
         return `<color=0E70FB>Cost: ${ Math.max(0 , this.data.lv - 1) * 20 + 40 } MP</color>\n` + 
-        `Restore ${ (this.data.lv - 1) * 3 + 5 }% max HP, minimum ${ (this.data.lv - 1) * 10 + 50 } HP`
+        `Restore ${ (this.data.lv - 1) * 3 + 5 }% max HP, minimum ${ (this.data.lv - 1) * 50 + 50 } HP`
     }
 
     public get jpn(): string {
         return `<color=0E70FB>消費: ${ Math.max(0 , this.data.lv - 1) * 20 + 40 } MP</color>\n` +
-        `最大体力値 ${ (this.data.lv - 1) * 3 + 5 }% 回復、最低 ${ (this.data.lv - 1) * 10 + 50 } 生命値 回復`
+        `最大体力値 ${ (this.data.lv - 1) * 3 + 5 }% 回復、最低 ${ (this.data.lv - 1) * 50 + 50 } 生命値 回復`
     }
 
 }
@@ -90,7 +90,7 @@ export class Iatrotechnics extends SkillPrototype {
         useOption.use.increaseHp({
             increase: Math.max(
                 useOption.use.maxHp * ((this.instance.lv - 1) * 3 + 5) / 100 , 
-                (this.instance.lv - 1) * 10 + 50
+                (this.instance.lv - 1) * 50 + 50
             ),
             fromType: FromType.skill,
             from: useOption.use,

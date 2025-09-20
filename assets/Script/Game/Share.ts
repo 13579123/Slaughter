@@ -15,15 +15,22 @@ export function createPlayerInstance() {
     // 获取角色所有被动技能
     const playerAllPassiveSkills = getPlayerAllPassiveSkills(characterData.currentCharacter)
     // 创建角色
-    const instance = Rx.reactive(new CharacterInstance({
+    const skills = []
+    const passive = playerAllPassiveSkills.map((key) => ({ lv: skillData.skillLevel[key], prototype: key }))
+    skillData.skills.forEach(
+        skillProto => skills.push({ lv: skillData.skillLevel[skillProto] , prototype: skillProto })
+    )
+    passive.forEach(skillDto => {
+        if (skillDto.lv > 0)
+            skills.push(skillDto)
+    })
+    const instance = new CharacterInstance({
         lv: characterData.lv,
-        equipments: equipmentData.equipment,
         // 主动技能和被动技能
-        skills: skillData.skills.map(
-            skillProto => ({ lv: skillData.skillLevel[skillProto] , prototype: skillProto })
-        ).concat(playerAllPassiveSkills.map((key) => ({ lv: skillData.skillLevel[key], prototype: key }))),
+        skills,
+        equipments: equipmentData.equipment,
         Proto: getCharacterPrototype(characterData.currentCharacter),
-    }))
+    })
     return instance
 }
 
