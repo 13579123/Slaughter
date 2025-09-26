@@ -12,6 +12,7 @@ import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
 import { ReactiveEffect, ReactiveEffectRunner } from 'db://assets/Module/Rx/reactivity';
 import { SkillInstance } from 'db://assets/Script/System/Core/Instance/SkillInstance';
 import { getSkillKey, getSkillPrototype } from 'db://assets/Script/System/Manager/SkillManager';
+import { resourceManager } from 'db://assets/Script/Game/Manager/ResourceManager';
 const { ccclass, property } = _decorator;
 
 
@@ -277,7 +278,9 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                             (btns.indexOf("uplevel") !== -1) ? {
                                 label: LanguageManager.getEntry("Levelup").getValue(settingManager.data.language),
                                 callback: (close: Function) => {
-                                    skillManager.data.upgradeSkill(prototype)
+                                    skillManager.data.upgradeSkill(prototype , resourceManager)
+                                    resourceManager.save()
+                                    skillManager.save()
                                     if (skillManager.data.getSkillLevel(prototype) >= 10) {
                                         close()
                                     }
@@ -286,7 +289,9 @@ export class ScenesMainCanvasSkillList extends ExtensionComponent {
                             (btns.indexOf("learn") !== -1) ? {
                                 label: LanguageManager.getEntry("Learn").getValue(settingManager.data.language),
                                 callback: (close: Function) => {
-                                    skillManager.data.learnSkill(prototype)
+                                    skillManager.data.learnSkill(prototype , resourceManager)
+                                    resourceManager.save()
+                                    skillManager.save()
                                     close()
                                 }
                             } : null,

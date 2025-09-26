@@ -18,7 +18,7 @@ class ResourcecDTO {
     }
 }
 
-class ResourcecData extends BaseEventManagerData<EventType> {
+export class ResourcecData extends BaseEventManagerData<EventType> {
 
     protected _gold: number = 10000
 

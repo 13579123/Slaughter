@@ -11,17 +11,50 @@ import { LeatherArmor } from '../Equipment/BeginnerKit/LeatherArmor';
 import { LeatherShoes } from '../Equipment/BeginnerKit/LeatherShoes';
 import { LeatherShoulder } from '../Equipment/BeginnerKit/LeatherShoulder';
 import { CcNative } from 'db://assets/Module/CcNative';
+import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
+import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Module/Language/LanguageManager';
+import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 const { ccclass, property } = _decorator;
+
+@RegisterLanguageEntry("Monopoly")
+class LanguageEntryMonopoly extends LanguageEntry {
+    public get chs(): string {
+        return "大富翁"
+    }
+    public get eng(): string {
+        return "Monopoly"
+    }
+    public get jpn(): string {
+        return "大富翁"
+    }
+}
+
+@RegisterLanguageEntry("Monopoly Description")
+class LanguageEntryMonopolyDescription extends LanguageEntry {
+    public get chs(): string {
+        return "获取 100000 金币"
+    }
+    public get eng(): string {
+        return "Get 100000 coins"
+    }
+    public get jpn(): string {
+        return "100000 コインを獲得する"
+    }
+}
 
 @RegisterAchivement("Monopoly")
 export class Monopoly extends AchivementPrototype {
 
     public get name(): string {
-        return "大富翁"
+        return LanguageManager.getEntry("Monopoly").getValue(
+            settingManager.data.language
+        )
     }
 
     public get description(): string {
-        return "获取1000000金币"
+        return LanguageManager.getEntry("Monopoly Description").getValue(
+            settingManager.data.language
+        )
     }
 
     // 图标
@@ -35,7 +68,7 @@ export class Monopoly extends AchivementPrototype {
     public get progress(): { progress: number; maxProgress: number; } {
         return {
             progress: achivementManager.data.achivementData.resource.addGold,
-            maxProgress: 1000000
+            maxProgress: 100000
         };
     }
 

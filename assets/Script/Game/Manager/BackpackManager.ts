@@ -3,7 +3,7 @@ import { Config } from "../Config";
 import { ItemDTO } from "../../System/Core/Prototype/ItemPrototype";
 import { ItemInstance } from "../../System/Core/Instance/ItemInstance";
 
-type EventType = "addItem"|"reduceItem"
+type EventType = "addItem"|"reduceItem"|"useItem"
 
 class BackpackDTO {
 
@@ -17,7 +17,7 @@ class BackpackDTO {
 
 }
 
-class BackpackData extends BaseEventManagerData<EventType> {
+export class BackpackData extends BaseEventManagerData<EventType> {
 
     public items: ItemDTO[] = [
         {prototype: "Stone" , count: 25}
@@ -32,6 +32,7 @@ class BackpackData extends BaseEventManagerData<EventType> {
 
     public useItem(instance: ItemInstance , count: number) {
         instance.proto.use(count)
+        this.emit("useItem" , instance)
     }
 
     public reduceCount(itemKey: string , count: number) {
@@ -42,7 +43,7 @@ class BackpackData extends BaseEventManagerData<EventType> {
                 if (item.count <= 0) {
                     item.count = 0
                 }
-                this.emit("reduceItem" , {prototype: itemKey , count: count})
+                this.emit("reduceItem" , item)
                 return
             }
         }
@@ -54,11 +55,23 @@ class BackpackData extends BaseEventManagerData<EventType> {
             const item = this.items[i];
             if (item.prototype === itemKey) {
                 item.count += count
+                this.emit("addItem" , item)
                 return
             }
         }
-        this.items.push({prototype: itemKey , count: count})
-        this.emit("addItem" , {prototype: itemKey , count: count})
+        const item = {prototype: itemKey , count: count}
+        this.items.push(item)
+        this.emit("addItem" , item)
+    }
+
+    public hasItem(itemKey: string , count: number) {
+        for (let i = 0; i < this.items.length; i++) {
+            const item = this.items[i];
+            if (item.prototype === itemKey) {
+                return item.count >= count
+            }
+        }
+        return false
     }
 
 }

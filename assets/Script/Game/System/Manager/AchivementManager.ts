@@ -25,6 +25,25 @@ export const getAchivement = (key: string) => {
     return AllAchivements.get(key);
 }
 
+// 获取所有每日任务
+export const getAllDayTaskAchivements = () => {
+    return AllDayTaskAchivements.values();
+}
+
+// 判断是否是每日任务
+export const isDayTask = (achive: string|AchivementPrototype) => {
+    if (typeof achive === 'string') {
+        return AllDayTaskAchivements.has(achive);
+    }
+    let r = false
+    AllDayTaskAchivements.forEach((v  , k) => {
+        if (achive === v) {
+            r = true
+        }
+    })
+    return r
+}
+
 // 获取成就key
 export const getAchivementKey = (achivement: AchivementPrototype) => {
     for (let [key, value] of AllAchivements) {
@@ -32,23 +51,4 @@ export const getAchivementKey = (achivement: AchivementPrototype) => {
             return key;
         }
     }
-}
-
-// 获取所有每日任务
-export const getAllDayTaskAchivements = () => {
-    return AllDayTaskAchivements.values();
-}
-
-// 判断是否是每日任务
-export const isDayTask = (key: string|AchivementPrototype) => {
-    if (typeof key === 'string') {
-        return AllDayTaskAchivements.has(key);
-    }
-    let r = false
-    AllDayTaskAchivements.forEach((v  , k) => {
-        if (AllDayTaskAchivements.has(k)) {
-            r = true
-        }
-    })
-    return r
 }

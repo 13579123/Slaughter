@@ -75,6 +75,7 @@ export class EquipmentItemPrefab extends ExtensionComponent {
         if (!instance) {
             sprite.spriteFrame = this.OrdinaryQuality
             this.ItemIconSprite.spriteFrame = null
+            this.node.getChildByName("Data").getComponent(Label).string = ""
             this.openShadow()
         }
         if (instance instanceof EquipmentInstance) {

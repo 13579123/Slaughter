@@ -65,11 +65,6 @@ export class EquipmentPrototype {
     public get propertyDescription(): string { return "" }
     // 套装名称
     public get suit(): string { return "" }
-    // 强化所需材料
-    public get strengthenMaterial(): {
-        count: number ,
-        itemPrototype: string , 
-    }[] { return [] }
     // 成长属性
     public readonly growProperty: BasePrototypeProperty = new BasePrototypeProperty();
     // 基础属性

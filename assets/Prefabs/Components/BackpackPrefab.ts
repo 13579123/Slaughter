@@ -29,7 +29,7 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
     protected EquipmentItemPrefab: Prefab = null
 
     // 修改展示数据
-    public showDataType = Rx.ref("item")
+    public showDataType = Rx.ref("equipment") // equipment | item
 
     // 修改是否展示详细信息
     public showDetailProperty = Rx.ref(false)

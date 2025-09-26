@@ -20,6 +20,12 @@ export class ScenesMainCanvasUi extends Component {
     @property(Node)
     protected achivementNode: Node = null;
 
+    @property(Node)
+    protected dailyTaskNode: Node = null;
+
+    @property(Node)
+    protected strengthNode: Node = null;
+
     // 初始化
     protected start(): void {
         this.levelSelectNode.active = false;
@@ -52,6 +58,16 @@ export class ScenesMainCanvasUi extends Component {
     // 开启成就界面
     protected async openAchievement() {
         this.achivementNode.active = true
+    }
+
+    // 开启每日任务
+    protected async openDailyTask() {
+        this.dailyTaskNode.active = true
+    }
+
+    // 开启强化界面
+    protected async openStrength() {
+        this.strengthNode.active = true
     }
 
 }

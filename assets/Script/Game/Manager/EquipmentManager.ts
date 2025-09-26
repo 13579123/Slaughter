@@ -4,8 +4,14 @@ import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
 import { createId } from "../Share";
 import { EquipmentInstance } from "../../System/Core/Instance/EquipmentInstance";
+import { getDecomposeMaterial, getStrongMaterial } from "../../System/Manager/EquipmentManager";
+import { message } from "../Message/Message";
+import { LanguageManager } from "db://assets/Module/Language/LanguageManager";
+import { settingManager } from "./SettingManager";
+import { ResourcecData, resourceManager } from "./ResourceManager";
+import { BackpackData, backpackManager } from "./BackpackManager";
 
-type EventType = "addEquipment"
+type EventType = "addEquipment"|"decomposeEquipment"|"strengthenEquipment"
 
 class EquipmentManagerDTO {
 
@@ -32,7 +38,7 @@ class EquipmentManagerDTO {
 
 }
 
-class EquipmentData extends BaseEventManagerData<EventType> {
+export class EquipmentData extends BaseEventManagerData<EventType> {
 
     public equipment: {
         weapon: EquipmentDTO,
@@ -82,14 +88,67 @@ class EquipmentData extends BaseEventManagerData<EventType> {
 
     // 添加装备
     public addEquipment(prototype: string , quality?: EquipmentQuality) {
-        this.emit("addEquipment" , {prototype , quality: quality || EquipmentQuality.Ordinary})
+        const id = createId()
+        this.emit("addEquipment" , {id , prototype , quality: quality || EquipmentQuality.Ordinary})
         this.equipments.push({ 
-            id: createId(),
+            id ,
             prototype,
             lv: 1,
             extraProperty: {},
             quality: quality || EquipmentQuality.Ordinary,
         })
+    }
+
+    // 强化装备
+    public strengthenEquipment(id: string , resourceManager: Manager<ResourcecData> , backpackManager: Manager<BackpackData>) {
+        let equipment = this.equipments.find(e => e.id === id)
+        if (!equipment) equipment = Object.values(this.equipment).find(e => e?.id === id)
+        if (!equipment) return
+        if (equipment.lv >= 10)
+            return message.toast(
+                LanguageManager.getEntry("EquipmentMaxLevel")
+                .getValue(settingManager.data.language)
+            )
+        const strongMaterial = getStrongMaterial(equipment.prototype , equipment.lv)
+        if (!strongMaterial) return equipment.lv += 1
+        if (resourceManager.data.gold < strongMaterial.gold) 
+            return message.toast(
+                LanguageManager.getEntry("NotEnoughGold")
+                .getValue(settingManager.data.language)
+            )
+        if (resourceManager.data.diamond < strongMaterial.diamond) 
+            return message.toast(
+                LanguageManager.getEntry("NotEnoughDiamond")
+                .getValue(settingManager.data.language)
+            )
+        for (let i = 0; i < strongMaterial.items.length; i++) {
+            const itemProto = strongMaterial.items[i];
+            if (!backpackManager.data.hasItem(itemProto.prototype , itemProto.count || 0)) 
+                return message.toast(
+                    LanguageManager.getEntry("NotEnoughItems").getValue(settingManager.data.language)
+                )
+        }
+        resourceManager.data.reduceGold(strongMaterial.gold)
+        resourceManager.data.reduceDiamond(strongMaterial.diamond)
+        strongMaterial.items.forEach(item => {
+            backpackManager.data.reduceCount(item.prototype , item.count || 0)
+        })
+        equipment.lv += 1
+        this.emit("strengthenEquipment" , equipment)
+    }
+
+    // 分解装备
+    public decompose(id: string , resourceManager: Manager<ResourcecData> , backpackManager: Manager<BackpackData>) {
+        const equipment = this.equipments.find(e => e.id === id)
+        if (!equipment) return
+        const material = getDecomposeMaterial(equipment.prototype , equipment.lv)
+        resourceManager.data.addGold(material.gold || 0)
+        resourceManager.data.addDiamond(material.diamond || 0)
+        if (material.items)
+            material.items.forEach(item => {
+                backpackManager.data.addItem(item.prototype , item.count || 0)
+            })
+        this.emit("decomposeEquipment" , equipment)
     }
 
 }

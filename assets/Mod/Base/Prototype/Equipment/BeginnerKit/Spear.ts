@@ -6,6 +6,8 @@ import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Module/Langu
 import { BasePrototypeProperty } from 'db://assets/Script/System/Core/Property/BasePrototypeProperty';
 import { EquipmentPrototype, EquipmentType, getQualityColor, getQualityName } from 'db://assets/Script/System/Core/Prototype/EquipmentPrototype';
 import { RegisterEquipment } from 'db://assets/Script/System/Manager/EquipmentManager';
+import { getItemKey } from 'db://assets/Script/System/Manager/ItemManager';
+import { Stone } from '../../Item/Stone';
 
 @RegisterLanguageEntry("Spear")
 class Spear_Entry extends LanguageEntry {
@@ -24,7 +26,24 @@ class Spear_Description_Entry extends LanguageEntry {
 // 套装效果 所需数量1 所需数量2
 const oneSuit = 2, twoSuit = 4
 
-@RegisterEquipment("Spear")
+@RegisterEquipment("Spear" , (lv: number) => {
+    if (lv >= 10) return null
+    return {
+        gold: lv * 500 + 1000,
+        diamond: lv * 5 + 20,
+        items: [
+            {prototype: getItemKey(Stone) , count: lv * 2 + 5},
+        ]
+    }
+} , (lv: number) => {
+    return {
+        gold: lv * 200 + 500,
+        diamond: lv * 2 + 10,
+        items: [
+            {prototype: getItemKey(Stone) , count: lv + 2},
+        ]
+    }
+})
 export class Spear extends EquipmentPrototype {
 
     public get name(): string {

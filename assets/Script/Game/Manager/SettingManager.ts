@@ -22,7 +22,7 @@ class SettingDTO {
     }
 }
 
-class SettingData {
+export class SettingData {
 
     // 背景音乐
     public backVolume: number = 0.5

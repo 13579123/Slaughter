@@ -52,9 +52,9 @@ export class LeatherArmor extends EquipmentPrototype {
             LanguageManager.getEntry("Quality").getValue(settingManager.data.language)
             }: <color=${getQualityColor(this.instance.quality)}>${LanguageManager.getEntry(getQualityName(this.instance.quality)).getValue(settingManager.data.language)
             }</color>\n`
-        res += this.instance.maxHp > 0 ? `${LanguageManager.getEntry("maxHp")
+        res += `${LanguageManager.getEntry("maxHp")
             .getValue(settingManager.data.language)
-            }: ${this.instance.maxHp.toFixed(1)}\n` : ""
+            }: ${this.instance.maxHp.toFixed(1)}\n`
         res += `${LanguageManager.getEntry("physicalDefense")
             .getValue(settingManager.data.language)
             }: ${this.instance.physicalDefense.toFixed(1)}\n`
@@ -78,6 +78,7 @@ export class LeatherArmor extends EquipmentPrototype {
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
         physicalDefense: 5,
         magicDefense: 5,
+        maxHp: 40,
     }).setProperty("maxHp", (hp) => {
         return hp + (this.suitCount >= oneSuit ? 50 : 0)
     }).setProperty("physicalDefense", (defense) => {
@@ -90,6 +91,7 @@ export class LeatherArmor extends EquipmentPrototype {
     public growProperty: BasePrototypeProperty = new BasePrototypeProperty({
         physicalDefense: 1.5,
         magicDefense: 1.5,
+        maxHp: 15
     })
 
     // icon图标

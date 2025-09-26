@@ -529,7 +529,22 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
         }
     }
 })();
+(function() {
+    @RegisterLanguageEntry("DayTask")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "每日任务"
+        }
 
+        public get eng(): string {
+            return "Daily Task"
+        }
+
+        public get jpn(): string {
+            return "毎日タスク"
+        }
+    }
+})();
 (function() {
     @RegisterLanguageEntry("GetReward")
     class _ extends LanguageEntry {
@@ -544,5 +559,155 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
         public get jpn(): string {
             return "報酬を得る"
         }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("EquipmentCanNotBeStrengthened")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "装备无法强化"
+        }
+
+        public get eng(): string {
+            return "Equipment can not be strengthened"
+        }
+
+        public get jpn(): string {
+            return "装備は強化できません"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("NotEnoughGold")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "金币不足"
+        }
+
+        public get eng(): string {
+            return "Not enough gold"
+        }
+
+        public get jpn(): string {
+            return "ゴールドが足りません"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("NotEnoughDiamond")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "钻石不足"
+        }
+
+        public get eng(): string {
+            return "Not enough diamond"
+        }
+
+        public get jpn(): string {
+            return "ダイヤが足りません"
+        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("EquipmentMaxLevel")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "装备已达最大等级"
+        }
+
+        public get eng(): string {
+            return "Equipment has reached max level"
+        }
+
+        public get jpn(): string {
+            return "装備は最大レベルに達しました"
+        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("NotEnoughDiamond")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "钻石不足"
+        }
+
+        public get eng(): string {
+            return "Not enough diamond"
+        }
+
+        public get jpn(): string {
+            return "ダイヤが足りません"
+        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Blacksmith")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "铁匠屋"
+        }
+
+        public get eng(): string {
+            return "Blacksmith"
+        }
+
+        public get jpn(): string {
+            return "鍛冶屋"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Strengthen")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "强化"
+        }
+
+        public get eng(): string {
+            return "Strengthen"
+        }
+
+        public get jpn(): string {
+            return "強化"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Decomposition")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "分解"
+        }
+
+        public get eng(): string {
+            return "Decomposition"
+        }
+
+        public get jpn(): string {
+            return "分解"
+        }
+
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("NotEnoughItems")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "物品不足"
+        }
+
+        public get eng(): string {
+            return "Not enough items"
+        }
+
+        public get jpn(): string {
+            return "アイテムが足りません"
+        }
+
     }
 })();

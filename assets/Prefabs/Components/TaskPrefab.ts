@@ -25,6 +25,25 @@ export class TaskPrefab extends ExtensionComponent {
     }
 
     protected initDayTask() {
+        // 容器节点
+        const contentNode = this.node.getChildByName("Container").getComponent(ScrollView).content
+        // 绑定展示
+        const tempItemNode = contentNode.getChildByName("TemAchivement")
+        this.effect(() => {
+            // 清空内容节点
+            contentNode.removeAllChildren()
+            // 获取所有成就
+            const allAchivement = Array.from(getAllAchivements())
+            // 遍历成就
+            for (let i = 0; i < allAchivement.length; i++) {
+                const achivement = allAchivement[i]
+                if (!isDayTask(achivement) || !achivement.open || achivementManager.data.hasGetReward(getAchivementKey(achivement))) continue
+                // 克隆节点
+                const itemNode = instantiate(tempItemNode)
+                this.initNode(itemNode, achivement)
+                contentNode.addChild(itemNode)
+            }
+        })
     }
 
     protected initAchivement() {
@@ -40,7 +59,7 @@ export class TaskPrefab extends ExtensionComponent {
             // 遍历成就
             for (let i = 0; i < allAchivement.length; i++) {
                 const achivement = allAchivement[i]
-                if (isDayTask(achivement)) continue
+                if (isDayTask(achivement) || !achivement.open) continue
                 // 克隆节点
                 const itemNode = instantiate(tempItemNode)
                 this.initNode(itemNode, achivement)

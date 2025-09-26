@@ -4,7 +4,7 @@ import { Config } from "../Config";
 import { message } from "../Message/Message";
 import { getSkillUpLevelMaterial, isSkillBelongToPlayer } from "../System/SkillConfig";
 import { characterManager } from "./CharacterManager";
-import { resourceManager } from "./ResourceManager";
+import { ResourcecData, resourceManager } from "./ResourceManager";
 import { getSkillPrototype } from "../../System/Manager/SkillManager";
 
 class SkillManagerDTO {
@@ -24,7 +24,7 @@ class SkillManagerDTO {
 
 }
 
-class SkillData {
+export class SkillData {
 
     // 已经装备的技能
     public skills: string[] = [];
@@ -86,7 +86,7 @@ class SkillData {
     }
 
     // 升级技能
-    public upgradeSkill(prototype: string) {
+    public upgradeSkill(prototype: string , resourceManager: Manager<ResourcecData>) {
         // 获取技能等级
         const level = this.getSkillLevel(prototype)
         if (level >= 10) {
@@ -108,13 +108,10 @@ class SkillData {
         resourceManager.data.reduceDiamond(upMaterial.diamond)
         // 升级技能
         this.skillLevel[prototype] = (this.skillLevel[prototype] || 0) + 1
-        // 保存
-        skillManager.save()
-        resourceManager.save()
     }
 
     // 学习技能
-    public learnSkill(prototype: string) {
+    public learnSkill(prototype: string , resourceManager: Manager<ResourcecData>) {
         // 获取升级材料
         const upMaterial = getSkillUpLevelMaterial(prototype , 0)
         if (upMaterial.gold > resourceManager.data.gold) {
@@ -130,9 +127,6 @@ class SkillData {
         resourceManager.data.reduceDiamond(upMaterial.diamond)
         // 升级技能
         this.skillLevel[prototype] = (this.skillLevel[prototype] || 0) + 1
-        // 保存
-        skillManager.save()
-        resourceManager.save()
     }
 
 }

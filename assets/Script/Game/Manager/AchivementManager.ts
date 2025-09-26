@@ -6,7 +6,9 @@ import { equipmentManager } from "./EquipmentManager";
 import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
 import { backpackManager } from "./BackpackManager";
 import { ItemDTO } from "../../System/Core/Prototype/ItemPrototype";
-import { getAchivement, isDayTask } from "../System/Manager/AchivementManager";
+import { getAchivement, getAchivementKey, getAllAchivements, isDayTask } from "../System/Manager/AchivementManager";
+import { Rx } from "db://assets/Module/Rx";
+import { message } from "../Message/Message";
 
 class AchivementResourceHistory {
     constructor(dto?: Partial<AchivementResourceHistory>) {
@@ -41,11 +43,14 @@ class AchivementResourceHistory {
     // 已经领取的任务
     hasGetReward: string[] = []
 
+    // 已经完成的任务
+    hasComplete: string[] = []
+
 }
 
 class AchivementDTO {
 
-    public dayTaskTime = 0
+    public dayTaskTime = Date.now()
 
     public dayTaskData = new AchivementResourceHistory()
 
@@ -61,9 +66,9 @@ class AchivementDTO {
 
 }
 
-class AchivementData {
+export class AchivementData {
 
-    public dayTaskTime = 0
+    public dayTaskTime = Date.now()
 
     public dayTaskData = new AchivementResourceHistory()
 
@@ -71,7 +76,11 @@ class AchivementData {
 
     constructor(data?: AchivementDTO) {
         if (data) {
-            if (new Date(data.dayTaskTime).toDateString() !== new Date().toDateString()) {
+            if (
+                new Date(data.dayTaskTime).toDateString() !== new Date().toDateString() || 
+                data.dayTaskTime === 0 || 
+                this.dayTaskTime === 0
+            ) {
                 this.dayTaskTime = Date.now()
                 this.dayTaskData = new AchivementResourceHistory()
             } else {
@@ -80,48 +89,71 @@ class AchivementData {
             }
             this.achivementData = new AchivementResourceHistory(data.achivementData)
         }
+        setTimeout(() => {
+            Array.from(getAllAchivements()).forEach((achivement) => {
+                const achivementKey = getAchivementKey(achivement)
+                if (this.hasComplete(achivementKey) || this.hasGetReward(achivementKey)) return
+                let stop = false
+                const runner = Rx.effect(() => {
+                    const progress = achivement.progress
+                    if (progress.progress / progress.maxProgress >= 1) {
+                        this.completeTask(achivementKey)
+                        message.taskNotify(achivement)
+                        stop = true
+                        if (runner) runner.effect.stop()
+                    }
+                })
+                if (stop) runner.effect.stop()
+            })
+        })
+        return
     }
 
     hasGetReward(key: string) {
         if (isDayTask(key)) {
-            if (achivementManager.data.dayTaskData.hasGetReward.indexOf(key) !== -1) return true
+            if (this.dayTaskData.hasGetReward.indexOf(key) !== -1) return true
         } else {
-            if (achivementManager.data.achivementData.hasGetReward.indexOf(key) !== -1) return true
+            if (this.achivementData.hasGetReward.indexOf(key) !== -1) return true
         }
         return false
     }
 
-    getRewardTask(key: string) {
-        const getReward = (reward: {
-            gold: number,
-            diamond: number,
-            items?: ItemDTO[],
-            equipment?: EquipmentDTO[]
-        }) => {
-            if (reward.gold) resourceManager.data.addGold(reward.gold)
-            if (reward.diamond) resourceManager.data.addGold(reward.diamond)
-            if (reward.items)
-                reward.items.forEach(item => backpackManager.data.addItem(item.prototype , item.count))
-            if (reward.equipment)
-                reward.equipment.forEach(equipment => equipmentManager.data.addEquipment(equipment.prototype , equipment.quality))
-            resourceManager.save()
-            backpackManager.save()
-            equipmentManager.save()
-        }
+    hasComplete(key: string) {
         if (isDayTask(key)) {
-            if (achivementManager.data.dayTaskData.hasGetReward.indexOf(key) !== -1) return
-            // 添加奖励
-            const achivement = getAchivement(key)
-            if (!achivement) return
-            getReward(achivement.rewards)
-            achivementManager.data.dayTaskData.hasGetReward.push(key)
+            if (this.dayTaskData.hasComplete.indexOf(key) !== -1) return true
         } else {
-            if (achivementManager.data.achivementData.hasGetReward.indexOf(key) !== -1) return
+            if (this.achivementData.hasComplete.indexOf(key) !== -1) return true
+        }
+        return false
+    }
+
+    completeTask(key: string) {
+        if (isDayTask(key)) {
+            if (this.dayTaskData.hasComplete.indexOf(key) !== -1) return
+            this.dayTaskData.hasComplete.push(key)
+        } else {
+            if (this.achivementData.hasComplete.indexOf(key) !== -1) return
+            this.achivementData.hasComplete.push(key)
+        }
+    }
+
+    getRewardTask(key: string) {
+        if (isDayTask(key)) {
+            // 已经获取过奖励
+            if (this.dayTaskData.hasGetReward.indexOf(key) !== -1) return
             // 添加奖励
             const achivement = getAchivement(key)
             if (!achivement) return
-            getReward(achivement.rewards)
-            achivementManager.data.achivementData.hasGetReward.push(key)
+            achivement.getRewards()
+            this.dayTaskData.hasGetReward.push(key)
+        } else {
+            // 已经获取过奖励
+            if (this.achivementData.hasGetReward.indexOf(key) !== -1) return
+            // 添加奖励
+            const achivement = getAchivement(key)
+            if (!achivement) return
+            achivement.getRewards()
+            this.achivementData.hasGetReward.push(key)
         }
     }
 

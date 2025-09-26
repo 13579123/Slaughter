@@ -25,7 +25,7 @@ class CharacterManagerDTO {
 
 }
 
-class CharacterData extends BaseEventManagerData<EventType> {
+export class CharacterData extends BaseEventManagerData<EventType> {
 
     public lv: number = 1
 
