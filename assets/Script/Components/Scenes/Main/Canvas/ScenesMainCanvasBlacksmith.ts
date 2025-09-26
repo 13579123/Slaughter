@@ -1,4 +1,6 @@
 import { _decorator, Color, Component, EventTouch, Label, Node, Prefab, RichText, ScrollView, Sprite } from 'cc';
+import { Diamond } from 'db://assets/Mod/Base/Prototype/Item/Diamond';
+import { Gold } from 'db://assets/Mod/Base/Prototype/Item/Gold';
 import { CcNative } from 'db://assets/Module/CcNative';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { Rx } from 'db://assets/Module/Rx';
@@ -9,8 +11,9 @@ import { resourceManager } from 'db://assets/Script/Game/Manager/ResourceManager
 import { EquipmentInstance } from 'db://assets/Script/System/Core/Instance/EquipmentInstance';
 import { ItemInstance } from 'db://assets/Script/System/Core/Instance/ItemInstance';
 import { EquipmentDTO } from 'db://assets/Script/System/Core/Prototype/EquipmentPrototype';
-import { getEquipmentKey, getEquipmentPrototype, getStrongMaterial } from 'db://assets/Script/System/Manager/EquipmentManager';
-import { getItemPrototype } from 'db://assets/Script/System/Manager/ItemManager';
+import { ItemDTO } from 'db://assets/Script/System/Core/Prototype/ItemPrototype';
+import { getDecomposeMaterial, getEquipmentKey, getEquipmentPrototype, getStrongMaterial } from 'db://assets/Script/System/Manager/EquipmentManager';
+import { getItemKey, getItemPrototype } from 'db://assets/Script/System/Manager/ItemManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasBlacksmith')
@@ -53,11 +56,19 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
         return
     }
 
+    // 展示类型切换
     protected showTypeChange(e: EventTouch, type: string) {
         this.showType.value = parseInt(type)
         if (this.showType.value === 0) {
             this.initStrengthen()
+        } else if (this.showType.value === 1) {
+            this.initDecompose()
         }
+    }
+
+    // 关闭
+    protected close() {
+        this.node.active = false
     }
 
     // 强化装备
@@ -77,17 +88,20 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
 
     // 分解装备
     protected decomposeEquipment() {
-        this.decomposeData.selectEquipList.forEach(e => {
-            equipmentManager.data.decompose(e.id , resourceManager , backpackManager)
-            resourceManager.save()
-            backpackManager.save()
-            equipmentManager.save()
-        })
+        equipmentManager.data.decompose(
+            this.decomposeData.selectEquipList.map(e => e.id), 
+            resourceManager, 
+            backpackManager
+        )
+        resourceManager.save()
+        backpackManager.save()
+        equipmentManager.save()
         this.initDecompose()
     }
 
     // 初始化强化
     protected initStrengthen() {
+        this.strengthenData.selectEquip = null
         this.renderStrengthenEquipment()
         this.renderStrengthenAllEquipment()
         return
@@ -152,7 +166,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
                 // 渲染需要的item
                 needMaterial.items.forEach(item => {
                     const node = CcNative.instantiate(this.EquipmentItemPrefab)
-                    node.setScale(0.7 , 0.7)
+                    node.setScale(0.7, 0.7)
                     node.getComponent(EquipmentItemPrefab).setInfo(new ItemInstance({
                         Proto: getItemPrototype(item.prototype),
                         count: item.count,
@@ -211,7 +225,77 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
 
     // 初始化分解
     protected initDecompose() {
+        this.decomposeData.selectEquipList = []
+        this.renderDecomposeAllEquipment()
+        this.renderDecomposeSelectedEquipment()
+        return
+    }
 
+    protected renderDecomposeSelectedEquipment() {
+        const decompositionNode = this.node.getChildByName("Blackmith").getChildByName("Decomposition")
+        const contentNode = decompositionNode.getChildByName("RetrunMaterial").getComponent(ScrollView).content
+        const children = Array.from(contentNode.children)
+        contentNode.removeAllChildren()
+        children.forEach(child => child.destroy())
+        const material: { [key: string]: number } = {}
+        this.decomposeData.selectEquipList.forEach(equipment => {
+            const decomposeMaterial = getDecomposeMaterial(equipment.prototype, equipment.lv)
+            if (!decomposeMaterial) return
+            const goldKey = getItemKey(Gold), diamondKey = getItemKey(Diamond)
+            if (decomposeMaterial.gold) {
+                if (!material[goldKey]) material[goldKey] = decomposeMaterial.gold
+                else material[goldKey] += decomposeMaterial.gold || 0
+            }
+            if (decomposeMaterial.diamond) {
+                if (!material[diamondKey]) material[diamondKey] = decomposeMaterial.diamond
+                else material[diamondKey] += decomposeMaterial.diamond || 0
+            }
+            decomposeMaterial?.items.forEach(item => {
+                if (material[item.prototype]) material[item.prototype] += item.count
+                else material[item.prototype] = item.count
+            })
+        })
+        Object.keys(material).forEach(key => {
+            const node = CcNative.instantiate(this.EquipmentItemPrefab)
+            node.getComponent(EquipmentItemPrefab).setInfo(new ItemInstance({
+                Proto: getItemPrototype(key),
+                count: material[key],
+            }))
+            contentNode.addChild(node)
+        })
+        return
+    }
+
+    protected renderDecomposeAllEquipment() {
+        const decompositionNode = this.node.getChildByName("Blackmith").getChildByName("Decomposition")
+        const contentNode = decompositionNode.getChildByName("AllEquipments").getComponent(ScrollView).content
+        const children = Array.from(contentNode.children)
+        contentNode.removeAllChildren()
+        children.forEach(child => child.destroy())
+        equipmentManager.data.equipments.forEach(equipment => {
+            const node = CcNative.instantiate(this.EquipmentItemPrefab)
+            node.getComponent(EquipmentItemPrefab).setInfo(new EquipmentInstance({
+                id: equipment.id,
+                lv: equipment.lv,
+                quality: equipment.quality,
+                Proto: getEquipmentPrototype(equipment.prototype),
+            }), () => {
+                // 如果没有选中
+                const index = this.decomposeData.selectEquipList.indexOf(equipment)
+                if (index === -1) {
+                    this.decomposeData.selectEquipList.push(equipment)
+                    node.getComponent(Sprite).color = new Color(180, 180, 180)
+                    this.renderDecomposeSelectedEquipment()
+                }
+                else {
+                    this.decomposeData.selectEquipList.splice(index, 1)
+                    node.getComponent(Sprite).color = new Color(255, 255, 255)
+                    this.renderDecomposeSelectedEquipment()
+                }
+            })
+            contentNode.addChild(node)
+        })
+        return
     }
 
 }

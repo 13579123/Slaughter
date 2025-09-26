@@ -96,6 +96,7 @@ export class AchivementData {
                 let stop = false
                 const runner = Rx.effect(() => {
                     const progress = achivement.progress
+                    const name = achivement.name
                     if (progress.progress / progress.maxProgress >= 1) {
                         this.completeTask(achivementKey)
                         message.taskNotify(achivement)

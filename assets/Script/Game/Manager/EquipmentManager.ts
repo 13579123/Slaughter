@@ -138,17 +138,34 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
     }
 
     // 分解装备
-    public decompose(id: string , resourceManager: Manager<ResourcecData> , backpackManager: Manager<BackpackData>) {
-        const equipment = this.equipments.find(e => e.id === id)
-        if (!equipment) return
-        const material = getDecomposeMaterial(equipment.prototype , equipment.lv)
-        resourceManager.data.addGold(material.gold || 0)
-        resourceManager.data.addDiamond(material.diamond || 0)
-        if (material.items)
+    public decompose(idList: string[] , resourceManager: Manager<ResourcecData> , backpackManager: Manager<BackpackData>) {
+        const materials = {gold: 0 , diamond: 0 , items: []}
+        idList.forEach(id => {
+            const equipment = this.equipments.find(e => e.id === id)
+            if (!equipment) return
+            const material = getDecomposeMaterial(equipment.prototype , equipment.lv)
+            resourceManager.data.addGold(material.gold || 0)
+            resourceManager.data.addDiamond(material.diamond || 0)
+            if (material.gold) materials.gold = (materials.gold || 0) + material.gold
+            if (material.diamond) materials.diamond = (materials.diamond || 0) + material.diamond
+            if (material.items)
             material.items.forEach(item => {
+                materials.items.push(item)
                 backpackManager.data.addItem(item.prototype , item.count || 0)
             })
-        this.emit("decomposeEquipment" , equipment)
+            this.emit("decomposeEquipment" , equipment)
+        })
+        this.equipments = Array.from(this.equipments).map(e => {
+            if (idList.includes(e.id)) return null
+            return e
+        }).filter(e => e !== null)
+        message.congratulations(
+            materials.gold , 
+            materials.diamond , 
+            materials.items , 
+            []
+        )
+        return
     }
 
 }

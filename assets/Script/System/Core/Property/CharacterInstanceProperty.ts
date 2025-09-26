@@ -40,7 +40,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         return this._hp;
     }
     public set hp(value: number) {
-        this._hp = Math.min(Math.max(value, 0), 1)
+        if (value > 1) value = 1
+        if (value < 0) value = 0
+        this._hp = value
     }
     
     // 当前魔法值
@@ -49,7 +51,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         return this._mp;
     }
     public set mp(value: number) {
-        this._mp = Math.min(Math.max(value, 0), 1)
+        if (value > 1) value = 1
+        if (value < 0) value = 0
+        this._hp = value
     }
 
     
