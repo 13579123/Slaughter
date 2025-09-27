@@ -7,6 +7,7 @@ import { EquipmentDTO } from "../../System/Core/Prototype/EquipmentPrototype";
 import { MessageCongratulationsPrefab } from "db://assets/Prefabs/Components/Message/MessageCongratulationsPrefab";
 import { AchivementPrototype } from "../System/Prototype/AchivementPrototype";
 import { MessageTaskNotifyPrefab } from "db://assets/Prefabs/Components/Message/MessageTaskNotifyPrefab";
+import { MessageConfirmPrefab } from "db://assets/Prefabs/Components/Message/MessageConfirmPrefab";
 
 class Message {
 
@@ -65,6 +66,31 @@ class Message {
         node.getComponent(MessageTaskNotifyPrefab).setNotifyInfo(achivement)
         .then(() => {
             parent.removeChild(node)
+        })
+    }
+
+    // 确认弹窗
+    protected ConfirmPrefab: Prefab = null;
+
+    public async confirm(title: string , message: string , confirm: string , cancel: string): Promise<boolean> {
+        if (!this.ConfirmPrefab) {
+            const assetManager = new CcNative.Asset.AssetManager("PrefabResource")
+            const prefab = await assetManager.load("Message/MessageConfirmPrefab" , Prefab)
+            this.ConfirmPrefab = prefab.value;
+        }
+        const node = CcNative.instantiate(this.ConfirmPrefab)
+        const parent = find("Canvas")
+        parent.addChild(node)
+        return new Promise<boolean>(res => {
+            node.getComponent(MessageConfirmPrefab).setConfirm(title, message, confirm, cancel, () => {
+                res(true)
+                parent.removeChild(node)
+                node.destroy()
+            } , () => {
+                res(false)
+                parent.removeChild(node)
+                node.destroy()
+            })
         })
     }
 

@@ -711,3 +711,49 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
 
     }
 })();
+(function() {
+    @RegisterLanguageEntry("Warning")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "警告"
+        }
+
+        public get eng(): string {
+            return "Warning"
+        }
+
+        public get jpn(): string {
+            return "警告"
+        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Confirm")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "确认"
+        }
+
+        public get eng(): string {
+            return "Confirm"
+        }
+
+        public get jpn(): string {
+            return "確認"        }
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Cancel")
+    class _ extends LanguageEntry {
+        public get chs(): string {
+            return "取消"
+        }
+
+        public get eng(): string {
+            return "Cancel"
+        }
+
+        public get jpn(): string {
+            return "キャンセル"        }
+    }
+})();

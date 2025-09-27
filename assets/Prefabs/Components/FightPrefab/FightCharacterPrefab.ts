@@ -85,10 +85,11 @@ export class FightCharacterPrefab extends ExtensionComponent {
         this.effect(() => {
             mpProgress.setProgress(this.character.mp)
             hpProgress.setProgress(this.character.hp)
-            mpLabel.string = Normal.number(this.character.mp * this.character.maxMp) + " / "
-                + Normal.number(this.character.maxMp)
+            console.log(this.character.hp)
             hpLabel.string = Normal.number(this.character.hp * this.character.maxHp) + " / "
                 + Normal.number(this.character.maxHp)
+            mpLabel.string = Normal.number(this.character.mp * this.character.maxMp) + " / "
+                + Normal.number(this.character.maxMp)
         })
         // 绑定buff展示
         const buffContainer = this.node.getChildByName("State").getChildByName("Buff")
@@ -203,18 +204,16 @@ export class FightCharacterPrefab extends ExtensionComponent {
         if (skill) {
             return new Promise((res) => {
                 this.character.useSkill({
-                    skill,
-                    animationComplete: () => {
+                    skill , animationComplete: () => {
                         res(null)
                         this.isAction = false
                     }
                 })
             })
-        }
+        } 
         return new Promise((res) => {
             this.character.attackCharacter({
-                target,
-                animationComplete: () => {
+                target , animationComplete: () => {
                     res(null)
                     this.isAction = false
                 }

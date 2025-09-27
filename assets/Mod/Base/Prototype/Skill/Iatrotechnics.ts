@@ -1,4 +1,4 @@
-import { log, SpriteFrame } from "cc";
+import { debug, log, SpriteFrame } from "cc";
 import { settingManager } from "db://assets/Script/Game/Manager/SettingManager";
 import { RegisterPlayerSkill, RegisterSkillUpLevel } from "db://assets/Script/Game/System/SkillConfig";
 import { CcNative } from "db://assets/Module/CcNative";
@@ -33,27 +33,27 @@ class Iatrotechnics_Name extends LanguageEntry {
 class Iatrotechnics_Description extends LanguageEntry {
 
     public get chs(): string {
-        return `<color=0E70FB>消耗: ${ Math.max(1 , this.data.lv - 1) * 20 + 40 } 魔法值</color>\n` + 
-        `恢复 ${ Math.max(1 , this.data.lv - 1) * 3 + 5 }% 最大生命值 ，最低回复 ${ Math.max(1 , this.data.lv - 1) * 50 + 50 } 生命值`
+        return `<color=0E70FB>消耗: ${Math.max(1, this.data.lv - 1) * 20 + 40} 魔法值</color>\n` +
+            `恢复 ${Math.max(1, this.data.lv - 1) * 3 + 5}% 最大生命值 ，最低回复 ${Math.max(1, this.data.lv - 1) * 50 + 50} 生命值`
     }
 
     public get eng(): string {
-        return `<color=0E70FB>Cost: ${ Math.max(1 , this.data.lv - 1) * 20 + 40 } MP</color>\n` + 
-        `Restore ${ Math.max(1 , this.data.lv - 1) * 3 + 5 }% max HP, minimum ${ Math.max(1 , this.data.lv - 1) * 50 + 50 } HP`
+        return `<color=0E70FB>Cost: ${Math.max(1, this.data.lv - 1) * 20 + 40} MP</color>\n` +
+            `Restore ${Math.max(1, this.data.lv - 1) * 3 + 5}% max HP, minimum ${Math.max(1, this.data.lv - 1) * 50 + 50} HP`
     }
 
     public get jpn(): string {
-        return `<color=0E70FB>消費: ${ Math.max(1 , this.data.lv - 1) * 20 + 40 } MP</color>\n` +
-        `最大体力値 ${ Math.max(1 , this.data.lv - 1) * 3 + 5 }% 回復、最低 ${ Math.max(1 , this.data.lv - 1) * 50 + 50 } 生命値 回復`
+        return `<color=0E70FB>消費: ${Math.max(1, this.data.lv - 1) * 20 + 40} MP</color>\n` +
+            `最大体力値 ${Math.max(1, this.data.lv - 1) * 3 + 5}% 回復、最低 ${Math.max(1, this.data.lv - 1) * 50 + 50} 生命値 回復`
     }
 
 }
 
 @RegisterSkill("Iatrotechnics")
 @RegisterPlayerSkill("Iatrotechnics", "Brave")
-@RegisterSkillUpLevel("Iatrotechnics" , (lv: number) => ({
-    diamond: lv * 50 + 150 ,
-    gold: Math.pow(2 , lv) * 100 + 100 , 
+@RegisterSkillUpLevel("Iatrotechnics", (lv: number) => ({
+    diamond: lv * 50 + 150,
+    gold: Math.pow(2, lv) * 100 + 100,
 }))
 export class Iatrotechnics extends SkillPrototype {
 
@@ -79,7 +79,7 @@ export class Iatrotechnics extends SkillPrototype {
     }
 
     public get cost(): { hp: number; mp: number; } {
-        return { hp: 0, mp: Math.max(1 , this.instance.lv - 1) * 20 + 40 }
+        return { hp: 0, mp: Math.max(1, this.instance.lv - 1) * 20 + 40 }
     }
 
     public get coolTime(): number {
@@ -87,11 +87,12 @@ export class Iatrotechnics extends SkillPrototype {
     }
 
     public use(useOption: { use: CharacterInstance; }): void {
+        const increase = Math.max(
+            useOption.use.maxHp * ((Math.max(1, this.instance.lv - 1) * 3 + 5) / 100),
+            Math.max(1, this.instance.lv - 1) * 50 + 50
+        )
         useOption.use.increaseHp({
-            increase: Math.max(
-                useOption.use.maxHp * ((Math.max(1 , this.instance.lv - 1) * 3 + 5) / 100) , 
-                Math.max(1 , this.instance.lv - 1) * 50 + 50
-            ),
+            increase: increase,
             fromType: FromType.skill,
             from: useOption.use,
         })

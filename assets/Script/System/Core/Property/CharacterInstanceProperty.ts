@@ -53,7 +53,7 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
     public set mp(value: number) {
         if (value > 1) value = 1
         if (value < 0) value = 0
-        this._hp = value
+        this._mp = value
     }
 
     

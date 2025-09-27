@@ -115,7 +115,7 @@ export class UserBaseDataPrefab extends ExtensionComponent {
         ]
         property.forEach(setting => {
             label.string += `${LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
-                }: ${Normal.number(characterInstance[setting.key] * setting.rate, setting.fixed, setting.force)}${setting.exit}\n`
+                }: ${Normal.number(characterInstance[setting.key] * setting.rate)}${setting.exit}\n`
         })
         avatarSprite.spriteFrame = await characterInstance.proto.icon()
     }

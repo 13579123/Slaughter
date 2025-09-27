@@ -515,7 +515,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                         progress.skill.proto.useFail(SkillFailReason.NotEnoughCoast, progress)
                         return res(false)
                     }
-                    if (progress.coolTime > 0) {
+                    if (progress.skill.coolTime > 0) {
                         progress.skill.proto.useFail(SkillFailReason.CoolDown, progress)
                         return res(false)
                     }
@@ -536,7 +536,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.skill = option.skill
         progress.type = "use"
         progress.cost = progress.skill.proto.cost
-        progress.coolTime = progress.skill.coolTime
+        progress.coolTime = progress.skill.proto.coolTime
         this.isSkillAble(option.skill, progress)
             .then(async able => {
                 if (!able) return
@@ -546,6 +546,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                         option.animationComplete && option.animationComplete()
                     } , res)
                 })
+                progress.skill.proto.use({ use: progress.from })
                 progress.from.reduceMp({ reduce: progress.cost.mp, from: progress.from })
                 progress.from.reduceHp({
                     reduce: progress.cost.hp,
@@ -554,8 +555,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     fromType: FromType.skillCost,
                     critical: false
                 })
-                progress.skill.coolTime = progress.skill.proto.coolTime
-                progress.skill.proto.use({ use: progress.from })
+                progress.skill.coolTime = progress.coolTime
                 await this.emitProgress("afterUseSkill", progress)
             })
         return

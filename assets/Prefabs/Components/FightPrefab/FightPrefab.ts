@@ -9,6 +9,10 @@ import { Normal } from 'db://assets/Script/System/Normal';
 import { isSkillPassive } from 'db://assets/Script/Game/System/SkillConfig';
 import { getCharacterKey } from 'db://assets/Script/System/Manager/CharacterManager';
 import { getSkillKey } from 'db://assets/Script/System/Manager/SkillManager';
+import { message } from 'db://assets/Script/Game/Message/Message';
+import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
+import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
+import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
 const { ccclass, property } = _decorator;
 
 type FightOption = {
@@ -105,13 +109,14 @@ export class FightPrefab extends ExtensionComponent {
             this.effect(() => {
                 if (skill.coolTime !== 0) coollingNode.active = true
                 else coollingNode.active = false
-                coollingNode.getChildByName("CoollingTime").getComponent(Label).string = `${(skill.coolTime / 1000).toFixed(1)}s`
+                coollingNode.getChildByName("CoollingTime").getComponent(Label).string = 
+                    `${(skill.coolTime / 1000).toFixed(1)}s`
             })
             // 绑定点击按钮
             skillNode.getChildByName("Icon").on(
                 Button.EventType.CLICK , 
                 async () => {
-                    if (await playerData.character.isSkillAble(skill))
+                    if (await playerData.character.isSkillAble(skill)) 
                         playerData.characterPrefab.characterUseSkill( skill )
                 }
             )
@@ -140,8 +145,12 @@ export class FightPrefab extends ExtensionComponent {
         rightCharacterPrefab.fightPrefab = this
     }
 
+    // 逃跑回调
+    protected escapeCallback: Function = null
+
     // 开始战斗逻辑
     protected async startFight(): Promise<"left" | "right" | "none"> {
+        let stopGame = false
         // 两边角色进入准备状态
         this.leftCharacterPrefab.characterReady();
         this.rightCharacterPrefab.characterReady();
@@ -194,7 +203,7 @@ export class FightPrefab extends ExtensionComponent {
                     (stop = true) ; 
                     res(null)
                 })
-                while(!stop) {
+                while(!stop && !stopGame) {
                     await characterPrefab.characterAction(target)
                     characterPrefab.characterReady()
                     await new Promise(
@@ -204,19 +213,48 @@ export class FightPrefab extends ExtensionComponent {
                 return
             })
         }
-        // 两边角色开始攻击
-        await Promise.all([
-            startAttack(this.leftCharacter, this.rightCharacter , this.leftCharacterPrefab , this.rightCharacterPrefab , "left"),
-            startAttack(this.rightCharacter, this.leftCharacter , this.rightCharacterPrefab , this.leftCharacterPrefab , "right"),
-        ])
-        if (!this.leftCharacter.hasDeath) this.leftCharacterPrefab.characterReady()
-        if (!this.rightCharacter.hasDeath) this.rightCharacterPrefab.characterReady()
         // 战斗结算
         return new Promise<"left" | "right" | "none">(async (res) => {
+            // 逃跑回调
+            this.escapeCallback = () => {
+                stopGame = true
+                res("none")
+            }
+            // 两边角色开始攻击
+            await Promise.all([
+                startAttack(this.leftCharacter, this.rightCharacter , this.leftCharacterPrefab , this.rightCharacterPrefab , "left"),
+                startAttack(this.rightCharacter, this.leftCharacter , this.rightCharacterPrefab , this.leftCharacterPrefab , "right"),
+            ])
+            if (!this.leftCharacter.hasDeath) this.leftCharacterPrefab.characterReady()
+            if (!this.rightCharacter.hasDeath) this.rightCharacterPrefab.characterReady()
+            // 结算
             if (this.leftCharacter.hasDeath && this.rightCharacter.hasDeath) res("none")
             if (this.leftCharacter.hasDeath) res("right")
             else if (this.rightCharacter.hasDeath) res("left")
         })
+    }
+
+    // 逃跑函数
+    protected escape(): void {
+        message.confirm(
+            LanguageManager.getEntry("Warning").getValue(settingManager.data.language),
+            (new class extends LanguageEntry {
+                public get chs(): string {
+                    return "你确定要逃跑吗？逃跑将视为失败，无法获得任何奖励";
+                }
+                public get eng(): string {
+                    return "Are you sure you want to escape? Escaping will be considered a failure and you will not receive any rewards";
+                }
+                public get jpn(): string {
+                    return "本当に逃げますか？逃げると失敗と見なされ、報酬を受け取ることができません";
+                }
+            }).getValue(settingManager.data.language),
+            LanguageManager.getEntry("Confirm").getValue(settingManager.data.language),
+            LanguageManager.getEntry("Cancel").getValue(settingManager.data.language)
+        ).then(res => {
+            if (res) this.escapeCallback && this.escapeCallback()
+        })
+        return
     }
 
     // 获取玩家角色

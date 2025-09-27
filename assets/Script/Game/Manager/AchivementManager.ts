@@ -96,7 +96,6 @@ export class AchivementData {
                 let stop = false
                 const runner = Rx.effect(() => {
                     const progress = achivement.progress
-                    const name = achivement.name
                     if (progress.progress / progress.maxProgress >= 1) {
                         this.completeTask(achivementKey)
                         message.taskNotify(achivement)
@@ -168,6 +167,7 @@ export const achivementManager = new Manager({
 })
 
 LoadingManager.addLoadingQueue(async () => {
+    achivementManager.data
     // 监听资源变化
     resourceManager.data.on("goldChange" , num => {
         if (num > 0) {

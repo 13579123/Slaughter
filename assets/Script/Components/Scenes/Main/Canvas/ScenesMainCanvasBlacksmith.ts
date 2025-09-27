@@ -3,11 +3,14 @@ import { Diamond } from 'db://assets/Mod/Base/Prototype/Item/Diamond';
 import { Gold } from 'db://assets/Mod/Base/Prototype/Item/Gold';
 import { CcNative } from 'db://assets/Module/CcNative';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
+import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
 import { Rx } from 'db://assets/Module/Rx';
 import { EquipmentItemPrefab } from 'db://assets/Prefabs/Components/EquipmentItemPrefab';
 import { backpackManager } from 'db://assets/Script/Game/Manager/BackpackManager';
 import { equipmentManager } from 'db://assets/Script/Game/Manager/EquipmentManager';
 import { resourceManager } from 'db://assets/Script/Game/Manager/ResourceManager';
+import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
+import { message } from 'db://assets/Script/Game/Message/Message';
 import { EquipmentInstance } from 'db://assets/Script/System/Core/Instance/EquipmentInstance';
 import { ItemInstance } from 'db://assets/Script/System/Core/Instance/ItemInstance';
 import { EquipmentDTO } from 'db://assets/Script/System/Core/Prototype/EquipmentPrototype';
@@ -88,6 +91,19 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
 
     // 分解装备
     protected decomposeEquipment() {
+        if (this.decomposeData.selectEquipList.length <= 0) {
+            return message.toast((new class extends LanguageEntry {
+                public get chs(): string {
+                    return "请选择要分解的装备"
+                }
+                public get eng(): string {
+                    return "Please select the equipment to decompose"
+                }
+                public get jpn(): string {
+                    return "分解する装備を選択してください"
+                }
+            }).getValue(settingManager.data.language))
+        }
         equipmentManager.data.decompose(
             this.decomposeData.selectEquipList.map(e => e.id), 
             resourceManager, 

@@ -1,16 +1,11 @@
 
 export class Normal {
 
-    public static number(num: number , fixed = 0 , force = false): string {
-        let useFixed = fixed
-        if (num === void 0 || num === null) return "0"
-        if (num.toString().indexOf(".") === -1) useFixed = 0
-        else useFixed = 2
-        if (force) useFixed = fixed
-        if (num < 10000) return num.toFixed(useFixed);
-        if (num < 1000000) return (num / 1000).toFixed(useFixed) + "K";
-        if (num < 100000000) return (num / 10000).toFixed(useFixed) + "W";
-        return (num / 1000000000).toFixed(useFixed) + "M";
+    public static number(num: number): string {
+        if (num < 10000) return num.toFixed(0);
+        if (num < 1000000) return (num / 1000).toFixed(2) + "K";
+        if (num < 100000000) return (num / 10000).toFixed(2) + "W";
+        return (num / 1000000).toFixed(2) + "M";
     }
 
 }
