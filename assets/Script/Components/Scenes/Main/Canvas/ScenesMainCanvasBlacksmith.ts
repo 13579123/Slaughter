@@ -117,7 +117,6 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
 
     // 初始化强化
     protected initStrengthen() {
-        this.strengthenData.selectEquip = null
         this.renderStrengthenEquipment()
         this.renderStrengthenAllEquipment()
         return
@@ -170,12 +169,18 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
                 getEquipmentKey(instance.proto),
                 instance.lv
             )
-            if (!needMaterial) needGoldLabel.string = needDiamondLabel.string = "0"
+            const materialContent = strengthenNode.getChildByName("NeedItems").getComponent(ScrollView).content
+            if (!needMaterial) {
+                needGoldLabel.string = needDiamondLabel.string = "0"
+                // 渲染材料
+                const children = Array.from(materialContent.children)
+                materialContent.removeAllChildren()
+                children.forEach(child => child.destroy())
+            }
             else {
                 needGoldLabel.string = needMaterial.gold + ""
                 needDiamondLabel.string = needMaterial.diamond + ""
                 // 渲染材料
-                const materialContent = strengthenNode.getChildByName("NeedItems").getComponent(ScrollView).content
                 const children = Array.from(materialContent.children)
                 materialContent.removeAllChildren()
                 children.forEach(child => child.destroy())
