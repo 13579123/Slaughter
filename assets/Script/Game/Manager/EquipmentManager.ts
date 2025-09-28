@@ -104,29 +104,37 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
         let equipment = this.equipments.find(e => e.id === id)
         if (!equipment) equipment = Object.values(this.equipment).find(e => e?.id === id)
         if (!equipment) return
-        if (equipment.lv >= 10)
-            return message.toast(
+        if (equipment.lv >= 10){
+            message.toast(
                 LanguageManager.getEntry("EquipmentMaxLevel")
                 .getValue(settingManager.data.language)
             )
+            return false
+        }
         const strongMaterial = getStrongMaterial(equipment.prototype , equipment.lv)
         if (!strongMaterial) return equipment.lv += 1
-        if (resourceManager.data.gold < strongMaterial.gold) 
-            return message.toast(
+        if (resourceManager.data.gold < strongMaterial.gold) {
+            message.toast(
                 LanguageManager.getEntry("NotEnoughGold")
                 .getValue(settingManager.data.language)
             )
-        if (resourceManager.data.diamond < strongMaterial.diamond) 
-            return message.toast(
+            return false
+        }
+        if (resourceManager.data.diamond < strongMaterial.diamond) {
+            message.toast(
                 LanguageManager.getEntry("NotEnoughDiamond")
                 .getValue(settingManager.data.language)
             )
+            return false
+        }
         for (let i = 0; i < strongMaterial.items.length; i++) {
             const itemProto = strongMaterial.items[i];
-            if (!backpackManager.data.hasItem(itemProto.prototype , itemProto.count || 0)) 
-                return message.toast(
+            if (!backpackManager.data.hasItem(itemProto.prototype , itemProto.count || 0)) {
+                message.toast(
                     LanguageManager.getEntry("NotEnoughItems").getValue(settingManager.data.language)
                 )
+                return false 
+            }
         }
         resourceManager.data.reduceGold(strongMaterial.gold)
         resourceManager.data.reduceDiamond(strongMaterial.diamond)
@@ -135,6 +143,7 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
         })
         equipment.lv += 1
         this.emit("strengthenEquipment" , equipment)
+        return true
     }
 
     // 分解装备

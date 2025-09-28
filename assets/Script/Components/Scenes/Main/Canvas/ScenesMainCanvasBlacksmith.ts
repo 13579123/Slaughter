@@ -77,7 +77,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
     // 强化装备
     protected strengthenEquipment() {
         if (this.strengthenData.selectEquip) {
-            equipmentManager.data.strengthenEquipment(
+            const success = equipmentManager.data.strengthenEquipment(
                 this.strengthenData.selectEquip.id,
                 resourceManager,
                 backpackManager
@@ -105,8 +105,8 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
             }).getValue(settingManager.data.language))
         }
         equipmentManager.data.decompose(
-            this.decomposeData.selectEquipList.map(e => e.id), 
-            resourceManager, 
+            this.decomposeData.selectEquipList.map(e => e.id),
+            resourceManager,
             backpackManager
         )
         resourceManager.save()
@@ -199,14 +199,15 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
         return
     }
 
-    // 渲染强化装备
+    // 所有强化装备列表的复制，用来避免重复渲染
+    protected allStrengthenEquipmentNodeMap: Map<string, { json: string, node: Node }> = new Map()
+
+    // 渲染所有装备
     protected renderStrengthenAllEquipment() {
         const strengthenNode = this.node.getChildByName("Blackmith").getChildByName("Strengthen")
         // 渲染所有装备
         const content = strengthenNode.getChildByName("AllEquipment").getChildByName("View").getChildByName("Content")
-        const children = Array.from(content.children)
         content.removeAllChildren()
-        children.forEach(child => child.destroy())
         const equipments: EquipmentDTO[] = [
             equipmentManager.data.equipment.weapon,
             equipmentManager.data.equipment.armor,
@@ -215,10 +216,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
         ]
         const nodes = []
         equipmentManager.data.equipments.forEach(e => equipments.push(e))
-        for (let i = 0; i < equipments.length; i++) {
-            const equipment = equipments[i];
-            const node = CcNative.instantiate(this.EquipmentItemPrefab)
-            nodes.push(node)
+        const setEquipment = (node: Node, equipment: EquipmentDTO) => {
             node.getComponent(EquipmentItemPrefab).setInfo(new EquipmentInstance({
                 id: equipment.id,
                 lv: equipment.lv,
@@ -240,6 +238,23 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
             if (this.strengthenData.selectEquip?.id === equipment.id) {
                 node.getComponent(Sprite).color = new Color(180, 180, 180)
             }
+        }
+        for (let i = 0; i < equipments.length; i++) {
+            const equipment = equipments[i];
+            let node = null
+            if (this.allStrengthenEquipmentNodeMap.has(equipment.id)) {
+                const data = this.allStrengthenEquipmentNodeMap.get(equipment.id)
+                node = data.node
+                if (data.json !== JSON.stringify(equipment)) {
+                    setEquipment(node, equipment)
+                    data.json = JSON.stringify(equipment)
+                }
+            } else {
+                node = CcNative.instantiate(this.EquipmentItemPrefab)
+                setEquipment(node, equipment)
+                this.allStrengthenEquipmentNodeMap.set(equipment.id, { node, json: JSON.stringify(equipment) })
+            }
+            nodes.push(node)
             content.addChild(node)
         }
     }
@@ -290,9 +305,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
     protected renderDecomposeAllEquipment() {
         const decompositionNode = this.node.getChildByName("Blackmith").getChildByName("Decomposition")
         const contentNode = decompositionNode.getChildByName("AllEquipments").getComponent(ScrollView).content
-        const children = Array.from(contentNode.children)
         contentNode.removeAllChildren()
-        children.forEach(child => child.destroy())
         equipmentManager.data.equipments.forEach(equipment => {
             const node = CcNative.instantiate(this.EquipmentItemPrefab)
             node.getComponent(EquipmentItemPrefab).setInfo(new EquipmentInstance({

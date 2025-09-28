@@ -144,7 +144,7 @@ export class AchivementData {
             // 添加奖励
             const achivement = getAchivement(key)
             if (!achivement) return
-            achivement.getRewards()
+            achivement.getRewards(resourceManager , backpackManager , equipmentManager)
             this.dayTaskData.hasGetReward.push(key)
         } else {
             // 已经获取过奖励
@@ -152,7 +152,7 @@ export class AchivementData {
             // 添加奖励
             const achivement = getAchivement(key)
             if (!achivement) return
-            achivement.getRewards()
+            achivement.getRewards(resourceManager , backpackManager , equipmentManager)
             this.achivementData.hasGetReward.push(key)
         }
     }

@@ -1,10 +1,11 @@
 import { Sprite, SpriteFrame } from "cc"
 import { ItemDTO } from "../../../System/Core/Prototype/ItemPrototype"
 import { EquipmentDTO } from "../../../System/Core/Prototype/EquipmentPrototype"
-import { backpackManager } from "../../Manager/BackpackManager"
-import { equipmentManager } from "../../Manager/EquipmentManager"
-import { resourceManager } from "../../Manager/ResourceManager"
+import { BackpackData, backpackManager } from "../../Manager/BackpackManager"
+import { EquipmentData, equipmentManager } from "../../Manager/EquipmentManager"
+import { ResourcecData, resourceManager } from "../../Manager/ResourceManager"
 import { message } from "../../Message/Message"
+import { Manager } from "../../../System/Manager"
 
 export class AchivementPrototype {
 
@@ -36,7 +37,11 @@ export class AchivementPrototype {
     } { return { gold: 0, diamond: 0, items: [], equipment: [] } }
 
     // 获取奖励
-    public getRewards() {
+    public getRewards(
+        resourceManager: Manager<ResourcecData> , 
+        backpackManager: Manager<BackpackData>, 
+        equipmentManager: Manager<EquipmentData>
+    ) {
         const reward = this.rewards
         if (reward.gold) resourceManager.data.addGold(reward.gold)
         if (reward.diamond) resourceManager.data.addGold(reward.diamond)

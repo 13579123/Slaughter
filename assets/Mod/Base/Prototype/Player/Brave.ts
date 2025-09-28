@@ -80,7 +80,7 @@ export class Brave extends CharacterPrototype {
     }
 
     // 攻击动画Promise会在攻击动作计算完成后resolve
-    playAttackAnimation(progress: AttackProgress, endCallback: Function, next: Function) {
+    playAttackAnimation(progress: AttackProgress, animationEndCallback: Function, next: Function) {
         const prefab = getComponentByPlayer(this.instance)
         if (!prefab) return next()
         prefab.playAnimation("Attack01", {
@@ -90,11 +90,11 @@ export class Brave extends CharacterPrototype {
                 name: "Attack01",
                 callback: () => next()
             },
-            complete: () => endCallback()
+            complete: () => animationEndCallback()
         })
         return
     }
-    playSkillAnimation(progress: SkillProgress, endCallback: Function, next: Function) {
+    playSkillAnimation(progress: SkillProgress, animationEndCallback: Function, next: Function) {
         const prefab = getComponentByPlayer(this.instance)
         if (!prefab) return next()
         prefab.playAnimation("Attack02", {
@@ -104,17 +104,17 @@ export class Brave extends CharacterPrototype {
                 name: "Attack02",
                 callback: () => next()
             },
-            complete: () => endCallback()
+            complete: () => animationEndCallback()
         })
     }
-    public playDieAnimation(progress: DeathProgress, endCallback: Function , next: Function): void {
+    public playDieAnimation(progress: DeathProgress, animationEndCallback: Function , next: Function): void {
         const prefab = getComponentByPlayer(this.instance)
         if (!prefab) return
         prefab.playAnimation("BeAttack", {
             count: 1,
             speed: 1,
             complete: () => {
-                endCallback() 
+                animationEndCallback() 
                 next()
             }
         })
