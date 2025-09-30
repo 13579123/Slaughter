@@ -157,6 +157,12 @@ export class AchivementData {
         }
     }
 
+    // 添加击杀记录
+    public addKillRecord(key: string) {
+        this.dayTaskData.kill[key] = (this.dayTaskData.kill[key] || 0) + 1
+        this.achivementData.kill[key] = (this.achivementData.kill[key] || 0) + 1
+    }
+
 }
 
 export const achivementManager = new Manager({

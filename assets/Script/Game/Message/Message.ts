@@ -25,14 +25,13 @@ class Message {
     }
 
     // 弹框消息
-    public async toast(msg: string) {
+    public async toast(msg: string , parent = find("Canvas")) {
         if (!this.ToastPrefab) {
             const assetManager = new CcNative.Asset.AssetManager("PrefabResource")
             const prefab = await assetManager.load("Message/MessageToastPrefab" , Prefab)
             this.ToastPrefab = prefab.value;
         }
         const node = CcNative.instantiate(this.ToastPrefab)
-        const parent = find("Canvas")
         parent.addChild(node)
         node.getComponent(MessageToastPrefab).setToast(msg)
         .then(_ => {
@@ -54,14 +53,13 @@ class Message {
     }
 
     // 恭喜
-    public async congratulations(gold: number , diamond: number , items: ItemDTO[] , equipments: EquipmentDTO[]) {
+    public async congratulations(gold: number , diamond: number , items: ItemDTO[] , equipments: EquipmentDTO[] , parent = find("Canvas")) {
         if (!this.CongratulationsPrefab) {
             const assetManager = new CcNative.Asset.AssetManager("PrefabResource")
             const prefab = await assetManager.load("Message/MessageCongratulationsPrefab" , Prefab)
             this.CongratulationsPrefab = prefab.value;
         }
         const node = CcNative.instantiate(this.CongratulationsPrefab)
-        const parent = find("Canvas")
         parent.addChild(node)
         node.getComponent(MessageCongratulationsPrefab)
         .setCongratulation(gold , diamond , items , equipments , () => {
@@ -82,14 +80,13 @@ class Message {
         }
     }
 
-    public async taskNotify(achivement: AchivementPrototype) {
+    public async taskNotify(achivement: AchivementPrototype , parent = find("Canvas")) {
         if (!this.TaskNotifyPrefab) {
             const assetManager = new CcNative.Asset.AssetManager("PrefabResource")
             const prefab = await assetManager.load("Message/MessageTaskNotifyPrefab" , Prefab)
             this.TaskNotifyPrefab = prefab.value;
         }
         const node = CcNative.instantiate(this.TaskNotifyPrefab)
-        const parent = find("Canvas")
         parent.addChild(node)
         node.getComponent(MessageTaskNotifyPrefab).setNotifyInfo(achivement)
         .then(() => {
@@ -109,14 +106,13 @@ class Message {
         }
     }
 
-    public async confirm(title: string , message: string , confirm: string , cancel: string): Promise<boolean> {
+    public async confirm(title: string , message: string , confirm: string , cancel: string , parent = find("Canvas")): Promise<boolean> {
         if (!this.ConfirmPrefab) {
             const assetManager = new CcNative.Asset.AssetManager("PrefabResource")
             const prefab = await assetManager.load("Message/MessageConfirmPrefab" , Prefab)
             this.ConfirmPrefab = prefab.value;
         }
         const node = CcNative.instantiate(this.ConfirmPrefab)
-        const parent = find("Canvas")
         parent.addChild(node)
         return new Promise<boolean>(res => {
             node.getComponent(MessageConfirmPrefab).setConfirm(title, message, confirm, cancel, () => {

@@ -135,7 +135,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
     }
 
     // 触发战斗流程事件
-    protected async emitProgress(e: keyof FightProgress, progress: Progress) {
+    public async emitProgress(e: keyof FightProgress, progress: Progress) {
         return new Promise(async res => {
             let hasNext = false
             progress.next = () => {

@@ -85,7 +85,6 @@ export class FightCharacterPrefab extends ExtensionComponent {
         this.effect(() => {
             mpProgress.setProgress(this.character.mp)
             hpProgress.setProgress(this.character.hp)
-            console.log(this.character.hp)
             hpLabel.string = Normal.number(this.character.hp * this.character.maxHp) + " / "
                 + Normal.number(this.character.maxHp)
             mpLabel.string = Normal.number(this.character.mp * this.character.maxMp) + " / "
@@ -156,7 +155,7 @@ export class FightCharacterPrefab extends ExtensionComponent {
             xMove = -2
         }
         // 隐藏状态
-        // this.node.getChildByName("State").active = false
+        this.node.getChildByName("State").active = false
         // 播放动画
         this.playAnimation(this.character.proto.animation.animations.move, { count: -1 })
         const spine = this.node.getChildByName("Spine")

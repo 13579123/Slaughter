@@ -250,7 +250,8 @@ export class FightPrefab extends ExtensionComponent {
                 }
             }).getValue(settingManager.data.language),
             LanguageManager.getEntry("Confirm").getValue(settingManager.data.language),
-            LanguageManager.getEntry("Cancel").getValue(settingManager.data.language)
+            LanguageManager.getEntry("Cancel").getValue(settingManager.data.language) ,
+            this.node
         ).then(res => {
             if (res) this.escapeCallback && this.escapeCallback()
         })

@@ -126,4 +126,6 @@ export interface FightProgress {
     beforeUseSkill?(progress: SkillProgress, next: Function): void,
     // 使用技能之后
     afterUseSkill?(progress: SkillProgress, next: Function): void,
+    // 战斗结束并且胜利
+    fightSuccessEnd?(progress: Progress , next: Function): void,
 }

@@ -92,7 +92,7 @@ export class Spear extends EquipmentPrototype {
     // 基础属性
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
         physicalAttack: 15,
-        attackSpeed: 1.3,
+        attackSpeed: 1.35,
     }).setProperty("physicalAttack", (atk) => {
         return atk + (this.suitCount >= oneSuit ? 15 : 0)
     }).setProperty("attackSpeed", (speed) => {
