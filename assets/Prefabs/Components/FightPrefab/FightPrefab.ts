@@ -206,8 +206,9 @@ export class FightPrefab extends ExtensionComponent {
                 while(!stop && !stopGame) {
                     await characterPrefab.characterAction(target)
                     characterPrefab.characterReady()
+                    // 攻击间隔
                     await new Promise(
-                        resolve => this.setAutoInterval(() => resolve(null) , {count: 1 , timer: 1000 / character.attackSpeed})
+                        resolve => this.setAutoInterval(() => resolve(null) , {count: 1 , timer: 800 / character.attackSpeed})
                     )
                 }
                 return

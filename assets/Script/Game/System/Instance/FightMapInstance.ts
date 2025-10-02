@@ -9,6 +9,7 @@ import { CharacterDTO } from "../../../System/Core/Prototype/CharacterPrototype"
 export enum MapData {
     Wall = 0,
     Floor = 1,
+    Treasure = 2,
 }
 
 export type MonsterData = {
@@ -56,6 +57,7 @@ export class FightMapInstance {
     protected initMonster() {
         const countArea = this.proto.monsterCount
         const count = Math.floor(Math.random() * countArea[0]) + (countArea[1] - countArea[0])
+        // 随机怪物
         for (let i = 0; i < count; i++) {
             // 随机获得一个空位置
             const emptyIndex = Math.floor(Math.random() * this.emptyPosition.length)
@@ -106,6 +108,21 @@ export class FightMapInstance {
                 })
             })
         }
+        // 随机宝箱
+        const treasureCount = Math.floor(Math.random() * this.proto.treasureCount[0]) + 
+            (this.proto.treasureCount[1] - this.proto.treasureCount[0])
+        for (let i = 0; i < treasureCount ; i++) {
+            // 随机获得一个空位置
+            const emptyIndex = Math.floor(Math.random() * this.emptyPosition.length)
+            if (!emptyIndex) break
+            // 移除空位置
+            const pos = this.emptyPosition[emptyIndex]
+            this.emptyPosition.splice(emptyIndex, 1)
+            if (pos) {
+                this.treasureData.push({position: pos})
+            }
+        }
+        // const emptyIndex = Math.floor(Math.random() * this.emptyPosition.length)
         return
     }
 

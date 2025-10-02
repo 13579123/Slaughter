@@ -11,6 +11,8 @@ class CharacterManagerDTO {
 
     public lv: number = 1
 
+    public exp: number = 0
+
     public characters: string[] = ["Brave"]
 
     public currentCharacter: string = "Brave"
@@ -20,6 +22,7 @@ class CharacterManagerDTO {
             this.characters = data.characters
             this.currentCharacter = data.currentCharacter
             this.lv = data.lv
+            this.exp = data.exp
         }
     }
 
@@ -39,6 +42,7 @@ export class CharacterData extends BaseEventManagerData<EventType> {
         super()
         if (data) {
             this.lv = data.lv
+            this.exp = data.exp
             this.characters = data.characters
             if (data.currentCharacter)
                 this.currentCharacter = data.currentCharacter

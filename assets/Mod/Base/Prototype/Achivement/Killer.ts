@@ -6,6 +6,8 @@ import { achivementManager } from 'db://assets/Script/Game/Manager/AchivementMan
 import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { RegisterAchivement } from 'db://assets/Script/Game/System/Manager/AchivementManager';
 import { AchivementPrototype } from 'db://assets/Script/Game/System/Prototype/AchivementPrototype';
+import { EquipmentDTO } from 'db://assets/Script/System/Core/Prototype/EquipmentPrototype';
+import { ItemDTO } from 'db://assets/Script/System/Core/Prototype/ItemPrototype';
 const { ccclass, property } = _decorator;
 
 const level = ["Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ", "Ⅸ", "Ⅹ"]
@@ -55,7 +57,7 @@ export class Killer1 extends AchivementPrototype {
 
     public get description(): string {
         return LanguageManager.getEntry("Killer Description").getValue(
-            settingManager.data.language, { level: 1 , killCount: 10 }
+            settingManager.data.language, { level: 1, killCount: 10 }
         )
     }
 
@@ -80,6 +82,14 @@ export class Killer1 extends AchivementPrototype {
         };
     }
 
+    public get rewards(): { gold: number; diamond: number; items?: ItemDTO[]; equipment?: EquipmentDTO[]; } {
+        return {
+            gold: 4000,
+            diamond: 50,
+            equipment: []
+        }
+    }
+
 }
 
 @RegisterAchivement("Killer2", true)
@@ -93,7 +103,7 @@ export class Killer2 extends AchivementPrototype {
 
     public get description(): string {
         return LanguageManager.getEntry("Killer Description").getValue(
-            settingManager.data.language, { level: 2 , killCount: 30 }
+            settingManager.data.language, { level: 2, killCount: 30 }
         )
     }
 
@@ -116,6 +126,14 @@ export class Killer2 extends AchivementPrototype {
             progress: killCount,
             maxProgress: 30
         };
+    }
+
+    public get rewards(): { gold: number; diamond: number; items?: ItemDTO[]; equipment?: EquipmentDTO[]; } {
+        return {
+            gold: 8000,
+            diamond: 70,
+            equipment: []
+        }
     }
 
 }

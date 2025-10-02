@@ -1,4 +1,4 @@
-import { _decorator, Button, Component, find, input, Input, instantiate, Node, NodeEventType, Prefab, Sprite, SystemEvent } from 'cc';
+import { _decorator, Button, Component, director, find, input, Input, instantiate, Node, NodeEventType, Prefab, Sprite, SystemEvent } from 'cc';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { SpineAnimation } from 'db://assets/Module/Extension/Component/SpineAnimation';
 import { MapData, MonsterData } from 'db://assets/Script/Game/System/Instance/FightMapInstance';
@@ -7,7 +7,7 @@ import { ScenesMapCanvasPlayer } from './ScenesMapCanvasPlayer';
 import { CcNative } from 'db://assets/Module/CcNative';
 import { FightPrefab } from 'db://assets/Prefabs/Components/FightPrefab/FightPrefab';
 import { CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
-import { getCharacterPrototype } from 'db://assets/Script/System/Manager/CharacterManager';
+import { getCharacterKey, getCharacterPrototype } from 'db://assets/Script/System/Manager/CharacterManager';
 import { message } from 'db://assets/Script/Game/Message/Message';
 import { Progress } from 'db://assets/Script/System/Core/Progress/FightProgress';
 import { ItemDTO } from 'db://assets/Script/System/Core/Prototype/ItemPrototype';
@@ -17,6 +17,8 @@ import { equipmentManager } from 'db://assets/Script/Game/Manager/EquipmentManag
 import { EquipmentDTO } from 'db://assets/Script/System/Core/Prototype/EquipmentPrototype';
 import { createId } from 'db://assets/Script/Game/Share';
 import { characterManager } from 'db://assets/Script/Game/Manager/CharacterManager';
+import { achivementManager } from 'db://assets/Script/Game/Manager/AchivementManager';
+import { ScenesMapCanvasFial } from './ScenesMapCanvasFial';
 const { ccclass, property } = _decorator;
 
 export const mapWidth = 150, mapHeight = 150
@@ -26,6 +28,9 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
 
     @property(Node)
     protected PlayerNode: Node = null
+
+    @property(Node)
+    protected FialNode: Node = null
 
     protected instance = getFightMapInstance()
 
@@ -78,6 +83,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                     node.getChildByName("Icon").getComponent(Sprite).spriteFrame = await wall()
             })
         })
+        return
     }
 
     // 按区域显示地图
@@ -136,8 +142,22 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                 return new Promise(res => stopRes = () => res(null))
             }
             // 循环执行移动路径
+            const spineAnimation = this.PlayerNode.getComponent(ScenesMapCanvasPlayer).spineAnimation
+            spineAnimation.playAnimation(this.instance.player.proto.animation.animations.move)
             for (let i = 0; i < movePath.length; i++) {
                 if (stop) break
+                if (movePath[i] === "left") {
+                    spineAnimation.node.setScale(
+                        -Math.abs(spineAnimation.node.scale.x),
+                        spineAnimation.node.scale.y
+                    )
+                }
+                if (movePath[i] === "right") {
+                    spineAnimation.node.setScale(
+                        Math.abs(spineAnimation.node.scale.x),
+                        spineAnimation.node.scale.y
+                    )
+                }
                 // 遇到障碍物则停止移动并且出发相关效果
                 let obstacle = this.isObstacle(
                     { x: this.instance.playerPosition.x, y: this.instance.playerPosition.y },
@@ -151,6 +171,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                 await this.PlayerNode.getComponent(ScenesMapCanvasPlayer).movePlayer(movePath[i])
                 this.renderFightMap()
             }
+            spineAnimation.playAnimation(this.instance.player.proto.animation.animations.idle)
             res(null)
             if (stopRes) stopRes()
             this.stopMoving = null
@@ -174,7 +195,6 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
             leftCharacter: this.instance.player,
             rightCharacter: monsterData.character,
         })
-        parent.removeChild(node)
         // 成功击杀怪物
         if (successDirect === "left") {
             this.instance.removeMonster(monsterPos)
@@ -183,8 +203,11 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
             this.instance.player.emitProgress("fightSuccessEnd" , new Progress())
             this.winSettlement(monsterData)
         } else {
-            message.toast("战斗失败" , this.PlayerNode)
+            await new Promise(res => setTimeout(res , 500))
+            this.FialNode.active = true
+            this.FialNode.getComponent(ScenesMapCanvasFial).plaFialAnimation()
         }
+        parent.removeChild(node)
     }
 
     // 胜利结算
@@ -227,8 +250,14 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
             }
         }
         equipmentManager.save()
+        
+        if (gold > 0 || diamond > 0 || items.length > 0 || equipments.length > 0)
+            message.congratulations(gold , diamond , items , equipments)
 
-        message.congratulations(gold , diamond , items , equipments)
+        // 添加击杀
+        achivementManager.data.addKillRecord(getCharacterKey(monsterData.character.proto))
+        achivementManager.save()
+        
     }
 
     // 判断下一步是否是障碍物

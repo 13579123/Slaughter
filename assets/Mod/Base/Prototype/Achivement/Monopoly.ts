@@ -75,7 +75,7 @@ export class Monopoly extends AchivementPrototype {
     public get rewards(): { gold: number; diamond: number; items?: ItemDTO[]; equipment?: EquipmentDTO[]; } {
         return {
             gold: 10000,
-            diamond: 500,
+            diamond: 1000,
             equipment: [
                 {
                     prototype: getEquipmentKey(Spear),

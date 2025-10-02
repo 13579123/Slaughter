@@ -157,12 +157,20 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
             resourceManager.data.addDiamond(material.diamond || 0)
             if (material.gold) materials.gold = (materials.gold || 0) + material.gold
             if (material.diamond) materials.diamond = (materials.diamond || 0) + material.diamond
-            if (material.items)
-            material.items.forEach(item => {
-                materials.items.push(item)
-                backpackManager.data.addItem(item.prototype , item.count || 0)
-            })
-            this.emit("decomposeEquipment" , equipment)
+            if (material.items) {
+                material.items.forEach(item => {
+                    let hasItem = false
+                    materials.items.forEach(i => {
+                        if (i.prototype === item.prototype) {
+                            i.count += item.count
+                            hasItem = true
+                        }
+                    })
+                    if (!hasItem) materials.items.push(item)
+                    backpackManager.data.addItem(item.prototype , item.count || 0)
+                })
+                this.emit("decomposeEquipment" , equipment)
+            }
         })
         this.equipments = Array.from(this.equipments).map(e => {
             if (idList.includes(e.id)) return null

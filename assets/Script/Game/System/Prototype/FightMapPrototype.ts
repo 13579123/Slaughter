@@ -42,6 +42,11 @@ export class FightMapPrototype {
         return [5 , 10]
     }
 
+    // 宝箱数量区间
+    public get chestCount() {
+        return [5 , 10]
+    }
+
     // icon列表
     public get icon(): {
         wall: (() => Promise<SpriteFrame>)[],

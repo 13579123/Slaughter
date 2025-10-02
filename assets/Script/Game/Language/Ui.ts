@@ -114,7 +114,7 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
     class _ extends LanguageEntry {
 
         public get chs(): string {
-            return "关卡选择"
+            return "副本选择"
         }
 
         public get eng(): string {
@@ -755,5 +755,24 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
 
         public get jpn(): string {
             return "キャンセル"        }
+    }
+})();
+(function() {
+
+    @RegisterLanguageEntry("Fail Label")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "又是一个不知名的尸骨，埋藏在这个被人遗忘之地"
+        }
+
+        public get eng(): string {
+            return "It's another unknown skeleton, buried in this forgotten place"
+        }
+
+        public get jpn(): string {
+            return "これはまた、忘れられた場所に埋まっている未知のスケルトンです"
+        }
+        
     }
 })();

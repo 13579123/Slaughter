@@ -5,6 +5,11 @@ import { FightMapPrototype, MonsterData } from "db://assets/Script/Game/System/P
 import { CharacterDTO } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { getCharacterKey } from "db://assets/Script/System/Manager/CharacterManager";
 import { Brave } from "../Player/Brave";
+import { getItemKey } from "db://assets/Script/System/Manager/ItemManager";
+import { Stone } from "../Item/Stone";
+import { Spear } from "../Equipment/BeginnerKit/Spear";
+import { getEquipmentKey } from "db://assets/Script/System/Manager/EquipmentManager";
+import { EquipmentQuality } from "db://assets/Script/System/Core/Prototype/EquipmentPrototype";
 
 @RegisterFightMap("Forest_1")
 export class Forest_1 extends FightMapPrototype {
@@ -50,9 +55,9 @@ export class Forest_1 extends FightMapPrototype {
                     } ,
                     dropItems: [],
                     dropeEquipments: [],
-                    dropExp: () => Math.floor(Math.random() * 5 + 5),
-                    dropGold: () => Math.floor(Math.random() * 30 + 20),
-                    dropDiamond: () => Math.floor(Math.random() * 2 + 1),
+                    dropExp: () => Math.floor(Math.random() * 30 + 25),
+                    dropGold: () => Math.floor(Math.random() * 50 + 50),
+                    dropDiamond: () => Math.floor(Math.random() * 5 + 6),
                 }
             ],
             monsters: [
@@ -65,8 +70,24 @@ export class Forest_1 extends FightMapPrototype {
                         extraProperty: {},
                         prototype: getCharacterKey(Brave),
                     } ,
-                    dropItems: [],
-                    dropeEquipments: [],
+                    dropItems: [
+                        { posibility: () => 0.1 , count: () => Math.floor(Math.random() * 3 + 1) , item: getItemKey(Stone) }
+                    ],
+                    dropeEquipments: [
+                        { 
+                            quality: () => {
+                                const random = Math.random()
+                                if (random <= 0.6) return EquipmentQuality.Ordinary
+                                if (random <= 0.75) return EquipmentQuality.Fine
+                                if (random <= 0.85) return EquipmentQuality.Rare
+                                if (random <= 0.93) return EquipmentQuality.Epic
+                                if (random <= 0.97) return EquipmentQuality.Legendary
+                                if (random <= 1.00) return EquipmentQuality.Mythic
+                            } , 
+                            posibility: () => 0.7 , 
+                            equipment: getEquipmentKey(Spear) 
+                        }
+                    ],
                     dropExp: () => Math.floor(Math.random() * 5 + 5),
                     dropGold: () => Math.floor(Math.random() * 30 + 20),
                     dropDiamond: () => Math.floor(Math.random() * 2 + 1),
