@@ -469,11 +469,13 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         if (!this.reinforcementItems[rineforcecmentPos.y]) return
         if (!this.reinforcementItems[rineforcecmentPos.y][rineforcecmentPos.x]) return
         const node = this.reinforcementItems[rineforcecmentPos.y][rineforcecmentPos.x]
-
+        
         // 符文数据
         const reinforcementData = this.instance.reinforcementData.find(v => {
             return v.position.x === rineforcecmentPos.x && v.position.y === rineforcecmentPos.y
         })
+
+        this.instance.removeReinforcement(rineforcecmentPos)
 
         const playDestroyAnimation = async () => {
             return new Promise(res => {
@@ -483,14 +485,14 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                 this.setAutoInterval(() => {
                     sprite.color = rgba
                     node.setPosition(node.x, posY)
-                    posY += 2
-                    rgba = new Color(255, 255, 255, rgba.a - 8)
-                }, { timer: 40, count: 20, complete: () => res(null) })
+                    posY += 2.5
+                    rgba = new Color(255, 255, 255, rgba.a - 9)
+                }, { timer: 35, count: 30, complete: () => res(null) })
             })
         }
+
         this.instance.player.addProperty(reinforcementData.data.property())
         await playDestroyAnimation()
-        this.instance.removeReinforcement(rineforcecmentPos)
         this.reinforcementItems[rineforcecmentPos.y][rineforcecmentPos.x] = node.parent = null
         node.destroy()
     }

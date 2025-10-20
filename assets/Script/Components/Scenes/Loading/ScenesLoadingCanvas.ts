@@ -1,6 +1,7 @@
-import { _decorator, Component, director, Label, Node } from 'cc';
+import { _decorator, Component, director, instantiate, Label, Node } from 'cc';
 import { LoadingManager } from 'db://assets/Module/Manager/LoadingManager';
 import { ModuleProgressPrefab } from 'db://assets/Module/Prefabs/ModuleProgressPrefab';
+import { ModuleVirtualListPrefab } from 'db://assets/Module/Prefabs/ModuleVirtualListPrefab';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesLoadingCanvas')
@@ -21,6 +22,7 @@ export class ScenesLoadingCanvas extends Component {
             stage: (current , max) => this.onStage(current , max),
             loaded: () => this.onLoaded(),
         })
+
     }
 
     protected onStage(current: number , max: number) {

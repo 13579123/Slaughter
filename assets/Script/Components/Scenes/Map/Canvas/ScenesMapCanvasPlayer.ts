@@ -31,17 +31,6 @@ export class ScenesMapCanvasPlayer extends ExtensionComponent {
 
     // 开始
     protected start() {
-        // 绑定角色数据并且监听装备变化
-        this.effect(() => this.userBaseDataPrefab.bindCharacter(this.instance.player))
-        this.effect(() => {
-            Object.keys(equipmentManager.data.equipment).forEach(key => equipmentManager.data.equipment[key])
-            const hp = Rx.toRaw(this.instance).player.hp
-            const mp = Rx.toRaw(this.instance).player.mp
-            const player = this.instance.createPlayerInstance()
-            player.hp = hp
-            player.mp = mp
-            this.instance.player = player
-        })
         // 绑定角色spine
         this.spineAnimation = this.node.getChildByName("Spine").getComponent(SpineAnimation)
         this.instance.player.proto.skeletonData().then((skele) => {

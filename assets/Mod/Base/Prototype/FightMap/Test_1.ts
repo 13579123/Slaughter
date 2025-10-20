@@ -16,6 +16,7 @@ import { LeatherArmor } from "../Equipment/BeginnerKit/LeatherArmor";
 import { LeatherShoes } from "../Equipment/BeginnerKit/LeatherShoes";
 import { LeatherShoulder } from "../Equipment/BeginnerKit/LeatherShoulder";
 import { MaxHpReinforcement } from "./Reinforcement/MaxHpReinforcement";
+import { PhysicalAttackReinforcement } from "./Reinforcement/PhysicalAttackReinforcement";
 
 @RegisterFightMap("Test_1")
 export class Test_1 extends FightMapPrototype {
@@ -160,7 +161,8 @@ export class Test_1 extends FightMapPrototype {
             max: 100,
             min: 50,
             data: [
-                MaxHpReinforcement
+                MaxHpReinforcement,
+                PhysicalAttackReinforcement,
             ],
         }
     }
