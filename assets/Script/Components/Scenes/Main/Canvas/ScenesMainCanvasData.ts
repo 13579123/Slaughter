@@ -24,7 +24,7 @@ export class ScenesMainCanvasData extends ExtensionComponent {
             // @ts-ignore
             window.character = character
             // 绑定渲染器
-            this.userBaseData.bindCharacter(character)
+            this.userBaseData.bindCharacter(character , false)
         })
         return
     }

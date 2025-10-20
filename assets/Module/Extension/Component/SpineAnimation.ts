@@ -4,6 +4,7 @@ const { ccclass, property } = _decorator;
 export type AnimationOption = {
     speed?: number; // 动画播放速度
     count?: number; // 动画播放次数，-1为无限循环
+    animationCache?: boolean; // 是否缓存动画
 }
 
 @ccclass('SpineAnimation')
@@ -16,7 +17,7 @@ export class SpineAnimation extends sp.Skeleton {
         let speed = option.speed || 1
         const temScale = this.timeScale
         this.timeScale = speed
-        return new Promise(res => {
+        const promise = new Promise<void>(res => {
             this.clearAnimation(0)
             this.addAnimation(0, name, count === 1 ? false : true)
             this.setCompleteListener(() => {
@@ -28,6 +29,7 @@ export class SpineAnimation extends sp.Skeleton {
                 }
             })
         })
+        return promise
     }
 
     // 挂点

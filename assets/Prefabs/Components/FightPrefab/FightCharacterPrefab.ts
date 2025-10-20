@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, find, instantiate, Label, Node, Prefab, sp, Sprite, UITransform } from 'cc';
+import { _decorator, AudioClip, AudioSource, Button, Color, Component, find, instantiate, Label, Node, Prefab, sp, Sprite, UITransform } from 'cc';
 import { CcNative } from 'db://assets/Module/CcNative';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { AnimationOption, SpineAnimation } from 'db://assets/Module/Extension/Component/SpineAnimation';
@@ -245,6 +245,13 @@ export class FightCharacterPrefab extends ExtensionComponent {
         if (option.complete) {
             option.complete()
         }
+    }
+
+    // 播放音效
+    public async playSound(audioClip: AudioClip) {
+        const audioSource = this.node.getChildByName("EffectSound").getComponent(AudioSource)
+        audioSource.clip = audioClip
+        audioSource.play()
     }
 
     // 帧间事件

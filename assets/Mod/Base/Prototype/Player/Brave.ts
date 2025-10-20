@@ -1,4 +1,4 @@
-import { sp, SpriteFrame } from "cc";
+import { AudioClip, sp, SpriteFrame } from "cc";
 import { settingManager } from "db://assets/Script/Game/Manager/SettingManager";
 import { CcNative } from "db://assets/Module/CcNative";
 import { LanguageEntry } from "db://assets/Module/Language/LanguageEntry";
@@ -88,7 +88,13 @@ export class Brave extends CharacterPrototype {
             speed: this.instance.attackSpeed,
             frameEvent: {
                 name: "Attack01",
-                callback: () => next()
+                callback: () => {
+                    next()
+                    // 播放音效
+                    new CcNative.Asset.AssetManager("ModBaseResource")
+                    .load("Sound/Character/Player/atk1" , AudioClip)
+                    .then((audio) => prefab.playSound(audio.value))
+                }
             },
             complete: () => animationEndCallback()
         })

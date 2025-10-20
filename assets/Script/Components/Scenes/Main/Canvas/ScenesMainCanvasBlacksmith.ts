@@ -17,10 +17,14 @@ import { EquipmentDTO } from 'db://assets/Script/System/Core/Prototype/Equipment
 import { ItemDTO } from 'db://assets/Script/System/Core/Prototype/ItemPrototype';
 import { getDecomposeMaterial, getEquipmentKey, getEquipmentPrototype, getStrongMaterial } from 'db://assets/Script/System/Manager/EquipmentManager';
 import { getItemKey, getItemPrototype } from 'db://assets/Script/System/Manager/ItemManager';
+import { ScenesMainCanvasSound } from './ScenesMainCanvasSound';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasBlacksmith')
 export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
+
+    @property(ScenesMainCanvasSound)
+    protected SoundController: ScenesMainCanvasSound = null;
 
     @property(Prefab)
     protected EquipmentItemPrefab: Prefab = null;
@@ -113,6 +117,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
         backpackManager.save()
         equipmentManager.save()
         this.initDecompose()
+        this.SoundController.playGetAwardSound()
     }
 
     // 初始化强化
@@ -318,7 +323,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
                 const index = this.decomposeData.selectEquipList.indexOf(equipment)
                 if (index === -1) {
                     this.decomposeData.selectEquipList.push(equipment)
-                    node.getComponent(Sprite).color = new Color(180, 180, 180)
+                    node.getComponent(Sprite).color = new Color(150, 150, 150)
                     this.renderDecomposeSelectedEquipment()
                 }
                 else {

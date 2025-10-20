@@ -153,6 +153,7 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
             const equipment = this.equipments.find(e => e.id === id)
             if (!equipment) return
             const material = getDecomposeMaterial(equipment.prototype , equipment.lv)
+            if (!material) return
             resourceManager.data.addGold(material.gold || 0)
             resourceManager.data.addDiamond(material.diamond || 0)
             if (material.gold) materials.gold = (materials.gold || 0) + material.gold

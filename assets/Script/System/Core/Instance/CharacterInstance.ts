@@ -561,5 +561,12 @@ export class CharacterInstance extends CharacterInstanceProperty {
         return
     }
 
+    // 添加额外属性
+    public addProperty(property: Partial<BaseInstanceProperty>) {
+        Object.keys(property).forEach(key => {
+            this.extraProperty[key] = (property[key] || 0) + (this.extraProperty[key] || 0)
+        })
+    }
+
 }
 1

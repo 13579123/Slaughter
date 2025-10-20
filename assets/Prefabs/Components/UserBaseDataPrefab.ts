@@ -40,14 +40,15 @@ export class UserBaseDataPrefab extends ExtensionComponent {
     @property(Prefab)
     protected FightBuffItemPrefab: Prefab = null
     
-
     protected effectList: ReactiveEffectRunner[] = []
 
-    public async bindCharacter(characterInstance: CharacterInstance) {
+    public async bindCharacter(characterInstance: CharacterInstance , showBuff = true) {
         characterInstance = Rx.reactive(characterInstance)
         this.effectList.forEach(r => r.effect.stop())
         this.effectList = []
         let globalId = 0
+        // 隐藏buff列表
+        if (!showBuff) this.buffContainer.active = false
         // 渲染头像
         const runner1 = this.effect(() => {
             const id = ++globalId
@@ -57,7 +58,7 @@ export class UserBaseDataPrefab extends ExtensionComponent {
         })
         // 渲染血条
         const runner2 = this.effect(() => {
-            this.numberLabel.string = `\n${(characterInstance.hp * characterInstance.maxHp).toFixed(0)}/${characterInstance.maxHp}\n` +
+            this.numberLabel.string = `\n${Normal.number(characterInstance.hp * characterInstance.maxHp)}/${Normal.number(characterInstance.maxHp)}\n` +
                 `${Normal.number(characterInstance.mp * characterInstance.maxMp)}/${Normal.number(characterInstance.maxMp)}\n` +
                 `${Normal.number(characterManager.data.exp)}/${Normal.number(characterManager.data.maxExp)}\n`
             this.hpProgress.setProgress(characterInstance.hp)

@@ -26,19 +26,22 @@
       },
       {
         "__id__": 78
+      },
+      {
+        "__id__": 86
       }
     ],
     "_active": true,
     "_components": [
       {
-        "__id__": 86
+        "__id__": 92
       },
       {
-        "__id__": 88
+        "__id__": 94
       }
     ],
     "_prefab": {
-      "__id__": 90
+      "__id__": 96
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -1743,6 +1746,110 @@
     "nestedPrefabInstanceRoots": null
   },
   {
+    "__type__": "cc.Node",
+    "_name": "EffectSound",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "_parent": {
+      "__id__": 1
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 87
+      },
+      {
+        "__id__": 89
+      }
+    ],
+    "_prefab": {
+      "__id__": 91
+    },
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "w": 1
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "_mobility": 0,
+    "_layer": 33554432,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "_id": ""
+  },
+  {
+    "__type__": "cc.AudioSource",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 86
+    },
+    "_enabled": true,
+    "__prefab": {
+      "__id__": 88
+    },
+    "_clip": null,
+    "_loop": false,
+    "_playOnAwake": false,
+    "_volume": 1,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.CompPrefabInfo",
+    "fileId": "88NkUeVOxDiLLhbi7CIYRU"
+  },
+  {
+    "__type__": "bfbd7m4BjZECqIwWvKI/3uJ",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 86
+    },
+    "_enabled": true,
+    "__prefab": {
+      "__id__": 90
+    },
+    "audioType": 1,
+    "_id": ""
+  },
+  {
+    "__type__": "cc.CompPrefabInfo",
+    "fileId": "2dXIq7UvhEj58VptubG9Pl"
+  },
+  {
+    "__type__": "cc.PrefabInfo",
+    "root": {
+      "__id__": 1
+    },
+    "asset": {
+      "__id__": 0
+    },
+    "fileId": "ed/I9p9IBCeYJE2xMDt6cd",
+    "instance": null,
+    "targetOverrides": null,
+    "nestedPrefabInstanceRoots": null
+  },
+  {
     "__type__": "cc.UITransform",
     "_name": "",
     "_objFlags": 0,
@@ -1752,7 +1859,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 87
+      "__id__": 93
     },
     "_contentSize": {
       "__type__": "cc.Size",
@@ -1780,7 +1887,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 89
+      "__id__": 95
     },
     "FightBuffItemPrefab": {
       "__uuid__": "8ba6b398-73af-43f6-8504-b0c0446dd122",

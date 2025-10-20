@@ -1,5 +1,6 @@
 import { Rx } from "../../Module/Rx";
 import { CharacterInstance } from "../System/Core/Instance/CharacterInstance";
+import { BasePrototypeProperty } from "../System/Core/Property/BasePrototypeProperty";
 import { CharacterDTO } from "../System/Core/Prototype/CharacterPrototype";
 import { getCharacterPrototype } from "../System/Manager/CharacterManager";
 import { characterManager } from "./Manager/CharacterManager";
@@ -7,8 +8,13 @@ import { equipmentManager } from "./Manager/EquipmentManager";
 import { skillManager } from "./Manager/SkillManager";
 import { getPlayerAllPassiveSkills, getPlayerSkillRootsNode } from "./System/SkillConfig";
 
+// 创建玩家实例配置
+export type PlayerOptions = {
+    extra?: Partial<BasePrototypeProperty>
+}
+
 // 根据玩家数据创建角色实例
-export function createPlayerInstance() {
+export function createPlayerInstance(opiotns: PlayerOptions = {}) {
     const characterData = characterManager.data
     const skillData = skillManager.data
     const equipmentData = equipmentManager.data
@@ -30,6 +36,7 @@ export function createPlayerInstance() {
         skills,
         equipments: equipmentData.equipment,
         Proto: getCharacterPrototype(characterData.currentCharacter),
+        extraProperty: opiotns.extra || {},
     })
     return instance
 }

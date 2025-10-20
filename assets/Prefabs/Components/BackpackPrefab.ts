@@ -248,45 +248,6 @@ export class ScenesMainCanvasBackpack extends ExtensionComponent {
         return
     }
 
-    // // 初始化详细信息
-    // protected async initDetail() {
-    //     const characterInstance = createPlayerInstance()
-    //     const detailPropertyNode = this.node.getChildByName("DetailProoerty")
-    //     const avatarSprite = detailPropertyNode.getChildByName("Avatar").getComponent(Sprite)
-    //     detailPropertyNode.getChildByName("Title")
-    //         .getComponent(Label).string = characterInstance.proto.name
-    //     detailPropertyNode.getChildByName("Detail")
-    //         .getComponent(ScrollView).content.getComponent(Label).string = characterInstance.proto.description
-    //     // 渲染其他属性
-    //     const label = detailPropertyNode.getChildByName("Property")
-    //         .getComponent(ScrollView)
-    //         .content
-    //         .getComponent(Label)
-    //     label.string = ""
-    //     const property = [
-    //         { key: "maxHp", force: false, fixed: 0, rate: 1, exit: "" },
-    //         { key: "maxMp", force: false, fixed: 0, rate: 1, exit: "" },
-    //         { key: "physicalAttack", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "magicAttack", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "lightAttack", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "darkAttack", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "physicalDefense", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "magicDefense", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "lightResistance", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "darkResistance", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "physicalPenetration", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "magicPenetration", force: false, fixed: 1, rate: 1, exit: "" },
-    //         { key: "criticalRate", force: false, fixed: 1, rate: 100, exit: "%" },
-    //         { key: "criticalDamage", force: false, fixed: 1, rate: 100, exit: "%" },
-    //         { key: "attackSpeed", force: true, fixed: 2, rate: 1, exit: "" },
-    //     ]
-    //     property.forEach(setting => {
-    //         label.string += `${LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
-    //             }: ${Normal.number(characterInstance[setting.key] * setting.rate, setting.fixed, setting.force)}${setting.exit}\n`
-    //     })
-    //     avatarSprite.spriteFrame = await characterInstance.proto.icon()
-    // }
-
     // 改变展示类型
     protected changeToItem() { this.showDataType.value = "item" }
     protected changeToEquipment() { this.showDataType.value = "equipment" }

@@ -4,6 +4,7 @@ import ExtensionComponent from 'db://assets/Module/Extension/Component/Extension
 const { ccclass, property, requireComponent } = _decorator;
 
 @ccclass('AutoAudioVolume')
+@requireComponent(AudioSource)
 export class AutoAudioVolume extends ExtensionComponent {
 
     @property({type: Enum({

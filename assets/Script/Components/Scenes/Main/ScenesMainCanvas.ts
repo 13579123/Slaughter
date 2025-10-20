@@ -1,4 +1,4 @@
-import { _decorator, Component, find, log, Node, Prefab } from 'cc';
+import { _decorator, Component, find, instantiate, log, Node, Prefab } from 'cc';
 import { DetailInfoPrefab } from 'db://assets/Prefabs/Components/DetailInfoPrefab';
 import { EquipmentInstance } from '../../../System/Core/Instance/EquipmentInstance';
 import { EquipmentQuality } from '../../../System/Core/Prototype/EquipmentPrototype';
@@ -56,6 +56,7 @@ export class ScenesMainCanvas extends Component {
             }, 2000);
             console.log(successPos + " 胜利" )
         }
+
     }
 
 }
