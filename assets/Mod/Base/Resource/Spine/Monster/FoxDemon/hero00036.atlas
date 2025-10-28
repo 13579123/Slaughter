@@ -1,0 +1,83 @@
+
+hero00036.png
+size: 427,574
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+mao
+  rotate: true
+  xy: 275, 478
+  size: 94, 111
+  orig: 94, 111
+  offset: 0, 0
+  index: -1
+shenti
+  rotate: false
+  xy: 2, 393
+  size: 271, 179
+  orig: 273, 181
+  offset: 2, 2
+  index: -1
+weiba1
+  rotate: true
+  xy: 2, 2
+  size: 229, 207
+  orig: 229, 207
+  offset: 0, 0
+  index: -1
+weiba2
+  rotate: true
+  xy: 211, 9
+  size: 222, 201
+  orig: 222, 201
+  offset: 0, 0
+  index: -1
+weiba3
+  rotate: false
+  xy: 2, 233
+  size: 251, 158
+  orig: 317, 158
+  offset: 0, 0
+  index: -1
+youidatui
+  rotate: true
+  xy: 275, 327
+  size: 78, 92
+  orig: 78, 92
+  offset: 0, 0
+  index: -1
+youqiandatui
+  rotate: false
+  xy: 338, 233
+  size: 60, 60
+  orig: 61, 61
+  offset: 0, 0
+  index: -1
+youqianxiaotui
+  rotate: false
+  xy: 275, 407
+  size: 98, 69
+  orig: 98, 69
+  offset: 0, 0
+  index: -1
+youxiaotui
+  rotate: false
+  xy: 369, 295
+  size: 51, 86
+  orig: 51, 86
+  offset: 0, 0
+  index: -1
+zuohoudatui
+  rotate: true
+  xy: 255, 267
+  size: 58, 81
+  orig: 58, 81
+  offset: 0, 0
+  index: -1
+zuoqiandatui
+  rotate: false
+  xy: 375, 383
+  size: 50, 93
+  orig: 50, 93
+  offset: 0, 0
+  index: -1

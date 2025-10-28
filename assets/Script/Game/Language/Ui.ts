@@ -776,3 +776,57 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
         
     }
 })();
+(function() {
+
+    @RegisterLanguageEntry("PlaceOfTrials")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "试炼之地"
+        }
+
+        public get eng(): string {
+            return "Place of Trials"
+        }
+
+        public get jpn(): string {
+            return "試練の地"
+        }
+        
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Enter")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "进入"
+        }
+
+        public get eng(): string {
+            return "Enter"
+        }
+
+        public get jpn(): string {
+            return "入る"
+        }
+        
+    }
+})();
+(function() {
+    @RegisterLanguageEntry("Leave")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "离开"
+        }
+
+        public get eng(): string {
+            return "Leave"
+        }
+
+        public get jpn(): string {
+            return "出る"
+        }
+    }
+})();

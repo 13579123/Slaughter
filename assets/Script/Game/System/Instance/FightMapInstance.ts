@@ -8,13 +8,13 @@ import { CharacterDTO } from "../../../System/Core/Prototype/CharacterPrototype"
 import { MapGenerator, RoomType } from "../../MapGenerated/MapGenerator";
 import { CcNative } from "db://assets/Module/CcNative";
 import { equipmentManager } from "../../Manager/EquipmentManager";
-import { EnterFightMapOptions } from "../Manager/FightMapManager";
 import { BasePrototypeProperty } from "../../../System/Core/Property/BasePrototypeProperty";
 
 export enum MapData {
-    None = 0,
-    Floor = 1,
-    Special = 2,
+    None,
+    Floor,
+    Special,
+    Wall,
 }
 
 export type MonsterData = {
@@ -41,12 +41,46 @@ export type ReinforcecmentData = {
     data: ReinforcementDTO
 }
 
+export type EnterFightMapOptions = {
+    // 玩家状态
+    playerState?: { hp: number, mp: number },
+    // 自定义属性
+    customData?: { [key: string]: number },
+    // 玩家额外属性
+    playerExtraProperty?: Partial<BasePrototypeProperty>,
+    // 玩家额外百分比属性
+    playerExtraPercentProperty?: Partial<BasePrototypeProperty>,
+    // 怪物额外属性
+    monsterExtraProperty?: Partial<BasePrototypeProperty>,
+    // 怪物额外百分比属性
+    monsterExtraPercentProperty?: Partial<BasePrototypeProperty>,
+}
+
+export enum MapDistribution {
+    FLOOR ,
+    WALL ,
+    MONSTER ,
+    BOSS ,
+    TREASURE ,
+    OBSTACLE ,
+    REINFORCEMENT ,
+    START_POSITION ,
+    END_POSITION ,
+}
+
 export class FightMapInstance {
 
+    // 自定义数据
+    public customData: { [key: string]: number } = {}
+
+    // 原型
     public proto: FightMapPrototype;
 
     // 玩家数据
     public player: CharacterInstance = null
+
+    // 当前对战的怪物
+    public currentMonster: CharacterInstance = null
 
     // 地图数据
     public mapData: MapData[][] = []
@@ -64,28 +98,38 @@ export class FightMapInstance {
     public roomData: { pos: { x: number, y: number }, size: { width: number, height: number }, type: RoomType }[] = []
 
     // 怪物数据
-    public monsterData: MonsterData[] = []
+    public readonly monsterData: MonsterData[] = []
 
     // 宝箱数据
-    public treasureData: TreasureData[] = []
+    public readonly treasureData: TreasureData[] = []
 
     // 障碍物数据
-    public obstacleData: ObstcaleData[] = []
+    public readonly obstacleData: ObstcaleData[] = []
 
     // 强化符文数据
-    public reinforcementData: ReinforcecmentData[] = []
+    public readonly reinforcementData: ReinforcecmentData[] = []
+
+    // 整体地图分布情况
+    public readonly mapDistribution: MapDistribution[][][] = []
 
     // 配置详情
     public readonly fightOptions: EnterFightMapOptions = {}
 
+    // 地图尺寸
+    public readonly mapSize: {width: number , height: number} = {width: 0, height: 0}
+
     // 构造器
     constructor(Proto: Constructor<FightMapPrototype>, option: EnterFightMapOptions = {}) {
-        this.fightOptions = option
+        this.fightOptions = option || {}
+        this.customData = option.customData || {}
         this.proto = new Proto(this);
+        this.mapSize = this.proto.mapSize
+        this.init()
     }
 
     // 创建玩家实例
     public createPlayerInstance(): CharacterInstance {
+        const lastPlayerInstance = this.player
         let extraProperty: Partial<BasePrototypeProperty> = {}, instance: CharacterInstance = createPlayerInstance()
         if (this.fightOptions.playerExtraProperty) {
             extraProperty = this.fightOptions.playerExtraProperty
@@ -96,6 +140,14 @@ export class FightMapInstance {
                     // @ts-ignore
                     extraProperty[property] = (this.fightOptions.playerExtraPercentProperty[property] as number + 1) * instance[property]
                 }
+            })
+        }
+        // 继承之前的加成
+        if (lastPlayerInstance) {
+            Object.keys(lastPlayerInstance.extraProperty).forEach((property: keyof BasePrototypeProperty) => {
+                if (typeof lastPlayerInstance.extraProperty[property] === 'number')
+                    // @ts-ignore
+                    extraProperty[property] = extraProperty[property] || 0 + lastPlayerInstance.extraProperty[property]
             })
         }
         instance.extraProperty = extraProperty
@@ -135,15 +187,20 @@ export class FightMapInstance {
         return instance
     }
 
-    // 是否初始化
-    public init() {
+    // 初始化
+    protected async init() {
         this.player = this.createPlayerInstance()
+        if (this.fightOptions.playerState) {
+            this.player.hp = this.fightOptions.playerState.hp
+            this.player.mp = this.fightOptions.playerState.mp
+        }
         if (this.proto.isBoss) {
             this.initBossMapData()
             this.initBossTreasure()
             this.initBossObstacle()
             this.initBossMonster()
             this.initBossReinforcement()
+            this.initMapDistribution()
         }
         else {
             this.initMapData()
@@ -151,22 +208,25 @@ export class FightMapInstance {
             this.initObstacle()
             this.initMonster()
             this.initReinforcement()
+            this.initMapDistribution()
         }
     }
 
     // 初始化楼层数据
     protected initMapData() {
+        // 地图尺寸
+        const mapSize = this.mapSize
         // 尺寸 房间合集
         const mapGenerator = new MapGenerator()
         // 房间
-        const roomMapData = mapGenerator.generateRandomRoom(this.proto.mapSize, this.roomData, 100)
+        const roomMapData = mapGenerator.generateRandomRoom(mapSize, this.roomData, 100)
         // 迷宫
-        const mazeMapData = mapGenerator.generateRandomMaze(this.proto.mapSize)
+        const mazeMapData = mapGenerator.generateRandomMaze(mapSize)
         // 地图数据合并
         const mapData = []
-        for (let i = 0; i < this.proto.mapSize.height; i++) {
+        for (let i = 0; i < mapSize.height; i++) {
             mapData.push([])
-            for (let j = 0; j < this.proto.mapSize.width; j++)
+            for (let j = 0; j < mapSize.width; j++)
                 mapData[i].push(roomMapData[i][j] || mazeMapData[i][j])
         }
         // 消除死胡同
@@ -209,22 +269,23 @@ export class FightMapInstance {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ]
         this.mapData = mapData
+        this.mapSize.width = mapData[0].length
+        this.mapSize.height = mapData.length
         // 添加空位置
         for (let y = 0; y < this.mapData.length; y++) {
             for (let x = 0; x < this.mapData[y].length; x++) {
                 if (this.mapData[y][x] === 1) this.addEmptyPosition(v2(x, y))
             }
         }
-        this.endPosition = v2(24, 7)
         this.playerPosition = v2(4, 7)
-        this.removeEmptyPosition(this.endPosition)
+        this.endPosition = v2(24, 7)
         this.removeEmptyPosition(this.playerPosition)
+        this.removeEmptyPosition(this.endPosition)
     }
 
     // 初始化怪物
     protected initMonster() {
-        const roomCount = this.roomData.length
-        const count = Math.floor(Math.random() * roomCount * 2) + roomCount
+        const count = this.proto.monsterData.monsterCount()
         for (let i = 0; i < count; i++) {
             const monster = this.proto.monsterData.monsters()
             const pos = this.emptyPosition[Math.floor(Math.random() * this.emptyPosition.length)]
@@ -237,6 +298,26 @@ export class FightMapInstance {
             })
             this.removeEmptyPosition(pos)
         }
+        this.roomData.forEach((room , index) => {
+            if (room.type === RoomType.MonsterTreasureRoom) {
+                const posList = [
+                    v2(Math.floor(room.pos.x + room.size.width / 2 - 1), Math.floor(room.pos.y + room.size.height / 2)),
+                    v2(Math.floor(room.pos.x + room.size.width / 2 + 1), Math.floor(room.pos.y + room.size.height / 2)),
+                    v2(Math.floor(room.pos.x + room.size.width / 2), Math.floor(room.pos.y + room.size.height / 2 + 1)),
+                    v2(Math.floor(room.pos.x + room.size.width / 2), Math.floor(room.pos.y + room.size.height / 2 - 1))
+                ]
+                posList.forEach(pos => {
+                    const monster = this.proto.monsterData.monsters()
+                    this.monsterData.push({
+                        dto: monster,
+                        position: pos,
+                        isBoss: false,
+                        character: this.createMonsterInstance(monster.dto)
+                    })
+                    this.removeEmptyPosition(pos)
+                })
+            }
+        })
         return
     }
 
@@ -250,19 +331,6 @@ export class FightMapInstance {
             character: this.createMonsterInstance(monster.dto)
         })
         this.removeEmptyPosition(v2(18, 7))
-    }
-
-    // 移除怪物
-    public removeMonster(pos: { x: number, y: number }) {
-        for (let i = 0; i < this.monsterData.length; i++) {
-            const monsterData = this.monsterData[i];
-            if (monsterData.position.x === pos.x && monsterData.position.y === pos.y) {
-                this.monsterData.splice(i, 1)
-                // 添加到空位置
-                this.emptyPosition.push(monsterData.position)
-                break
-            }
-        }
     }
 
     // 初始化宝箱
@@ -299,13 +367,23 @@ export class FightMapInstance {
                 ]
                 posList.forEach(pos => {
                     if (this.mapData[pos.y] && this.mapData[pos.y][pos.x] !== MapData.Special) return
+                    const level = 3
                     this.treasureData.push({
-                        level: 3, open: false, position: v2(pos.x, pos.y),
-                        openIcon: this.proto.treasureIcon.open[3 - 1] || this.proto.treasureIcon.open[0],
-                        closeIcon: this.proto.treasureIcon.close[3 - 1] || this.proto.treasureIcon.close[0],
+                        level, open: false, position: v2(pos.x, pos.y),
+                        openIcon: this.proto.treasureIcon.open[level - 1] || this.proto.treasureIcon.open[0],
+                        closeIcon: this.proto.treasureIcon.close[level - 1] || this.proto.treasureIcon.close[0],
                     })
                 })
                 return
+            }
+            if (room.type === RoomType.MonsterTreasureRoom) {
+                const pos = v2(Math.floor(room.pos.x + room.size.width / 2), Math.floor(room.pos.y + room.size.height / 2))
+                const level = 4
+                this.treasureData.push({
+                    level, open: false, position: v2(pos.x, pos.y),
+                    openIcon: this.proto.treasureIcon.open[level - 1] || this.proto.treasureIcon.open[0],
+                    closeIcon: this.proto.treasureIcon.close[level - 1] || this.proto.treasureIcon.close[0],
+                })
             }
             return
         })
@@ -344,13 +422,13 @@ export class FightMapInstance {
 
     // 初始化强化符文
     protected initReinforcement() {
-        for (let i = 0; i < this.emptyPosition.length && i < this.proto.reinforcementData.max ; i++) {
+        for (let i = 0; i < this.emptyPosition.length && i < this.proto.reinforcementData.max; i++) {
             const pos = this.emptyPosition[Math.floor(Math.random() * this.emptyPosition.length)]
             if (!pos) return
             if (Math.random() < this.proto.reinforcementData.posibility) {
                 const reinforcement = this.proto.reinforcementData.data[Math.floor(Math.random() * this.proto.reinforcementData.data.length)]
                 if (!reinforcement) return
-                this.reinforcementData.push({ position: pos , data: reinforcement })
+                this.reinforcementData.push({ position: pos, data: reinforcement })
                 this.removeEmptyPosition(pos)
             }
         }
@@ -359,7 +437,7 @@ export class FightMapInstance {
                 const pos = this.emptyPosition[Math.floor(Math.random() * this.emptyPosition.length)]
                 const reinforcement = this.proto.reinforcementData.data[Math.floor(Math.random() * this.proto.reinforcementData.data.length)]
                 if (!reinforcement || !pos) return
-                this.reinforcementData.push({ position: pos , data: reinforcement })
+                this.reinforcementData.push({ position: pos, data: reinforcement })
             }
         }
     }
@@ -371,6 +449,53 @@ export class FightMapInstance {
         this.reinforcementData.push({ position: v2(22, 7), data: reinforcement })
     }
 
+    // 初始化分布记录
+    protected initMapDistribution() {
+        // 初始和终点的位置
+        this.addDistributionRecord(this.playerPosition , MapDistribution.START_POSITION)
+        this.addDistributionRecord(this.endPosition , MapDistribution.END_POSITION)
+        // 地图数据
+        this.mapData.forEach((row, y) => {
+            row.forEach((cell, x) => {
+                if (cell === MapData.Floor || cell === MapData.Special) 
+                    this.addDistributionRecord({x , y} , MapDistribution.FLOOR)
+                if (cell === MapData.Wall) this.addDistributionRecord({x , y} , MapDistribution.WALL)
+            })
+        })
+        // 怪物数据
+        this.monsterData.forEach((monsterData) => {
+            if (monsterData.isBoss) this.addDistributionRecord(monsterData.position , MapDistribution.BOSS)
+            this.addDistributionRecord(monsterData.position , MapDistribution.MONSTER)
+        })
+        // 强化符文数据
+        this.reinforcementData.forEach((reinforcementData) => {
+            this.addDistributionRecord(reinforcementData.position , MapDistribution.REINFORCEMENT)
+        })
+        // 宝箱数据
+        this.treasureData.forEach((treasureData) => {
+            this.addDistributionRecord(treasureData.position , MapDistribution.TREASURE)
+        })
+        // 障碍物数据
+        this.obstacleData.forEach((obstacleData) => {
+            this.addDistributionRecord(obstacleData.position , MapDistribution.OBSTACLE)
+        })
+    }
+
+    // 移除怪物
+    public removeMonster(pos: { x: number, y: number }) {
+        for (let i = 0; i < this.monsterData.length; i++) {
+            const monsterData = this.monsterData[i];
+            if (monsterData.position.x === pos.x && monsterData.position.y === pos.y) {
+                this.monsterData.splice(i, 1)
+                // 添加到空位置
+                this.emptyPosition.push(monsterData.position)
+                // 移除分布记录
+                this.removeDistributionRecord(monsterData.position , MapDistribution.MONSTER)
+                break
+            }
+        }
+    }
+
     // 移除强化符文
     public removeReinforcement(pos: { x: number, y: number }) {
         for (let i = 0; i < this.reinforcementData.length; i++) {
@@ -379,6 +504,8 @@ export class FightMapInstance {
                 this.reinforcementData.splice(i, 1)
                 // 添加到空位置
                 this.emptyPosition.push(reinforcementData.position)
+                // 移除分布记录
+                this.removeDistributionRecord(reinforcementData.position , MapDistribution.REINFORCEMENT)
                 break
             }
         }
@@ -415,6 +542,25 @@ export class FightMapInstance {
                 this.emptyPosition.splice(i, 1)
                 break
             }
+        }
+    }
+
+    // 添加分布记录
+    protected addDistributionRecord(pos: { x: number, y: number }, distribution: MapDistribution) {
+        if (!this.mapDistribution[pos.y]) this.mapDistribution[pos.y] = []
+        if (!this.mapDistribution[pos.y][pos.x]) 
+            this.mapDistribution[pos.y][pos.x] = [distribution]
+        else {
+            if (!this.mapDistribution[pos.y][pos.x].includes(distribution))
+                this.mapDistribution[pos.y][pos.x].push(distribution)
+        }
+    }
+
+    // 移除分布记录
+    protected removeDistributionRecord(pos: { x: number, y: number }, distribution: MapDistribution) {
+        if (this.mapDistribution[pos.y] && this.mapDistribution[pos.y][pos.x]) {
+            const index = this.mapDistribution[pos.y][pos.x].indexOf(distribution)
+            if (index !== -1) this.mapDistribution[pos.y][pos.x].splice(index, 1)
         }
     }
 

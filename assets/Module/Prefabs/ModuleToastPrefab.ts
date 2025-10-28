@@ -1,6 +1,6 @@
 import { _decorator, Color, Component, Label, Node, Sprite } from 'cc';
 import ExtensionComponent from '../Extension/Component/ExtensionComponent';
-const { ccclass, property } = _decorator;
+const { ccclass, property, menu } = _decorator;
 
 @ccclass('ModuleToastPrefab')
 export class ModuleToastPrefab extends ExtensionComponent {

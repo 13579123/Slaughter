@@ -204,7 +204,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                 (new Promise(res => {
                     this.proto.playDieAnimation(progress , () => {} , res)
                 })).then(async () => {
-                    this.emit(CharacterEvent.Death , option) 
+                    this.emit(CharacterEvent.Death , option)
                 })
                 await this.emitProgress("afterDeath", progress)
             })
@@ -316,9 +316,12 @@ export class CharacterInstance extends CharacterInstanceProperty {
     // 增加魔法值(纯粹增加)
     public increaseMp(option: {
         increase: number,
-        from: CharacterInstance,
+        from?: CharacterInstance,
+        fromType?: FromType
     }) {
         if (this._hasDeath || this._preDeath) return
+        option.from = option.from || this
+        option.fromType = option.fromType || FromType.skill
         this.mp = ((this.maxMp * this.mp) + option.increase) / this.maxMp
         this.emit(CharacterEvent.IncreaseMp, option)
     }
@@ -329,7 +332,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         type: DamageType,
         from: CharacterInstance,
         fromType: FromType,
-        critical: boolean,
+        critical?: boolean,
     }) {
         if (this._hasDeath || this._preDeath) return
         const progress = new DamageProgress()
@@ -339,7 +342,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.fromType = option.fromType
         progress.damageType = option.type
         progress.damageRate = 1.0
-        progress.critical = option.critical
+        progress.critical = option.critical || false
         this.emitProgress("beforeDamage", progress)
             .then(async () => {
                 const damage = progress.damage * progress.damageRate
@@ -437,7 +440,10 @@ export class CharacterInstance extends CharacterInstanceProperty {
         target: CharacterInstance,
         animationComplete?: (progress: AttackProgress) => void
     }) {
-        if (this._hasDeath || this._preDeath) return
+        if (this._hasDeath || this._preDeath) {
+            option.animationComplete && option.animationComplete(new AttackProgress())
+            return
+        }
         // 流程
         const progress = new AttackProgress()
         progress.from = this
@@ -530,7 +536,10 @@ export class CharacterInstance extends CharacterInstanceProperty {
         useAble?: () => void,
         animationComplete?: () => void
     }) {
-        if (this._hasDeath || this._preDeath) return
+        if (this._hasDeath || this._preDeath) {
+            option.animationComplete && option.animationComplete()
+            return
+        }
         const progress = new SkillProgress()
         progress.from = this
         progress.skill = option.skill
@@ -539,14 +548,14 @@ export class CharacterInstance extends CharacterInstanceProperty {
         progress.coolTime = progress.skill.proto.coolTime
         this.isSkillAble(option.skill, progress)
             .then(async able => {
-                if (!able) return
+                if (!able) return option.animationComplete && option.animationComplete()
                 if (option.useAble) option.useAble()
                 await new Promise(res => {
                     progress.from.proto.playSkillAnimation(progress , () => {
                         option.animationComplete && option.animationComplete()
                     } , res)
                 })
-                progress.skill.proto.use({ use: progress.from })
+                await progress.skill.proto.use({ use: progress.from })
                 progress.from.reduceMp({ reduce: progress.cost.mp, from: progress.from })
                 progress.from.reduceHp({
                     reduce: progress.cost.hp,
@@ -555,6 +564,7 @@ export class CharacterInstance extends CharacterInstanceProperty {
                     fromType: FromType.skillCost,
                     critical: false
                 })
+                // 计算冷却缩减后的冷却
                 progress.skill.coolTime = progress.coolTime
                 await this.emitProgress("afterUseSkill", progress)
             })

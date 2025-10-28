@@ -260,3 +260,20 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
         }
     }
 })();
+(function() {
+    @RegisterLanguageEntry("coolDown")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "冷却缩减"
+        }
+
+        public get eng(): string {
+            return "CoolDown"
+        }
+
+        public get jpn(): string {
+            return "クールダウン短縮"
+        }
+    }
+})();

@@ -16,7 +16,13 @@ export class ScenesMapCanvasUserState extends ExtensionComponent {
     // 战斗数据实例
     protected instance = getFightMapInstance()
 
+    // 初始化
     protected start() {
+        this.initState()
+    }
+
+    // 初始化状态绑定
+    protected initState() {
         // 绑定角色数据并且监听装备变化
         this.effect(() => this.userBaseDataPrefab.bindCharacter(this.instance.player))
         this.effect(() => {

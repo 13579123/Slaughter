@@ -6,6 +6,9 @@ import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
 import { LanguageManager, RegisterLanguageEntry } from 'db://assets/Module/Language/LanguageManager';
 import { ItemPrototype } from 'db://assets/Script/System/Core/Prototype/ItemPrototype';
 import { getItemKey, RegisterItem } from 'db://assets/Script/System/Manager/ItemManager';
+import { equipmentManager } from 'db://assets/Script/Game/Manager/EquipmentManager';
+import { getAllEquipmentKeys, getEquipmentKey } from 'db://assets/Script/System/Manager/EquipmentManager';
+import { Spear } from '../Equipment/BeginnerKit/Spear';
 const { ccclass, property } = _decorator;
 
 @RegisterLanguageEntry("Stone")
@@ -43,8 +46,11 @@ export class Stone extends ItemPrototype {
     }
 
     public use(number: number) {
+        const equipmentKey = getAllEquipmentKeys()[Math.floor(Math.random() * getAllEquipmentKeys().length)]
+        equipmentManager.data.addEquipment(equipmentKey)
         backpackManager.data.reduceCount(getItemKey(Stone) , number)
         backpackManager.save()
+        equipmentManager.save()
     }
 
 }

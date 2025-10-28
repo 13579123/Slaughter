@@ -142,6 +142,11 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
             equipmentPrefab.setInfo(null)
             needGoldLabel.string = needDiamondLabel.string = "0"
             nameLabel.string = propertyDescription.string = nextLevelPropertyDescription.string = ""
+            const materialContent = strengthenNode.getChildByName("NeedItems").getComponent(ScrollView).content
+            // 渲染材料
+            const children = Array.from(materialContent.children)
+            materialContent.removeAllChildren()
+            children.forEach(child => child.destroy())
         } else if (this.strengthenData.selectEquip) {
             const instance = new EquipmentInstance({
                 id: this.strengthenData.selectEquip.id,
@@ -246,6 +251,7 @@ export class ScenesMainCanvasBlacksmith extends ExtensionComponent {
         }
         for (let i = 0; i < equipments.length; i++) {
             const equipment = equipments[i];
+            if (!equipment) continue
             let node = null
             if (this.allStrengthenEquipmentNodeMap.has(equipment.id)) {
                 const data = this.allStrengthenEquipmentNodeMap.get(equipment.id)

@@ -1,5 +1,7 @@
 import { _decorator, Component, find, Node, Prefab } from 'cc';
 import { CcNative } from 'db://assets/Module/CcNative';
+import { BackpackPrefab } from 'db://assets/Prefabs/Components/BackpackPrefab';
+import { TaskPrefab, TaskType } from 'db://assets/Prefabs/Components/TaskPrefab';
 const { ccclass, property } = _decorator;
 
 @ccclass('ScenesMainCanvasUi')
@@ -9,27 +11,26 @@ export class ScenesMainCanvasUi extends Component {
     @property(Node)
     protected levelSelectNode: Node = null;
 
-    // 背包节点
-    @property(Node)
-    protected backpackNode: Node = null;
+    // 背包预制体
+    @property(Prefab)
+    protected backpackPrefab: Prefab = null;
     
     // 技能节点
     @property(Node)
     protected skillNode: Node = null;
 
-    @property(Node)
-    protected achivementNode: Node = null;
-
-    @property(Node)
-    protected dailyTaskNode: Node = null;
+    @property(Prefab)
+    protected taskPrefab: Prefab = null;
 
     @property(Node)
     protected strengthNode: Node = null;
 
+    @property(Node)
+    protected placeholderNode: Node = null;
+
     // 初始化
     protected start(): void {
         this.levelSelectNode.active = false;
-        this.backpackNode.active = false;
     }
 
     // 开启设置
@@ -47,7 +48,11 @@ export class ScenesMainCanvasUi extends Component {
 
     // 开启背包界面
     protected async openBackpack() {
-        this.backpackNode.active = true
+        const node = CcNative.instantiate(this.backpackPrefab)
+        node.getComponent(BackpackPrefab).onClose(() => {
+            if (node && node.isValid) node.destroy()
+        })
+        this.placeholderNode.addChild(node)
     }
 
     // 开启技能界面
@@ -57,12 +62,24 @@ export class ScenesMainCanvasUi extends Component {
 
     // 开启成就界面
     protected async openAchievement() {
-        this.achivementNode.active = true
+        const node = CcNative.instantiate(this.taskPrefab)
+        const taskPrefab = node.getComponent(TaskPrefab)
+        taskPrefab.taskType = TaskType.achivement
+        node.getComponent(TaskPrefab).onClose(() => {
+            if (node && node.isValid) node.destroy()
+        })
+        this.placeholderNode.addChild(node)
     }
 
     // 开启每日任务
     protected async openDailyTask() {
-        this.dailyTaskNode.active = true
+        const node = CcNative.instantiate(this.taskPrefab)
+        const taskPrefab = node.getComponent(TaskPrefab)
+        taskPrefab.taskType = TaskType.dayTask
+        node.getComponent(TaskPrefab).onClose(() => {
+            if (node && node.isValid) node.destroy()
+        })
+        this.placeholderNode.addChild(node)
     }
 
     // 开启强化界面

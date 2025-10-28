@@ -19,3 +19,22 @@ import { RegisterLanguageEntry } from "db://assets/Module/Language/LanguageManag
 
     }
 })();
+
+(function() {
+    @RegisterLanguageEntry("Sealing")
+    class _ extends LanguageEntry {
+
+        public get chs(): string {
+            return "封印套装"
+        }
+
+        public get eng(): string {
+            return "Sealing Set"
+        }
+
+        public get jpn(): string {
+            return "封印セット"
+        }
+
+    }
+})();

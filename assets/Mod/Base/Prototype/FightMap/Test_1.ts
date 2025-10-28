@@ -1,7 +1,7 @@
 import { director, SpriteFrame } from "cc";
 import { CcNative } from "db://assets/Module/CcNative";
 import { RegisterFightMap } from "db://assets/Script/Game/System/Manager/FightMapManager";
-import { FightMapPrototype, MonsterData, ReinforcementDTO } from "db://assets/Script/Game/System/Prototype/FightMapPrototype";
+import { FightMapPrototype, MonsterData, ReinforcementDTO, TreasureData } from "db://assets/Script/Game/System/Prototype/FightMapPrototype";
 import { CharacterDTO } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { getCharacterKey } from "db://assets/Script/System/Manager/CharacterManager";
 import { Brave } from "../Player/Brave";
@@ -17,6 +17,9 @@ import { LeatherShoes } from "../Equipment/BeginnerKit/LeatherShoes";
 import { LeatherShoulder } from "../Equipment/BeginnerKit/LeatherShoulder";
 import { MaxHpReinforcement } from "./Reinforcement/MaxHpReinforcement";
 import { PhysicalAttackReinforcement } from "./Reinforcement/PhysicalAttackReinforcement";
+import { PhysicalDefenseReinforcement } from "./Reinforcement/PhysicalDefenseReinforcement";
+import { MaxMpReinforcement } from "./Reinforcement/MaxMpReinforcement";
+import { MagicDefenseReinforcement } from "./Reinforcement/MagicDefenseReinforcement";
 
 @RegisterFightMap("Test_1")
 export class Test_1 extends FightMapPrototype {
@@ -39,7 +42,7 @@ export class Test_1 extends FightMapPrototype {
                         prototype: getCharacterKey(Brave),
                     } ,
                     dropItems: [],
-                    dropeEquipments: [],
+                    dropEquipments: [],
                     dropExp: () => Math.floor(Math.random() * 30 + 25),
                     dropGold: () => Math.floor(Math.random() * 50 + 50),
                     dropDiamond: () => Math.floor(Math.random() * 5 + 6),
@@ -59,7 +62,7 @@ export class Test_1 extends FightMapPrototype {
                     dropItems: [
                         { posibility: () => 0.1 , count: () => Math.floor(Math.random() * 3 + 1) , item: getItemKey(Stone) }
                     ],
-                    dropeEquipments: [
+                    dropEquipments: [
                         { 
                             quality: () => {
                                 const random = Math.random()
@@ -82,7 +85,7 @@ export class Test_1 extends FightMapPrototype {
         }
     }
 
-    public getTreasureGoldReward(level: number): { gold: number; diamond: number; items: ItemDTO[]; equipments: EquipmentDTO[]; } {
+    public getTreasureGoldReward(level: number): TreasureData {
         const items: ItemDTO[] = [] , equipments: EquipmentDTO[] = []
         const EquipmentList = [Spear , LeatherArmor , LeatherShoes , LeatherShoulder]
         if (level === 3) {
@@ -162,7 +165,10 @@ export class Test_1 extends FightMapPrototype {
             min: 50,
             data: [
                 MaxHpReinforcement,
+                MaxMpReinforcement,
+                MagicDefenseReinforcement,
                 PhysicalAttackReinforcement,
+                PhysicalDefenseReinforcement,
             ],
         }
     }

@@ -78,7 +78,7 @@ export class LeatherArmor extends EquipmentPrototype {
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
         physicalDefense: 5,
         magicDefense: 5,
-        maxHp: 40,
+        maxHp: 50,
     }).setProperty("maxHp", (hp) => {
         return hp + (this.suitCount >= oneSuit ? 50 : 0)
     }).setProperty("physicalDefense", (defense) => {

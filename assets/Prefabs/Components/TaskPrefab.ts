@@ -8,11 +8,13 @@ import { LanguageManager } from '../../Module/Language/LanguageManager';
 import { settingManager } from '../../Script/Game/Manager/SettingManager';
 const { ccclass, property } = _decorator;
 
+export const TaskType = Enum({ dayTask: "dayTask" , achivement: "achievement" });
+
 @ccclass('TaskPrefab')
 export class TaskPrefab extends ExtensionComponent {
 
-    @property({type: Enum({ dayTask: "dayTask" , achivement: "achievement" })})
-    protected taskType: string = "achievement"
+    @property({type: TaskType})
+    public taskType: string = "achievement"
 
     protected start(): void {
         if (this.taskType == "dayTask") {
@@ -103,9 +105,16 @@ export class TaskPrefab extends ExtensionComponent {
         })
     }
 
+    // 关闭回调
+    protected _onClose: Function = () => {}
+    public onClose(fn: Function) {
+        this._onClose = fn
+    }
+
     // 关闭成就
     protected closeAchivement() {
         this.node.active = false
+        this._onClose()
     }
 
 }

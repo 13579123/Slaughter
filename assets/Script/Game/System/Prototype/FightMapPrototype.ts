@@ -12,7 +12,7 @@ export type MonsterDTO = {
     dropGold: () => number,
     dropDiamond: () => number,
     dropItems: { posibility: () => number, count: () => number, item: string }[],
-    dropeEquipments: { posibility: () => number, quality: () => EquipmentQuality, equipment: string }[],
+    dropEquipments: { posibility: () => number, quality: () => EquipmentQuality, equipment: string }[],
 }
 
 export type MonsterData = {
@@ -26,7 +26,27 @@ export type ReinforcementDTO = {
     property: () => Partial<BasePrototypeProperty>
 }
 
+export type RewardItemsDTO = {
+    prototype: string , count: number
+}
+
+export type RewardEquipmentDTO = {
+    prototype: string,
+    quality: EquipmentQuality
+}
+
+export type TreasureData = {
+    gold: number,
+    diamond: number,
+    items: RewardItemsDTO[],
+    equipments: RewardEquipmentDTO[],
+}
+
 export class FightMapPrototype {
+
+    public get name(): string {
+        return "未知关卡"
+    }
 
     public get isBoss() {
         return false
@@ -71,7 +91,7 @@ export class FightMapPrototype {
             top: [
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/FightMap/Stone/spriteFrame" , SpriteFrame
+                        "Texture/FightMap/Stone/spriteFrame", SpriteFrame
                     )).value
                 }
             ],
@@ -79,7 +99,7 @@ export class FightMapPrototype {
             bottom: [
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/FightMap/Stone/spriteFrame" , SpriteFrame
+                        "Texture/FightMap/Stone/spriteFrame", SpriteFrame
                     )).value
                 }
             ],
@@ -87,7 +107,7 @@ export class FightMapPrototype {
             wall: [
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/FightMap/Stone/spriteFrame" , SpriteFrame
+                        "Texture/FightMap/Stone/spriteFrame", SpriteFrame
                     )).value
                 }
             ],
@@ -99,36 +119,46 @@ export class FightMapPrototype {
             open: [
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/Treasure/open-treasure-01/spriteFrame" , SpriteFrame
+                        "Texture/Treasure/open-treasure-01/spriteFrame", SpriteFrame
                     )).value
-                } ,
+                },
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/Treasure/open-treasure-02/spriteFrame" , SpriteFrame
+                        "Texture/Treasure/open-treasure-02/spriteFrame", SpriteFrame
                     )).value
-                } ,
+                },
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/Treasure/open-treasure-03/spriteFrame" , SpriteFrame
+                        "Texture/Treasure/open-treasure-03/spriteFrame", SpriteFrame
                     )).value
-                } ,
+                },
+                async (): Promise<SpriteFrame> => {
+                    return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
+                        "Texture/Treasure/open-treasure-04/spriteFrame", SpriteFrame
+                    )).value
+                },
             ],
             close: [
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
                         "Texture/Treasure/close-treasure-01/spriteFrame", SpriteFrame
                     )).value
-                } ,
+                },
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/Treasure/close-treasure-02/spriteFrame" , SpriteFrame
+                        "Texture/Treasure/close-treasure-02/spriteFrame", SpriteFrame
                     )).value
-                } ,
+                },
                 async (): Promise<SpriteFrame> => {
                     return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
-                        "Texture/Treasure/close-treasure-03/spriteFrame" , SpriteFrame
+                        "Texture/Treasure/close-treasure-03/spriteFrame", SpriteFrame
                     )).value
-                } ,
+                },
+                async (): Promise<SpriteFrame> => {
+                    return (await (new CcNative.Asset.AssetManager("ModBaseResource")).load(
+                        "Texture/Treasure/close-treasure-04/spriteFrame", SpriteFrame
+                    )).value
+                },
             ]
         }
     }
@@ -144,12 +174,7 @@ export class FightMapPrototype {
     }
 
     // 宝箱奖励
-    public getTreasureGoldReward(level: number): {
-        gold: number,
-        diamond: number,
-        items: ItemDTO[],
-        equipments: EquipmentDTO[],
-    } {
+    public getTreasureGoldReward(level: number): TreasureData {
         return {
             gold: 0,
             diamond: 0,
@@ -167,7 +192,7 @@ export class FightMapPrototype {
     }
 
     // 强化符文数据
-    public get reinforcementData(): {posibility: number , max: number , min: number , data: ReinforcementDTO[]} {
+    public get reinforcementData(): { posibility: number, max: number, min: number, data: ReinforcementDTO[] } {
         return {
             posibility: 0.01, // 仅对非boss关卡生效
             max: 4, // 仅对非boss关卡生效
@@ -182,6 +207,7 @@ export class FightMapPrototype {
 
     // 离开回调
     public onLeave() {
+        
     }
 
 }

@@ -7,6 +7,9 @@ export type ManagerOption<T> = {
     descrypt?: boolean,
     // 存储键
     storageKey: string,
+    // 回调
+    save?: (data: T) => void,
+    update?: (data: T) => void,
     // 构造器
     Constructor: Constructor<T>,
     // 数据转换构造器
@@ -34,11 +37,13 @@ export class Manager<T> {
             dto , 
             this.option.descrypt
         )
+        if (this.option.save) this.option.save(this._data)
     }
 
     public update() {
         const dto = CcNative.Storage.get(this.option.storageKey)
         this._data = Rx.reactive(new this.option.Constructor(dto))
+        if (this.option.update) this.option.update(this._data)
     }
 
 }

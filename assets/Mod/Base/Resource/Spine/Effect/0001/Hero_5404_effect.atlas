@@ -1,0 +1,300 @@
+
+Hero_5404_effect.png
+size: 1255,367
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+images_effect/atk/3-1
+  rotate: false
+  xy: 345, 132
+  size: 111, 27
+  orig: 115, 110
+  offset: 3, 40
+  index: -1
+images_effect/atk/yuan
+  rotate: false
+  xy: 1155, 92
+  size: 70, 70
+  orig: 76, 76
+  offset: 1, 5
+  index: -1
+images_effect/skill1/14
+  rotate: false
+  xy: 986, 48
+  size: 35, 34
+  orig: 36, 35
+  offset: 1, 0
+  index: -1
+images_effect/skill1/15
+  rotate: false
+  xy: 1023, 48
+  size: 35, 34
+  orig: 36, 35
+  offset: 1, 0
+  index: -1
+images_effect/skill1/gz
+  rotate: false
+  xy: 2, 129
+  size: 130, 236
+  orig: 130, 236
+  offset: 0, 0
+  index: -1
+images_effect/skill1/sd2_0000
+  rotate: false
+  xy: 307, 130
+  size: 36, 29
+  orig: 150, 150
+  offset: 57, 6
+  index: -1
+images_effect/skill1/sd2_0001
+  rotate: false
+  xy: 1051, 209
+  size: 82, 36
+  orig: 150, 150
+  offset: 34, 10
+  index: -1
+images_effect/skill1/sd2_0002
+  rotate: true
+  xy: 739, 10
+  size: 90, 48
+  orig: 150, 150
+  offset: 33, 15
+  index: -1
+images_effect/skill1/sd2_0003
+  rotate: false
+  xy: 956, 199
+  size: 93, 46
+  orig: 150, 150
+  offset: 31, 20
+  index: -1
+images_effect/skill1/sd2_0005
+  rotate: false
+  xy: 1060, 5
+  size: 95, 77
+  orig: 150, 150
+  offset: 29, 23
+  index: -1
+images_effect/skill1/sd2_0007
+  rotate: true
+  xy: 1172, 272
+  size: 93, 81
+  orig: 150, 150
+  offset: 30, 27
+  index: -1
+images_effect/skill1/sd2_0009
+  rotate: false
+  xy: 1155, 164
+  size: 94, 95
+  orig: 150, 150
+  offset: 30, 29
+  index: -1
+images_effect/skill1/sd2_0010
+  rotate: true
+  xy: 633, 3
+  size: 97, 104
+  orig: 150, 150
+  offset: 32, 33
+  index: -1
+images_effect/skill1/sd2_0012
+  rotate: true
+  xy: 1067, 111
+  size: 96, 86
+  orig: 150, 150
+  offset: 32, 58
+  index: -1
+images_effect/skill1/sd2_0014
+  rotate: false
+  xy: 1157, 4
+  size: 89, 86
+  orig: 150, 150
+  offset: 33, 59
+  index: -1
+images_effect/skill1/xsd_000
+  rotate: false
+  xy: 981, 3
+  size: 58, 43
+  orig: 128, 170
+  offset: 39, 0
+  index: -1
+images_effect/skill1/xsd_001
+  rotate: false
+  xy: 1070, 261
+  size: 100, 104
+  orig: 128, 170
+  offset: 13, 0
+  index: -1
+images_effect/skill1/xsd_002
+  rotate: true
+  xy: 956, 247
+  size: 118, 112
+  orig: 128, 170
+  offset: 6, 0
+  index: -1
+images_effect/skill1/xsd_004
+  rotate: true
+  xy: 223, 4
+  size: 123, 170
+  orig: 128, 170
+  offset: 4, 0
+  index: -1
+images_effect/skill1/xsd_005
+  rotate: false
+  xy: 855, 195
+  size: 99, 170
+  orig: 128, 170
+  offset: 5, 0
+  index: -1
+images_effect/skill1/xsd_006
+  rotate: false
+  xy: 793, 10
+  size: 120, 170
+  orig: 128, 170
+  offset: 8, 0
+  index: -1
+images_effect/skill1/xsd_007
+  rotate: true
+  xy: 86, 3
+  size: 124, 135
+  orig: 128, 170
+  offset: 4, 0
+  index: -1
+images_effect/skill1/xsd_008
+  rotate: true
+  xy: 395, 7
+  size: 123, 169
+  orig: 128, 170
+  offset: 3, 1
+  index: -1
+images_effect/skill1/xsd_009
+  rotate: true
+  xy: 633, 102
+  size: 34, 151
+  orig: 128, 170
+  offset: 55, 19
+  index: -1
+images_effect/skill1/xsd_010
+  rotate: false
+  xy: 2, 2
+  size: 82, 125
+  orig: 128, 170
+  offset: 2, 45
+  index: -1
+images_effect/skill1/xsd_011
+  rotate: false
+  xy: 986, 84
+  size: 79, 113
+  orig: 128, 170
+  offset: 2, 57
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_000
+  rotate: true
+  xy: 915, 2
+  size: 44, 64
+  orig: 128, 256
+  offset: 23, 126
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_001
+  rotate: false
+  xy: 566, 14
+  size: 65, 121
+  orig: 128, 256
+  offset: 21, 71
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_002
+  rotate: false
+  xy: 915, 48
+  size: 69, 145
+  orig: 128, 256
+  offset: 19, 50
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_003
+  rotate: false
+  xy: 779, 182
+  size: 74, 183
+  orig: 128, 256
+  offset: 16, 28
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_004
+  rotate: false
+  xy: 384, 163
+  size: 77, 202
+  orig: 128, 256
+  offset: 13, 18
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_005
+  rotate: false
+  xy: 302, 161
+  size: 80, 204
+  orig: 128, 256
+  offset: 14, 21
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_006
+  rotate: false
+  xy: 218, 161
+  size: 82, 204
+  orig: 128, 256
+  offset: 18, 24
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_007
+  rotate: false
+  xy: 134, 158
+  size: 82, 207
+  orig: 128, 256
+  offset: 23, 23
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_008
+  rotate: false
+  xy: 463, 169
+  size: 86, 196
+  orig: 128, 256
+  offset: 24, 36
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_009
+  rotate: false
+  xy: 599, 172
+  size: 88, 193
+  orig: 128, 256
+  offset: 24, 45
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_010
+  rotate: false
+  xy: 689, 172
+  size: 88, 193
+  orig: 128, 256
+  offset: 26, 48
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_011
+  rotate: false
+  xy: 551, 170
+  size: 46, 195
+  orig: 128, 256
+  offset: 69, 50
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_012
+  rotate: true
+  xy: 599, 138
+  size: 32, 192
+  orig: 128, 256
+  offset: 84, 54
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_013
+  rotate: true
+  xy: 134, 129
+  size: 27, 171
+  orig: 128, 256
+  offset: 88, 71
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_014
+  rotate: true
+  xy: 458, 147
+  size: 14, 122
+  orig: 128, 256
+  offset: 101, 85
+  index: -1
+images_effect/skill2/volley_shot_circle_dark_sheet_015
+  rotate: true
+  xy: 458, 137
+  size: 8, 109
+  orig: 128, 256
+  offset: 106, 97
+  index: -1

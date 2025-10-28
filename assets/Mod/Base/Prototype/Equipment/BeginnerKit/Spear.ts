@@ -81,7 +81,7 @@ export class Spear extends EquipmentPrototype {
         const suitEntryStr = LanguageManager.getEntry(this.suit).getValue(settingManager.data.language)
         res += `\n${this.suitCount >= oneSuit ? `<color=#00ff00>` : ""}${suitEntryStr}(${oneSuit}): ${LanguageManager.getEntry("physicalAttack")
                 .getValue(settingManager.data.language)
-            }: +15${this.suitCount >= oneSuit ? `</color>` : ""}\n`
+            }: +10${this.suitCount >= oneSuit ? `</color>` : ""}\n`
         res += `${this.suitCount >= twoSuit ? `<color=#00ff00>` : ""}${suitEntryStr}(${twoSuit}): ${LanguageManager.getEntry("attackSpeed")
                 .getValue(settingManager.data.language)
             }: +0.15${this.suitCount >= twoSuit ? `</color>` : ""}\n`
@@ -92,9 +92,9 @@ export class Spear extends EquipmentPrototype {
     // 基础属性
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
         physicalAttack: 15,
-        attackSpeed: 1.35,
+        attackSpeed: 1.25,
     }).setProperty("physicalAttack", (atk) => {
-        return atk + (this.suitCount >= oneSuit ? 15 : 0)
+        return atk + (this.suitCount >= oneSuit ? 10 : 0)
     }).setProperty("attackSpeed", (speed) => {
         return speed + (this.suitCount >= twoSuit ? 0.15 : 0)
     })

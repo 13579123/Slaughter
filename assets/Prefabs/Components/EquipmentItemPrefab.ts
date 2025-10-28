@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Sprite, SpriteFrame, Enum, Prefab, Label } from 'cc';
+import { _decorator, Component, Node, Sprite, SpriteFrame, Enum, Prefab, Label, EventTouch } from 'cc';
 import { EquipmentInstance } from '../../Script/System/Core/Instance/EquipmentInstance';
 import { EquipmentQuality } from '../../Script/System/Core/Prototype/EquipmentPrototype';
 import { ItemInstance } from '../../Script/System/Core/Instance/ItemInstance';

@@ -23,10 +23,7 @@ export class SkillPrototype {
     public get description(): string { return "Equipment Description" }
     // 技能消耗
     public get cost() {
-        return {
-            hp: 0,
-            mp: 0,
-        }
+        return { hp: 0 , mp: 0, }
     }
     // 技能冷却
     public get coolTime() {
@@ -34,10 +31,11 @@ export class SkillPrototype {
     }
     // 学习消耗
     public get learnCost() {
-        return {
-            gold: 0,
-            diamond: 0
-        }
+        return { gold: 0 , diamond: 0 }
+    }
+    // 额外属性
+    public get extraProperty(): Partial<BasePrototypeProperty> {
+        return {}
     }
     // 保存对应的实例
     constructor(public readonly instance: SkillInstance) {
@@ -55,10 +53,9 @@ export class SkillPrototype {
         }
     }
     // 使用技能回调
-    public use(useOption: {
+    public async use(useOption: {
         use: CharacterInstance,
-    }) {
-    }
+    }) {}
     // 创建原型实例的回调
     public onCreate() {}
 }

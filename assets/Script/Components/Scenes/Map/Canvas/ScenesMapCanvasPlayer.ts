@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, v2 } from 'cc';
+import { _decorator, Component, Label, Node, v2 } from 'cc';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { UserBaseDataPrefab } from 'db://assets/Prefabs/Components/UserBaseDataPrefab';
 import { getFightMapInstance } from 'db://assets/Script/Game/System/Manager/FightMapManager';
@@ -95,6 +95,30 @@ export class ScenesMapCanvasPlayer extends ExtensionComponent {
                 }
             }
             return
+        })
+    }
+
+    // 展示金币经验奖励
+    public playRewardAnimation(gold: number, exp: number) {
+        // 展示奖励
+        const rewardMessageNode = this.node.getChildByName("RewardMessage")
+        const goldRewardNode = rewardMessageNode.getChildByName("GoldReward")
+        const expRewardNode = rewardMessageNode.getChildByName("ExpReward")
+        rewardMessageNode.setPosition(0 , 130)
+        if (gold > 0) {
+            goldRewardNode.active = true
+            goldRewardNode.getChildByName("Count").getComponent(Label).string = "+" + gold
+        }
+        if (exp > 0) {
+            expRewardNode.active = true
+            expRewardNode.getChildByName("Count").getComponent(Label).string = "+" + exp
+        }
+        this.setAutoInterval(() => {
+            rewardMessageNode.setPosition(0 , rewardMessageNode.y + 1)
+        } , {
+            timer: 20 , 
+            count: 60 , 
+            complete: () => expRewardNode.active = goldRewardNode.active = false
         })
     }
 

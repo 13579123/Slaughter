@@ -114,6 +114,14 @@ export class BasePrototypeProperty {
         }
         return this._criticalDamage;
     }
+    // 冷却指数
+    protected _coolDown: number = 0;
+    public get coolDown(): number {
+        if (this.getterMap.has("coolDown")) {
+            return this.getterMap.get("coolDown")(this._coolDown)
+        }
+        return this._coolDown;
+    }
     // 攻击速度信息
     protected _attackSpeed: number = 0;
     public get attackSpeed(): number {

@@ -62,6 +62,10 @@ export class BaseInstanceProperty {
     public get attackSpeed(): number {
         return 0;
     }
+    // 冷却指数
+    public get coolDown(): number {
+        return 0
+    }
 }
 
 

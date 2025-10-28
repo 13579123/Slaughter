@@ -112,6 +112,7 @@ export class UserBaseDataPrefab extends ExtensionComponent {
             { key: "magicPenetration", force: false, fixed: 1, rate: 1, exit: "" },
             { key: "criticalRate", force: false, fixed: 1, rate: 100, exit: "%" },
             { key: "criticalDamage", force: false, fixed: 1, rate: 100, exit: "%" },
+            { key: "coolDown", force: true, fixed: 0, rate: 1, exit: "" },
             { key: "attackSpeed", force: true, fixed: 2, rate: 1, exit: "" },
         ]
         property.forEach(setting => {

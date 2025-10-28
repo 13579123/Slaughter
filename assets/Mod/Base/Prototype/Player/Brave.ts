@@ -6,7 +6,7 @@ import { LanguageManager, RegisterLanguageEntry } from "db://assets/Module/Langu
 import { BasePrototypeProperty } from "db://assets/Script/System/Core/Property/BasePrototypeProperty";
 import { AnimationConfig, CharacterPrototype } from "db://assets/Script/System/Core/Prototype/CharacterPrototype";
 import { RegisterCharacter } from "db://assets/Script/System/Manager/CharacterManager";
-import { getComponentByPlayer } from "db://assets/Script/Game/System/PlayerToPrefabMap";
+import { getComponentByCharacter } from "db://assets/Script/Game/System/CharacterToPrefabMap";
 import { AttackProgress, DeathProgress, SkillProgress } from "db://assets/Script/System/Core/Progress/FightProgress";
 
 @RegisterLanguageEntry("Brave")
@@ -35,9 +35,9 @@ export class Brave extends CharacterPrototype {
     }
 
     public baseProperty: BasePrototypeProperty = new BasePrototypeProperty({
-        maxHp: 300,
-        maxMp: 70,
-        physicalAttack: 120,
+        maxHp: 1000,
+        maxMp: 150,
+        physicalAttack: 80,
         magicAttack: 40,
         physicalDefense: 20,
         magicDefense: 20,
@@ -45,15 +45,18 @@ export class Brave extends CharacterPrototype {
         criticalDamage: 1.5,
         physicalPenetration: 5,
         magicPenetration: 5,
+        attackSpeed: 1.0,
     })
 
     public growProperty: BasePrototypeProperty = new BasePrototypeProperty({
-        maxHp: 30,
+        maxHp: 100,
         maxMp: 10,
-        physicalAttack: 7,
+        physicalAttack: 10,
         magicAttack: 5,
         physicalDefense: 5,
         magicDefense: 5,
+        lightResistance: 2,
+        darkResistance: 2,
     })
 
     public get animation(): AnimationConfig {
@@ -81,7 +84,7 @@ export class Brave extends CharacterPrototype {
 
     // 攻击动画Promise会在攻击动作计算完成后resolve
     playAttackAnimation(progress: AttackProgress, animationEndCallback: Function, next: Function) {
-        const prefab = getComponentByPlayer(this.instance)
+        const prefab = getComponentByCharacter(this.instance)
         if (!prefab) return next()
         prefab.playAnimation("Attack01", {
             count: 1,
@@ -101,7 +104,7 @@ export class Brave extends CharacterPrototype {
         return
     }
     playSkillAnimation(progress: SkillProgress, animationEndCallback: Function, next: Function) {
-        const prefab = getComponentByPlayer(this.instance)
+        const prefab = getComponentByCharacter(this.instance)
         if (!prefab) return next()
         prefab.playAnimation("Attack02", {
             count: 1,
@@ -114,7 +117,7 @@ export class Brave extends CharacterPrototype {
         })
     }
     public playDieAnimation(progress: DeathProgress, animationEndCallback: Function , next: Function): void {
-        const prefab = getComponentByPlayer(this.instance)
+        const prefab = getComponentByCharacter(this.instance)
         if (!prefab) return
         prefab.playAnimation("BeAttack", {
             count: 1,

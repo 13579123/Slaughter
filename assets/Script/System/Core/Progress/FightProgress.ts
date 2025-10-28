@@ -22,9 +22,9 @@ export class AttackProgress extends Progress {
 
     public damageRateType = {
         physic: 1.0,
-        magic: 0.2,
-        light: 1.0,
-        dark: 1.0,
+        magic: 0.4,
+        light: 0.8,
+        dark: 0.8,
         real: 0,
     }
 

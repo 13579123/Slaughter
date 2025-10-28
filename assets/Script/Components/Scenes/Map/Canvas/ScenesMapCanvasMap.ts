@@ -1,12 +1,11 @@
-import { _decorator, Button, Color, Component, director, find, input, Input, instantiate, KeyCode, Node, NodeEventType, Prefab, Sprite, SystemEvent, UITransform, Vec2 } from 'cc';
+import { _decorator, Button, Color, Component, director, EventTouch, find, input, Input, instantiate, KeyCode, Label, Node, NodeEventType, Prefab, ScrollView, Sprite, SystemEvent, UITransform, Vec2 } from 'cc';
 import ExtensionComponent from 'db://assets/Module/Extension/Component/ExtensionComponent';
 import { SpineAnimation } from 'db://assets/Module/Extension/Component/SpineAnimation';
-import { MapData, MonsterData, TreasureData } from 'db://assets/Script/Game/System/Instance/FightMapInstance';
+import { MapData, MapDistribution, MonsterData, TreasureData } from 'db://assets/Script/Game/System/Instance/FightMapInstance';
 import { getFightMapInstance } from 'db://assets/Script/Game/System/Manager/FightMapManager';
 import { ScenesMapCanvasPlayer } from './ScenesMapCanvasPlayer';
 import { CcNative } from 'db://assets/Module/CcNative';
 import { FightPrefab } from 'db://assets/Prefabs/Components/FightPrefab/FightPrefab';
-import { CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
 import { getCharacterKey, getCharacterPrototype } from 'db://assets/Script/System/Manager/CharacterManager';
 import { message } from 'db://assets/Script/Game/Message/Message';
 import { Progress } from 'db://assets/Script/System/Core/Progress/FightProgress';
@@ -23,6 +22,9 @@ import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
 import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
 import { ScenesMapCanvasSound } from './ScenesMapCanvasSound';
+import { Normal } from 'db://assets/Script/System/Normal';
+import { CharacterInstance } from 'db://assets/Script/System/Core/Instance/CharacterInstance';
+import { forEach } from '../../../../../../scripting/engine/cocos/asset/asset-manager/utilities';
 const { ccclass, property } = _decorator;
 
 export const mapWidth = 130, mapHeight = 130
@@ -93,6 +95,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         this.templatetreasureItem.parent = null
         this.createFightMap()
         this.createMiniFightMap()
+        this.createMonster()
         this.renderMonster()
         this.renderTreasure()
         this.renderObstacle()
@@ -107,10 +110,18 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         // 创建地图渲染节点
         this.instance.mapData.forEach((list, y) => {
             list.forEach(async (item, x) => {
+                this.mapItems[y] = this.mapItems[y] || []
+                if (item === MapData.None) {
+                    this.mapItems[y][x] = null
+                    return
+                }
                 const node = instantiate(this.templateMapItem)
                 const maskNode = node.getChildByName("Mask")
                 maskNode.active = false
                 node.on(NodeEventType.TOUCH_START, () => {
+                    this.mapItems.forEach(col => {
+                        col.forEach(n => { if (n) n.getChildByName("Mask").active = false })
+                    })
                     maskNode.active = true
                 })
                 node.on(NodeEventType.TOUCH_CANCEL, () => {
@@ -118,11 +129,10 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                 })
                 node.on(NodeEventType.TOUCH_END, async () => {
                     maskNode.active = false
-                    if (item !== MapData.None) this.moveTo(x, y)
+                    this.moveTo(x, y)
                 })
                 this.mapItems[y] = this.mapItems[y] || []
                 this.mapItems[y][x] = node
-                if (item === MapData.None) return
                 let floor = floors.floor[0]
                 if (item === MapData.Floor)
                     floor = floors.floor[Math.floor(Math.random() * floors.floor.length)]
@@ -145,90 +155,170 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                 miniMap.getComponent(UITransform).height = 15
                 if (!this.miniMapItems[y]) this.miniMapItems[y] = []
                 if (item !== MapData.None) this.miniMapItems[y][x] = miniMap
+                else this.miniMapItems[y][x] = null
             })
+        })
+        // 地图名称
+        this.node.getChildByName("MapName").getComponent(Label).string = this.instance.proto.name
+        return
+    }
+
+    // 创建怪物节点
+    protected createMonster() {
+        this.instance.monsterData.forEach(async monsterData => {
+            const node = instantiate(this.templateMonsterItem)
+            if (!this.monsterItems[monsterData.position.y]) 
+                this.monsterItems[monsterData.position.y] = []
+            let stop = null
+            node.on(NodeEventType.TOUCH_START, (event: EventTouch) => {
+                event.preventSwallow = true
+                stop = this.setAutoInterval(() => {
+                    this.showMonsterProperty(monsterData.position)
+                    stop = null
+                }, { timer: 500, count: 1 })
+            })
+            node.on(NodeEventType.TOUCH_END, (event: EventTouch) => {
+                if (stop) {
+                    event.preventSwallow = true
+                    stop && stop()
+                }
+            })
+            node.on(NodeEventType.TOUCH_CANCEL, (event: EventTouch) => {
+                event.preventSwallow = true
+                stop && stop()
+            })
+            this.monsterItems[monsterData.position.y][monsterData.position.x] = node
+            node.setPosition(
+                monsterData.position.x * mapWidth - mapWidth / 2, 
+                -monsterData.position.y * mapHeight + mapHeight / 2
+            )
+            if (monsterData.isBoss) node.setScale(node.scale.x * 1.5, node.scale.y * 1.5)
+            const spineAnimation = node.getChildByName('Spine').getComponent(SpineAnimation)
+            spineAnimation.skeletonData = await monsterData.character.proto.skeletonData()
+            spineAnimation.playAnimation(monsterData.character.proto.animation.animations.idle)
         })
         return
     }
 
     // 按区域显示地图
     protected renderFightMap() {
-        const areax = 5, areay = 6
+        // 显示区域
+        const areax = 4, areay = 6
         const content = this.node.getChildByName("MapContent")
-        content.removeAllChildren()
-        this.mapItems.forEach((list, y) => {
-            list.forEach((node, x) => {
-                if (Math.abs(x - this.instance.playerPosition.x) <= areax && Math.abs(y - this.instance.playerPosition.y) <= areay) {
-                    node.setPosition(x * mapWidth - mapWidth / 2, -y * mapWidth + mapWidth / 2)
-                    content.addChild(node)
-                }
-                return
-            })
+        // 需要添加的节点
+        const needRenderNode = []
+        for (let y = this.instance.playerPosition.y - areay; y <= this.instance.playerPosition.y + areay; y++) {
+            for (let x = this.instance.playerPosition.x - areax; x <= this.instance.playerPosition.x + areax; x++) {
+                const node = this.mapItems[y]?.[x]
+                if (!node) continue
+                needRenderNode.push(node)
+                node.setPosition(x * mapWidth - mapWidth / 2, -y * mapWidth + mapWidth / 2)
+            }
+        }
+        // 移除不需要的节点
+        const childrens = Array.from(content.children)
+        childrens.forEach((node) => {
+            const index = needRenderNode.indexOf(node)
+            // 移除不需要的节点
+            if (index === -1) content.removeChild(node)
+            // 避免反复添加
+            else needRenderNode.splice(index, 1)
         })
+        // 添加需要的节点
+        needRenderNode.forEach((node) => content.addChild(node))
         return
     }
 
     // 渲染小地图
     protected renderMiniMap() {
-        const miniAreax = 10, miniAreay = 10
-        this.MiniMapContentNode.removeAllChildren()
-        this.miniMapItems.forEach((list, y) => {
-            list.forEach((node, x) => {
-                if (!node) return
-                if (Math.abs(x - this.instance.playerPosition.x) <= miniAreax && Math.abs(y - this.instance.playerPosition.y) <= miniAreay) {
-                    node.setPosition(x * 15 - 15 / 2, -y * 15 + 15 / 2)
-                    node.getChildByName("MonsterIcon").active = false
-                    node.getChildByName("BossIcon").active = false
-                    node.getChildByName("EndIcon").active = false
-                    node.getChildByName("TreasureIcon").active = false
-                    // 结束位置
-                    if (this.instance.endPosition.x === x && this.instance.endPosition.y === y) {
-                        node.getChildByName("EndIcon").active = true
-                    }
-                    // 怪物位置
-                    const monster = this.instance.monsterData.find(monster => {
-                        if (monster.position.x === x && monster.position.y === y) {
-                            return true
-                        }
-                    })
-                    if (monster) {
-                        if (monster.isBoss) node.getChildByName("BossIcon").active = true
-                        else node.getChildByName("MonsterIcon").active = true
-                    }
-                    // 宝箱位置
-                    const treasure = this.instance.treasureData.find(treasure => {
-                        if (treasure.position.x === x && treasure.position.y === y) return true
-                    })
-                    if (treasure) node.getChildByName("TreasureIcon").active = true
-                    // 添加节点
-                    this.MiniMapContentNode.addChild(node)
+        const miniAreax = 8, miniAreay = 8
+        const needRenderNode = []
+        for (let y = this.instance.playerPosition.y - miniAreay; y <= this.instance.playerPosition.y + miniAreay; y++) {
+            for (let x = this.instance.playerPosition.x - miniAreax; x <= this.instance.playerPosition.x + miniAreax; x++) {
+                const node = this.miniMapItems[y]?.[x]
+                if (!node) continue
+                // 可视范围内
+                node.setPosition(x * 15 - 15 / 2, -y * 15 + 15 / 2)
+                const bossIcon = node.getChildByName("BossIcon")
+                const monsterIcon = node.getChildByName("MonsterIcon")
+                const endIcon = node.getChildByName("EndIcon")
+                const treasureIcon = node.getChildByName("TreasureIcon")
+                const reinforcementIcon = node.getChildByName("ReinforcementIcon")
+                bossIcon.active = false
+                monsterIcon.active = false
+                endIcon.active = false
+                treasureIcon.active = false
+                reinforcementIcon.active = false
+                // 添加渲染队列 
+                needRenderNode.push(node)
+                // 根据分布记录渲染
+                const mapDistribution = this.instance.mapDistribution[y]?.[x] || []
+                if (mapDistribution.includes(MapDistribution.MONSTER)) {
+                    if (mapDistribution.includes(MapDistribution.BOSS)) bossIcon.active = true
+                    else monsterIcon.active = true
+                    continue
                 }
-                return
-            })
+                if (mapDistribution.includes(MapDistribution.TREASURE)) {
+                    treasureIcon.active = true
+                    continue
+                }
+                if (mapDistribution.includes(MapDistribution.REINFORCEMENT)) {
+                    reinforcementIcon.active = true
+                    continue
+                }
+                if (mapDistribution.includes(MapDistribution.END_POSITION)) endIcon.active = true
+            }
+        }
+        // 移除不需要的节点
+        const childrens = Array.from(this.MiniMapContentNode.children)
+        childrens.forEach((node) => {
+            const index = needRenderNode.indexOf(node)
+            // 移除不需要的节点
+            if (index === -1) this.MiniMapContentNode.removeChild(node)
+            else needRenderNode.splice(index, 1)
         })
+        // 添加需要的节点
+        needRenderNode.forEach((node) => this.MiniMapContentNode.addChild(node))
     }
 
     // 显示怪物 
     protected renderMonster() {
+        const areax = 4 , areay = 6
         const content = this.node.getChildByName("MonsterContent")
-        content.removeAllChildren()
-        this.instance.monsterData.forEach(async monsterData => {
-            const node = instantiate(this.templateMonsterItem)
-            if (!this.monsterItems[monsterData.position.y]) this.monsterItems[monsterData.position.y] = []
-            this.monsterItems[monsterData.position.y][monsterData.position.x] = node
-            const spineAnimation = node.getChildByName('Spine').getComponent(SpineAnimation)
-            node.setPosition(
-                monsterData.position.x * mapWidth - mapWidth / 2,
-                -monsterData.position.y * mapHeight + mapHeight / 2,
-                0
-            )
-            spineAnimation.skeletonData = await monsterData.character.proto.skeletonData()
-            content.addChild(node)
-            spineAnimation.playAnimation(monsterData.character.proto.animation.animations.idle)
-            if (monsterData.isBoss) {
-                node.setScale(node.scale.x * 1.5, node.scale.y * 1.5)
-            }
-            return
+        const needRenderNode: {position: Vec2 , node: Node}[] = []
+        this.monsterItems.forEach((list , y) => {
+            list.forEach((monsterNode , x) => {
+                if (!monsterNode) return
+                // 是否在显示范围内
+                if (
+                    Math.abs(x - this.instance.playerPosition.x) > areax 
+                    || 
+                    Math.abs(y - this.instance.playerPosition.y) > areay
+                ) return
+                needRenderNode.push({position: new Vec2(x , y) , node: monsterNode})
+            })
         })
+        // 移除不需要的节点
+        const childrens = Array.from(content.children)
+        childrens.forEach((node) => {
+            const index = needRenderNode.findIndex((item) => item.node === node)
+            // 移除不需要的节点
+            if (index === -1) content.removeChild(node)
+            else needRenderNode.splice(index, 1)
+        })
+        // 添加需要的节点
+        needRenderNode.forEach((data) => {
+            let monsterInstance: CharacterInstance = null
+            content.addChild(data.node)
+            for (let i = 0; i < this.instance.monsterData.length; i++) {
+                const monster = this.instance.monsterData[i];
+                if (monster.position.equals(data.position)) monsterInstance = monster.character
+            }
+            if (!monsterInstance) return
+            const spineAnimation = data.node.getChildByName('Spine').getComponent(SpineAnimation)
+            spineAnimation.playAnimation(monsterInstance.proto.animation.animations.idle)
+        })
+        return
     }
 
     // 显示宝箱
@@ -330,6 +420,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                     this.instance.player.proto.animation.animations.move,
                     { animationCache: true }
                 )
+            const scenesMapCanvasPlayer = this.PlayerNode.getComponent(ScenesMapCanvasPlayer)
             this.isCancelMoving = false
             for (let i = 0; i < movePath.length; i++) {
                 // 停止移动
@@ -360,9 +451,10 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                     this.encounterReinforcecment(obstacle.nextPos)
                 }
                 // 移动
-                await this.PlayerNode.getComponent(ScenesMapCanvasPlayer).movePlayer(movePath[i])
+                await scenesMapCanvasPlayer.movePlayer(movePath[i])
                 this.renderFightMap()
                 this.renderMiniMap()
+                this.renderMonster()
             }
             // 播放等待动画
             if (!this.isCancelMoving)
@@ -402,6 +494,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
 
     // 遭遇怪物回调
     protected async encounterMonster(monsterPos: { x: number, y: number }) {
+        // 获取怪物节点
         if (!this.monsterItems[monsterPos.y]) return
         if (!this.monsterItems[monsterPos.y][monsterPos.x]) return
         const monsterNode = this.monsterItems[monsterPos.y][monsterPos.x]
@@ -409,6 +502,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         const monsterData = this.instance.monsterData.find(
             monsterD => monsterD.position.x === monsterPos.x && monsterD.position.y === monsterPos.y
         )
+        // 怪物不存在
         if (!monsterData) return
         // 开始战斗
         const parent = this.FightContentNode
@@ -416,20 +510,26 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
             .load("FightPrefab/FightPrefab", Prefab)
         const node = CcNative.instantiate(fightPrefab.value)
         parent.addChild(node)
+
         const successDirect = await node.getComponent(FightPrefab).setFightAndStart({
             player: "left",
             leftCharacter: this.instance.player,
             rightCharacter: monsterData.character,
+            onStart: () => {
+                this.instance.currentMonster = monsterData.character
+            }
         })
         // 成功击杀怪物
         if (successDirect === "left") {
             this.instance.removeMonster(monsterPos)
             this.moveTo(monsterPos.x, monsterPos.y)
             this.instance.player.emitProgress("fightSuccessEnd", new Progress())
+            this.instance.currentMonster = null
             this.winSettlement(monsterData)
             monsterNode.parent = this.monsterItems[monsterPos.y][monsterPos.x] = null
             monsterNode.destroy()
         } else {
+            this.instance.currentMonster = null
             if (this.instance.player.hp <= 0) {
                 await new Promise(res => setTimeout(res, 500))
                 this.FialNode.active = true
@@ -448,15 +548,17 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         })
         if (!treasureData || treasureData.open) return
         const reward = this.instance.proto.getTreasureGoldReward(treasureData.level)
+        const getItems = []
         reward.items.forEach(item => {
-            backpackManager.data.addItem(item.prototype, item.count)
+            getItems.push(backpackManager.data.addItem(item.prototype, item.count))
         })
+        const getEquipments = []
         reward.equipments.forEach(equip => {
-            equipmentManager.data.addEquipment(equip.prototype, equip.quality)
+            getEquipments.push(equipmentManager.data.addEquipment(equip.prototype, equip.quality))
         })
         backpackManager.save()
         equipmentManager.save()
-        message.congratulations(reward.gold, reward.diamond, reward.items, reward.equipments)
+        message.congratulations(reward.gold, reward.diamond, getItems, getEquipments)
         treasureData.open = true
         // 播放音效
         this.SoundNode.getComponent(ScenesMapCanvasSound).playGetAwardSound()
@@ -469,7 +571,7 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         if (!this.reinforcementItems[rineforcecmentPos.y]) return
         if (!this.reinforcementItems[rineforcecmentPos.y][rineforcecmentPos.x]) return
         const node = this.reinforcementItems[rineforcecmentPos.y][rineforcecmentPos.x]
-        
+
         // 符文数据
         const reinforcementData = this.instance.reinforcementData.find(v => {
             return v.position.x === rineforcecmentPos.x && v.position.y === rineforcecmentPos.y
@@ -530,13 +632,13 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         if (confirm) this.instance.proto.onLeave()
     }
 
-    // 胜利结算
+    // 战斗胜利结算
     protected winSettlement(monsterData: MonsterData) {
         const exp = monsterData.dto.dropExp()
         const gold = monsterData.dto.dropGold()
         const diamond = monsterData.dto.dropDiamond()
         const dropItems = monsterData.dto.dropItems
-        const dropEquipments = monsterData.dto.dropeEquipments
+        const dropEquipments = monsterData.dto.dropEquipments
         const items: ItemDTO[] = []
         const equipments: EquipmentDTO[] = []
         characterManager.data.addExp(exp)
@@ -544,14 +646,18 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
         resourceManager.data.addGold(gold)
         resourceManager.data.addDiamond(diamond)
         resourceManager.save()
+        let hasGetReward = false
         for (let i = 0; i < dropItems.length; i++) {
+            if (hasGetReward) break
             if (dropItems[i].posibility() > Math.random()) {
                 const count = dropItems[i].count()
                 backpackManager.data.addItem(dropItems[i].item, count)
                 items.push({ prototype: dropItems[i].item, count })
+                hasGetReward = true
             }
         }
         for (let i = 0; i < dropEquipments.length; i++) {
+            if (hasGetReward) break
             if (dropEquipments[i].posibility() > Math.random()) {
                 const dto: EquipmentDTO = {
                     lv: 1,
@@ -562,10 +668,14 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
                 }
                 equipmentManager.data.addEquipment(dto.prototype, dto.quality)
                 equipments.push(dto)
+                hasGetReward = true
             }
         }
-        if (gold > 0 || diamond > 0 || items.length > 0 || equipments.length > 0)
-            message.congratulations(gold, diamond, items, equipments)
+        // 展示奖励
+        if (diamond > 0 || items.length > 0 || equipments.length > 0)
+            message.congratulations(0, diamond, items, equipments)
+        // 展示金币经验奖励
+        this.PlayerNode.getComponent(ScenesMapCanvasPlayer).playRewardAnimation(gold, exp)
         // 添加击杀记录
         achivementManager.data.addKillRecord(getCharacterKey(monsterData.character.proto))
 
@@ -639,6 +749,59 @@ export class ScenesMapCanvasMap extends ExtensionComponent {
             }
         }
         return { type: "road", nextPos }
+    }
+
+    // 展示怪物属性
+    protected showMonsterProperty(monsterPos: Vec2) {
+        const monsterData = this.instance.monsterData.find(m => m.position.equals(monsterPos))
+        if (!monsterData) return
+        const detailInfo = this.node.getChildByName("MonsterDetailInfo")
+        detailInfo.active = true
+        monsterData.character.proto.skeletonData().then(
+            sk => {
+                if (!sk) return
+                const spineAnimation = detailInfo.getChildByName("Spine").getComponent(SpineAnimation)
+                spineAnimation.skeletonData = sk
+                spineAnimation.playAnimation(monsterData.character.proto.animation.animations.idle)
+            }
+        )
+
+        // 渲染其他属性
+        const label = detailInfo.getChildByName("Detail")
+            .getComponent(ScrollView)
+            .content
+            .getComponent(Label)
+        label.string = ""
+        const property = [
+            { key: "maxHp", force: false, fixed: 0, rate: 1, exit: "" },
+            { key: "maxMp", force: false, fixed: 0, rate: 1, exit: "" },
+            { key: "physicalAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "magicAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "lightAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "darkAttack", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "physicalDefense", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "magicDefense", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "lightResistance", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "darkResistance", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "physicalPenetration", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "magicPenetration", force: false, fixed: 1, rate: 1, exit: "" },
+            { key: "criticalRate", force: false, fixed: 1, rate: 100, exit: "%" },
+            { key: "criticalDamage", force: false, fixed: 1, rate: 100, exit: "%" },
+            { key: "attackSpeed", force: true, fixed: 2, rate: 1, exit: "" },
+        ]
+        property.forEach(setting => {
+            label.string += `${LanguageManager.getEntry(setting.key).getValue(settingManager.data.language)
+                }: ${Normal.number(monsterData.character[setting.key] * setting.rate , setting.fixed)}${setting.exit}\n`
+        })
+
+        // 简介
+        detailInfo.getChildByName("Description").getComponent(Label).string = monsterData.character.proto.description
+
+    }
+
+    // 隐藏怪物属性
+    protected hideMonsterProperty() {
+        this.node.getChildByName("MonsterDetailInfo").active = false
     }
 
     protected update(dt: number): void {

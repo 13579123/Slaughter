@@ -1,0 +1,104 @@
+
+hero00023.png
+size: 393,157
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+dao
+  rotate: false
+  xy: 80, 76
+  size: 161, 79
+  orig: 162, 88
+  offset: 1, 0
+  index: -1
+shenti
+  rotate: true
+  xy: 341, 109
+  size: 46, 50
+  orig: 46, 50
+  offset: 0, 0
+  index: -1
+tou
+  rotate: true
+  xy: 88, 2
+  size: 72, 57
+  orig: 73, 57
+  offset: 0, 0
+  index: -1
+weigu
+  rotate: false
+  xy: 203, 14
+  size: 51, 60
+  orig: 54, 60
+  offset: 0, 0
+  index: -1
+xiaba
+  rotate: false
+  xy: 147, 7
+  size: 54, 67
+  orig: 54, 67
+  offset: 0, 0
+  index: -1
+xiongbu
+  rotate: false
+  xy: 2, 64
+  size: 76, 91
+  orig: 76, 91
+  offset: 0, 0
+  index: -1
+youdabi
+  rotate: false
+  xy: 243, 77
+  size: 46, 78
+  orig: 46, 78
+  offset: 0, 0
+  index: -1
+youdatui
+  rotate: false
+  xy: 355, 12
+  size: 33, 57
+  orig: 33, 57
+  offset: 0, 0
+  index: -1
+youxiaobi
+  rotate: true
+  xy: 2, 2
+  size: 60, 84
+  orig: 60, 84
+  offset: 0, 0
+  index: -1
+youxiaotui
+  rotate: false
+  xy: 256, 16
+  size: 54, 59
+  orig: 54, 59
+  offset: 0, 0
+  index: -1
+zuodabi
+  rotate: false
+  xy: 312, 60
+  size: 22, 36
+  orig: 22, 36
+  offset: 0, 0
+  index: -1
+zuodatui
+  rotate: true
+  xy: 291, 98
+  size: 57, 48
+  orig: 57, 48
+  offset: 0, 0
+  index: -1
+zuoxaobi
+  rotate: false
+  xy: 312, 2
+  size: 41, 56
+  orig: 41, 56
+  offset: 0, 0
+  index: -1
+zuoxiaotui
+  rotate: true
+  xy: 341, 71
+  size: 36, 50
+  orig: 38, 50
+  offset: 2, 0
+  index: -1

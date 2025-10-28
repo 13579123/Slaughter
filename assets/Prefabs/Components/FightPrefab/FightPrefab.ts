@@ -13,6 +13,7 @@ import { message } from 'db://assets/Script/Game/Message/Message';
 import { LanguageManager } from 'db://assets/Module/Language/LanguageManager';
 import { settingManager } from 'db://assets/Script/Game/Manager/SettingManager';
 import { LanguageEntry } from 'db://assets/Module/Language/LanguageEntry';
+import { bindCharacterToComponent, unbindCharacterComponent } from 'db://assets/Script/Game/System/CharacterToPrefabMap';
 const { ccclass, property } = _decorator;
 
 type FightOption = {
@@ -84,13 +85,10 @@ export class FightPrefab extends ExtensionComponent {
         // 获取玩家数据
         const playerData = this.getPlayerData()
         // 这一局不存在玩家 隐藏技能面版
-        if (!playerData) {
-            skillPanel.active = false
-            return
-        } else skillPanel.active = true
+        if (!playerData) return skillPanel.active = false
+        else skillPanel.active = true
         // 遍历技能数据
-        let index = 0
-        playerData.character.skills.map(skill => {
+        playerData.character.skills.map((skill , index) => {
             // 如果是被动技能则跳过
             const isPassive = isSkillPassive(
                 getCharacterKey(playerData.character.proto) , 
@@ -99,18 +97,21 @@ export class FightPrefab extends ExtensionComponent {
             if (isPassive) return null
             // 创建技能节点
             const skillNode = instantiate(skillItemTemp)
+            // 技能节点坐标
+            skillNode.setPosition(threeNodePos[index].x , threeNodePos[index].y)
             // 图标
-            skill.proto.icon().then(spriteFrame => 
-                skillNode.getChildByName("Icon")
+            skill.proto.icon().then(spriteFrame => skillNode.getChildByName("Icon")
                 .getComponent(Sprite).spriteFrame = spriteFrame
             )
             // 时间展示绑定
             const coollingNode = skillNode.getChildByName("Coolling")
+            const collingMaskSprite = coollingNode.getComponent(Sprite)
+            const collingTimeLabel = coollingNode.getChildByName("CoollingTime").getComponent(Label)
             this.effect(() => {
                 if (skill.coolTime !== 0) coollingNode.active = true
                 else coollingNode.active = false
-                coollingNode.getChildByName("CoollingTime").getComponent(Label).string = 
-                    `${(skill.coolTime / 1000).toFixed(1)}s`
+                collingMaskSprite.fillRange = ((skill.coolTime / 1000) / skill.proto.coolTime)
+                collingTimeLabel.string = `${(skill.coolTime / 1000).toFixed(1)}s`
             })
             // 绑定点击按钮
             skillNode.getChildByName("Icon").on(
@@ -121,7 +122,6 @@ export class FightPrefab extends ExtensionComponent {
                 }
             )
             skillPanel.getChildByName("SkillContainer").addChild(skillNode)
-            index++
         })
         return
     }
@@ -143,6 +143,9 @@ export class FightPrefab extends ExtensionComponent {
         this.node.getChildByName("RightCharacterContainer").addChild(rightNode)
         this.rightCharacterPrefab = rightCharacterPrefab
         rightCharacterPrefab.fightPrefab = this
+        // 绑定
+        bindCharacterToComponent(this.leftCharacter , this.leftCharacterPrefab)
+        bindCharacterToComponent(this.rightCharacter , this.rightCharacterPrefab)
     }
 
     // 逃跑回调
@@ -196,15 +199,14 @@ export class FightPrefab extends ExtensionComponent {
             return new Promise(async res => {
                 let stop = false
                 character.on(CharacterEvent.Death, () => {
-                    (stop = true);
-                    res(null)
+                    (stop = true) ; res(null)
                 })
                 target.on(CharacterEvent.Death, () => {
-                    (stop = true) ; 
-                    res(null)
+                    (stop = true) ; res(null)
                 })
                 while(!stop && !stopGame) {
                     await characterPrefab.characterAction(target)
+                    if (character._preDeath || character.hasDeath) break
                     characterPrefab.characterReady()
                     // 攻击间隔
                     await new Promise(
@@ -232,6 +234,9 @@ export class FightPrefab extends ExtensionComponent {
             if (this.leftCharacter.hasDeath && this.rightCharacter.hasDeath) res("none")
             if (this.leftCharacter.hasDeath) res("right")
             else if (this.rightCharacter.hasDeath) res("left")
+        }).finally(() => {
+            unbindCharacterComponent(this.leftCharacter)
+            unbindCharacterComponent(this.rightCharacter)
         })
     }
 

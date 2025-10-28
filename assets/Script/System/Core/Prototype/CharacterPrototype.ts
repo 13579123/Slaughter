@@ -5,7 +5,7 @@ import { BuffProgress, AttackProgress, FightProgress, DamageProgress, DeathProgr
 import { EquipmentDTO } from "./EquipmentPrototype";
 import { BuffDTO } from "./BuffPrototype";
 import { SkillDTO } from "./SkillPrototype";
-import { getComponentByPlayer } from "../../../Game/System/PlayerToPrefabMap";
+import { getComponentByCharacter } from "../../../Game/System/CharacterToPrefabMap";
 
 export type CharacterDTO = {
     // 等级
@@ -37,7 +37,9 @@ export enum FromType {
     // 被buff造成
     buff = "buff",
     // 被技能消耗
-    skillCost = "skillCost"
+    skillCost = "skillCost",
+    // 药剂
+    medicine = "medicine",
 }
 
 export type AnimationConfig = {
@@ -88,5 +90,6 @@ export class CharacterPrototype {
     }
     public playDieAnimation(progress: DeathProgress , endCallback: Function , next: Function) {
         endCallback()
+        next()
     }
 }

@@ -67,7 +67,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.maxHp : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.maxHp ? sum + bf.extraProperty.maxHp : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.maxHp ? sum + sk.proto.extraProperty.maxHp : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 最大魔法值
     public get maxMp(): number {
@@ -79,7 +81,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.maxMp : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.maxMp ? sum + bf.extraProperty.maxMp : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.maxMp ? sum + sk.proto.extraProperty.maxMp : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 物理攻击力
     public get physicalAttack(): number {
@@ -91,7 +95,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.physicalAttack : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.physicalAttack ? sum + bf.extraProperty.physicalAttack : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.physicalAttack ? sum + sk.proto.extraProperty.physicalAttack : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 魔法攻击力
     public get magicAttack(): number {
@@ -103,7 +109,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.magicAttack : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.magicAttack ? sum + bf.extraProperty.magicAttack : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.magicAttack ? sum + sk.proto.extraProperty.magicAttack : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 光属性攻击力
     public get lightAttack(): number {
@@ -115,7 +123,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.lightAttack : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.lightAttack ? sum + bf.extraProperty.lightAttack : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.lightAttack ? sum + sk.proto.extraProperty.lightAttack : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 暗属性攻击力
     public get darkAttack(): number {
@@ -127,7 +137,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.darkAttack : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.darkAttack ? sum + bf.extraProperty.darkAttack : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.darkAttack ? sum + sk.proto.extraProperty.darkAttack : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 物理防御力
     public get physicalDefense(): number {
@@ -139,7 +151,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.physicalDefense : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.physicalDefense ? sum + bf.extraProperty.physicalDefense : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.physicalDefense ? sum + sk.proto.extraProperty.physicalDefense : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 魔法防御力
     public get magicDefense(): number {
@@ -151,7 +165,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.magicDefense : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.magicDefense ? sum + bf.extraProperty.magicDefense : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.magicDefense ? sum + sk.proto.extraProperty.magicDefense : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 光属性抗性
     public get lightResistance(): number {
@@ -163,7 +179,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.lightResistance : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.lightResistance ? sum + bf.extraProperty.lightResistance : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.lightResistance ? sum + sk.proto.extraProperty.lightResistance : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 暗属性抗性
     public get darkResistance(): number {
@@ -175,7 +193,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.darkResistance : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.darkResistance ? sum + bf.extraProperty.darkResistance : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.darkResistance ? sum + sk.proto.extraProperty.darkResistance : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 物理穿透
     public get physicalPenetration(): number {
@@ -187,7 +207,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.physicalPenetration : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.physicalPenetration ? sum + bf.extraProperty.physicalPenetration : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.physicalPenetration ? sum + sk.proto.extraProperty.physicalPenetration : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 魔法穿透
     public get magicPenetration(): number {
@@ -199,7 +221,9 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.magicPenetration : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.magicPenetration ? sum + bf.extraProperty.magicPenetration : sum, 0)
-        return base + grow + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.magicPenetration ? sum + sk.proto.extraProperty.magicPenetration : sum, 0)
+        return base + grow + extra + equip + buff + skill
     }
     // 暴击率 0 - 1
     public get criticalRate(): number {
@@ -207,12 +231,12 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.criticalRate || 0 
         const equip = Object.keys(this.equipments)
             .map(k => this.equipments[k])
-            .reduce((sum, eq) => {
-                return eq ? (sum + eq.criticalRate) : sum
-            } , 0)
+            .reduce((sum, eq) => { return eq ? (sum + eq.criticalRate) : sum } , 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.criticalRate ? sum + bf.extraProperty.criticalRate : sum, 0)
-        return base + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.criticalRate ? sum + sk.proto.extraProperty.criticalRate : sum, 0)
+        return base + extra + equip + buff + skill
     }
     // 暴击伤害
     public get criticalDamage(): number {
@@ -223,17 +247,36 @@ export class CharacterInstanceProperty extends BaseInstanceProperty {
             .reduce((sum, eq) => eq ? sum + eq.criticalDamage : sum, 0)
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.criticalDamage ? sum + bf.extraProperty.criticalDamage : sum , 0)
-        return base + extra + equip + buff
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.criticalDamage ? sum + sk.proto.extraProperty.criticalDamage : sum, 0)
+        return base + extra + equip + buff + skill
     }
+
     // 攻击速度
     public get attackSpeed(): number {
         const buff = this.buffs
             .reduce((sum, bf) => bf.extraProperty.attackSpeed ? sum + bf.extraProperty.attackSpeed : sum, 0)
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.attackSpeed ? sum + sk.proto.extraProperty.attackSpeed : sum, 0)
         if (this.equipments.weapon) {
-            return Math.max(0.4 , Math.min(this.equipments.weapon.attackSpeed + buff , 3))
+            return Math.max(0.4 , Math.min(this.equipments.weapon.attackSpeed + buff + skill, 3))
         } else {
-            return Math.max(0.4 , Math.min(1 + buff , 3))
+            return Math.max(0.4 , Math.min(this.proto.baseProperty.attackSpeed + buff + skill, 3))
         }
     }
 
+    // 冷却缩减
+    public get coolDown(): number {
+        const base = this.proto.baseProperty.coolDown 
+        const grow = this.proto.growProperty.coolDown * (this.lv - 1)
+        const extra = this.extraProperty.coolDown || 0 
+        const equip = Object.keys(this.equipments)
+            .map(k => this.equipments[k])
+            .reduce((sum, eq) => eq ? sum + eq.coolDown : sum, 0)
+        const buff = this.buffs
+            .reduce((sum, bf) => bf.extraProperty.coolDown ? sum + bf.extraProperty.coolDown : sum, 0)
+        const skill = this.skills
+            .reduce((sum, sk) => sk.proto.extraProperty.coolDown ? sum + sk.proto.extraProperty.coolDown : sum, 0)
+        return base + grow + extra + equip + buff + skill
+    }
 }

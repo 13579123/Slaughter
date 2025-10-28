@@ -1,8 +1,9 @@
 import { MapData } from "../System/Instance/FightMapInstance"
 
 export enum RoomType {
-    OrdinaryRoom = "ordinaryRoom",
-    TreasureRoom = "treasureRoom",
+    OrdinaryRoom = "ordinaryRoom", // 普通房间
+    TreasureRoom = "treasureRoom", // 宝箱房
+    MonsterTreasureRoom = "monsterTreasureRoom", // 怪物宝箱房
 }
 
 export class MapGenerator {
@@ -45,18 +46,19 @@ export class MapGenerator {
         }
         // 随机添加房间
         while (roomLoopCount > 0) {
+            // 房间类型
+            let roomType: RoomType = RoomType.OrdinaryRoom , roomTypeRandom = Math.random()
+            if (roomTypeRandom < 0.05) roomType = RoomType.TreasureRoom
+            else if (roomTypeRandom < 0.1) roomType = RoomType.MonsterTreasureRoom
             // 随机位置
             const posX = Math.floor(Math.random() * size.width - 1) + 1
             const posY = Math.floor(Math.random() * size.height - 1) + 1
             // 随机大小
-            const width = this.convertToOdd(Math.floor(Math.random() * 4) + 5)
-            const height = this.convertToOdd(Math.floor(Math.random() * 4) + 5)
+            const width = roomType === RoomType.OrdinaryRoom ? this.convertToOdd(Math.floor(Math.random() * 4) + 5) : 5
+            const height = roomType === RoomType.OrdinaryRoom ? this.convertToOdd(Math.floor(Math.random() * 4) + 5) : 5
             // 判断是否重叠
-            const hasOverlap = isOverlap(posX, posY, width, height)
-            if (!hasOverlap) {
-                let roomType: RoomType = RoomType.OrdinaryRoom
-                // 小概率是宝箱房
-                if (Math.random() < 1.05) roomType = RoomType.TreasureRoom
+            if (!isOverlap(posX, posY, width, height)) {
+                // 添加房间
                 rooms.push({ pos: { x: posX, y: posY }, size: { width, height }, type: roomType })
                 // 添加到地图
                 for (let y = 0; y < height; y++) {
@@ -74,7 +76,9 @@ export class MapGenerator {
     // 生成随机迷宫
     public generateRandomMaze(size: { width: number, height: number }) {
         const mapData: (0 | 1)[][] = []
+        // 所有未开通的房间
         const notEnterRoomMap = new Set<string>()
+        // 已经进入过但是还有未开通相邻房间的房间
         const hasGoButHasNotEnterRoomMap = new Set<string>()
         // 初始化为基础地图
         const sizeHeight = size.height % 2 === 0 ? size.height + 1 : size.height
@@ -91,7 +95,7 @@ export class MapGenerator {
             }
             mapData.push(list)
         }
-        // 随机生成地图 砸墙算法
+        // 随机生成地图 最小生成树砸墙算法
         let posx = 1, posy = 1
         while (notEnterRoomMap.size > 0) {
             // 房间已经进入
@@ -108,6 +112,10 @@ export class MapGenerator {
                 direct.push({ x: posx, y: posy + 2, wallX: posx, wallY: posy + 1 })
             // 如果没有则随机找一个进入过但是还有没有打通房间的房间
             if (direct.length === 0) {
+                hasGoButHasNotEnterRoomMap.delete(`${posx} ${posy}`)
+                if (hasGoButHasNotEnterRoomMap.size === 0) {
+                    break
+                }
                 const keys = Array.from(hasGoButHasNotEnterRoomMap.keys())
                 const key = keys[Math.floor(Math.random() * keys.length)]
                 const [x, y] = key.split(" ")

@@ -25,8 +25,8 @@ export function lightDamage(
 ) {
     const reduction = lightInjuryReduction(resistance)
     // 暗防御越高，光伤害越高
-    const reDamageRate = (1 + darkResistance / (darkResistance + 350))
-    return Math.max(0 , (damage * (1 - reduction) - resistance * 0.02) * reDamageRate)
+    const reDamageRate = 1 + (darkResistance /  Math.max(1 , (darkResistance + 400)))
+    return Math.max(0 , (damage * (1 - reduction) - resistance * 0.1) * reDamageRate)
 }
 
 export function darkDamage(
@@ -36,6 +36,6 @@ export function darkDamage(
 ) {
     const reduction = darkInjuryReduction(resistance)
     // 光防御越高，暗伤害越高
-    const reDamageRate = (1 + lightResistance / (lightResistance + 350))
-    return Math.max(0 , damage * (1 - reduction) - resistance * 0.02 * reDamageRate)
+    const reDamageRate = 1 + (lightResistance /  Math.max(1 , (lightResistance + 400)))
+    return Math.max(0 , (damage * (1 - reduction) - resistance * 0.1) * reDamageRate)
 }

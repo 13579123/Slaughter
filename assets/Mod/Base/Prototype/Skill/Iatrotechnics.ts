@@ -12,7 +12,6 @@ import { Rx } from "db://assets/Module/Rx";
 import { SkillProgress } from "db://assets/Script/System/Core/Progress/FightProgress";
 import { message } from "db://assets/Script/Game/Message/Message";
 
-
 @RegisterLanguageEntry("Iatrotechnics_Name")
 class Iatrotechnics_Name extends LanguageEntry {
 
@@ -33,28 +32,31 @@ class Iatrotechnics_Name extends LanguageEntry {
 class Iatrotechnics_Description extends LanguageEntry {
 
     public get chs(): string {
-        return `<color=0E70FB>消耗: ${Math.max(1, this.data.lv - 1) * 20 + 40} 魔法值</color>\n` +
-            `恢复 ${Math.max(1, this.data.lv - 1) * 3 + 5}% 最大生命值 ，最低回复 ${Math.max(1, this.data.lv - 1) * 50 + 50} 生命值`
+        const lv = Math.max(0, this.data.lv - 1)
+        return `<color=0E70FB>消耗: ${Math.max(1, lv) * 20 + 40} 魔法值</color>\n冷却时间: ${20 - lv * 1.5}s\n` +
+            `恢复 ${Math.max(1, lv) * 20 + 80}% 魔力值的生命值 ，最低回复 ${Math.max(0, lv) * 50 + 50} 生命值`
     }
 
     public get eng(): string {
-        return `<color=0E70FB>Cost: ${Math.max(1, this.data.lv - 1) * 20 + 40} MP</color>\n` +
-            `Restore ${Math.max(1, this.data.lv - 1) * 3 + 5}% max HP, minimum ${Math.max(1, this.data.lv - 1) * 50 + 50} HP`
+        const lv = Math.max(0, this.data.lv - 1)
+        return `<color=0E70FB>Cost: ${Math.max(1, lv) * 20 + 40} MP</color>\nCooldown: ${20 - lv * 1.5}s\n` +
+            `Restore HP equal to ${Math.max(1, lv) * 20 + 80}% of your MP, minimum ${Math.max(0, lv) * 50 + 50} HP`
     }
 
     public get jpn(): string {
-        return `<color=0E70FB>消費: ${Math.max(1, this.data.lv - 1) * 20 + 40} MP</color>\n` +
-            `最大体力値 ${Math.max(1, this.data.lv - 1) * 3 + 5}% 回復、最低 ${Math.max(1, this.data.lv - 1) * 50 + 50} 生命値 回復`
+        const lv = Math.max(0, this.data.lv - 1)
+        return `<color=0E70FB>消費: ${Math.max(1, lv) * 20 + 40} MP</color>\nクールタイム: ${20 - lv * 1.5}秒\n` +
+            `MPの${Math.max(1, lv) * 20 + 80}%に相当するHPを回復、最低回復量は${Math.max(0, lv) * 50 + 50}HP`
     }
 
 }
 
-@RegisterSkill("Iatrotechnics")
 @RegisterPlayerSkill("Iatrotechnics", "Brave")
 @RegisterSkillUpLevel("Iatrotechnics", (lv: number) => ({
     diamond: lv * 50 + 150,
     gold: Math.pow(2, lv) * 100 + 100,
 }))
+@RegisterSkill("Iatrotechnics")
 export class Iatrotechnics extends SkillPrototype {
 
     public get name(): string {
@@ -83,13 +85,14 @@ export class Iatrotechnics extends SkillPrototype {
     }
 
     public get coolTime(): number {
-        return 20 - this.instance.lv * 1.5
+        if (!this.instance.characterInstance) return 20 - this.instance.lv * 1.5
+        return (20 - this.instance.lv * 1.5) * (1 - this.instance.characterInstance.coolDown / (this.instance.characterInstance.coolDown + 150))
     }
 
-    public use(useOption: { use: CharacterInstance; }): void {
+    public async use(useOption: { use: CharacterInstance; }) {
         const increase = Math.max(
-            useOption.use.maxHp * ((Math.max(1, this.instance.lv - 1) * 3 + 5) / 100),
-            Math.max(1, this.instance.lv - 1) * 50 + 50
+            useOption.use.magicAttack * ((Math.max(1, this.instance.lv - 1) * 20 + 80) / 100),
+            Math.max(0, this.instance.lv - 1) * 50 + 50
         )
         useOption.use.increaseHp({
             increase: increase,
@@ -100,20 +103,17 @@ export class Iatrotechnics extends SkillPrototype {
 
     public useFail(reason: SkillFailReason, progress: SkillProgress): void {
         if (reason === SkillFailReason.NotEnoughCoast)
-            message.toast(LanguageManager.getEntry("Iatrotechnics Fail").getValue(settingManager.data.language))
+            message.toast((new class extends LanguageEntry {
+                public get chs(): string {
+                    return "当前法力值不足以使用该技能"
+                }
+                public get eng(): string {
+                    return "Not enough MP to use this skill"
+                }
+                public get jpn(): string {
+                    return "MPが足りません"
+                }
+            }).getValue(settingManager.data.language))
     }
 
-}
-
-@RegisterLanguageEntry("Iatrotechnics Fail")
-class IatrotechnicsFail extends LanguageEntry {
-    public get chs(): string {
-        return "当前法力值不足以使用该技能"
-    }
-    public get eng(): string {
-        return "Not enough MP to use this skill"
-    }
-    public get jpn(): string {
-        return "MPが足りません"
-    }
 }

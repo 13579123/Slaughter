@@ -1,5 +1,5 @@
 import { Constructor, director } from "cc";
-import { FightMapInstance } from "../Instance/FightMapInstance";
+import { EnterFightMapOptions, FightMapInstance } from "../Instance/FightMapInstance";
 import { FightMapPrototype } from "../Prototype/FightMapPrototype";
 import { Rx } from "db://assets/Module/Rx";
 import { BasePrototypeProperty } from "../../../System/Core/Property/BasePrototypeProperty";
@@ -41,21 +41,14 @@ export function getFightMapInstance(): FightMapInstance {
     return instance;
 }
 
-export type EnterFightMapOptions = {
-    // 玩家额外属性
-    playerExtraProperty?: Partial<BasePrototypeProperty>,
-    // 玩家额外百分比属性
-    playerExtraPercentProperty?: Partial<BasePrototypeProperty>,
-    // 怪物额外属性
-    monsterExtraProperty?: Partial<BasePrototypeProperty>,
-    // 怪物额外百分比属性
-    monsterExtraPercentProperty?: Partial<BasePrototypeProperty>,
-}
-
 export function enterFightMap(id: string, options: EnterFightMapOptions = {}) {
     instance = Rx.reactive(new FightMapInstance(getFightMapPrototype(id) , options))
-    instance.init()
     director.loadScene("Map");
+}
+
+export function exitFightMap() {
+    instance = null;
+    director.loadScene("Main");
 }
 
 // @ts-ignore

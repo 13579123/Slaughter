@@ -27,8 +27,7 @@ export function createPlayerInstance(opiotns: PlayerOptions = {}) {
         skillProto => skills.push({ lv: skillData.skillLevel[skillProto] , prototype: skillProto })
     )
     passive.forEach(skillDto => {
-        if (skillDto.lv > 0)
-            skills.push(skillDto)
+        if (skillDto.lv > 0) skills.push(skillDto)
     })
     const instance = new CharacterInstance({
         lv: characterData.lv,

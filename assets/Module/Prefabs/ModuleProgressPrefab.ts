@@ -117,3 +117,7 @@ export class ModuleProgressPrefab extends Component {
     }
 
 }
+function menu(arg0: string): (target: typeof ModuleProgressPrefab) => void | typeof ModuleProgressPrefab {
+    throw new Error('Function not implemented.');
+}
+

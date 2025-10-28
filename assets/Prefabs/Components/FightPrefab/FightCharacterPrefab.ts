@@ -10,8 +10,8 @@ import { Normal } from 'db://assets/Script/System/Normal';
 import { FightBuffItemPrefab } from './FightBuffItemPrefab';
 import { SkillInstance } from 'db://assets/Script/System/Core/Instance/SkillInstance';
 import { DamageType, FromType } from 'db://assets/Script/System/Core/Prototype/CharacterPrototype';
-import { bindPlayerToComponent } from 'db://assets/Script/Game/System/PlayerToPrefabMap';
 import { FightPrefab } from './FightPrefab';
+import { getFightMapInstance } from 'db://assets/Script/Game/System/Manager/FightMapManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('FightCharacterPrefab')
@@ -42,8 +42,6 @@ export class FightCharacterPrefab extends ExtensionComponent {
     public async bindCharacter(character: CharacterInstance, pos: "left" | "right", isPlayer = true) {
         // 设置角色数据
         this.character = Rx.reactive(character)
-        // 绑定角色和预制体组件
-        bindPlayerToComponent(this.character, this)
         // 展示状态
         this.isPlayer = isPlayer
         // 设置位置
@@ -175,6 +173,7 @@ export class FightCharacterPrefab extends ExtensionComponent {
 
     // 角色准备
     public characterReady() {
+        if (this.character._preDeath || this.character.hasDeath) return
         // 播放idle动画
         this.playAnimation(this.character.proto.animation.animations.idle, { count: -1 })
         // 准备
@@ -188,6 +187,8 @@ export class FightCharacterPrefab extends ExtensionComponent {
 
     // 角色释放技能
     public characterUseSkill(skill: SkillInstance) {
+        if (this.character._preDeath || this.character.hasDeath) return
+        // 该技能已经在队列中
         if (this.skillQueue.indexOf(skill) !== -1) return
         this.skillQueue.push(skill)
     }
@@ -197,19 +198,21 @@ export class FightCharacterPrefab extends ExtensionComponent {
 
     // 角色行动
     public async characterAction(target: CharacterInstance) {
+        if (this.character._preDeath || this.character.hasDeath) return
         if (this.isAction) return
         this.isAction = true
-        const skill = this.skillQueue.shift()
-        if (skill) {
+        if (this.skillQueue.length > 0) {
+            const skill = this.skillQueue[this.skillQueue.length - 1]
             return new Promise((res) => {
                 this.character.useSkill({
                     skill , animationComplete: () => {
                         res(null)
+                        this.skillQueue.splice(this.skillQueue.indexOf(skill) , 1)
                         this.isAction = false
                     }
                 })
             })
-        } 
+        }
         return new Promise((res) => {
             this.character.attackCharacter({
                 target , animationComplete: () => {

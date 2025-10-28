@@ -87,12 +87,14 @@ export class MessageCongratulationsPrefab extends ExtensionComponent {
         }
         if (items) {
             items.forEach(item => {
+                if (!item || !item.prototype || !getItemPrototype(item.prototype)) return
                 const instance = new ItemInstance({Proto: getItemPrototype(item.prototype) , count: item.count})
                 addItem(instance)
             })
         }
         if (equipments) {
             equipments.forEach(equip => {
+                if (!equip || !equip.prototype || !getEquipmentPrototype(equip.prototype)) return
                 const instance = new EquipmentInstance({
                     lv: equip.lv,
                     id: equip.id,

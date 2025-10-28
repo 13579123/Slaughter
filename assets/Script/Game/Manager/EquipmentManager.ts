@@ -4,7 +4,7 @@ import { EquipmentType } from "../../System/Core/Prototype/EquipmentPrototype";
 import { Config } from "../Config";
 import { createId } from "../Share";
 import { EquipmentInstance } from "../../System/Core/Instance/EquipmentInstance";
-import { getDecomposeMaterial, getStrongMaterial } from "../../System/Manager/EquipmentManager";
+import { getDecomposeMaterial, getEquipmentPrototype, getStrongMaterial } from "../../System/Manager/EquipmentManager";
 import { message } from "../Message/Message";
 import { LanguageManager } from "db://assets/Module/Language/LanguageManager";
 import { settingManager } from "./SettingManager";
@@ -46,21 +46,27 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
         shoes: EquipmentDTO,
         accessory: EquipmentDTO,
     } = {
-            weapon: { id: createId() , lv: 1, prototype: "Spear", extraProperty: {}, quality: EquipmentQuality.Ordinary },
-            armor: { id: createId() , lv: 1, prototype: "LeatherArmor", extraProperty: {}, quality: EquipmentQuality.Fine },
-            shoes: { id: createId() , lv: 1, prototype: "LeatherShoes", extraProperty: {}, quality: EquipmentQuality.Rare },
-            accessory: { id: createId() , lv: 1, prototype: "LeatherShoulder", extraProperty: {}, quality: EquipmentQuality.Epic },
+            weapon: null,
+            armor: null,
+            shoes: null,
+            accessory: null,
         }
 
     public equipments: EquipmentDTO[] = [
-        { id: createId() , lv: 1, prototype: "Spear", extraProperty: {}, quality: EquipmentQuality.Mythic }
     ]
 
     constructor(data?: EquipmentManagerDTO) {
         super()
         if (data) {
-            Object.keys(data.equipment).forEach(k => this.equipment[k] = data.equipment[k])
-            this.equipments = data.equipments
+            Object.keys(data.equipment).forEach(k => {
+                // 剔除不存在的装备
+                if (data.equipment[k] && getEquipmentPrototype(data.equipment[k].prototype)) 
+                    this.equipment[k] = data.equipment[k]
+                else
+                    this.equipment[k] = null
+            })
+            // 剔除不存在的装备
+            this.equipments = data.equipments.filter(e => e && getEquipmentPrototype(e.prototype))
         }
     }
 
@@ -88,15 +94,18 @@ export class EquipmentData extends BaseEventManagerData<EventType> {
 
     // 添加装备
     public addEquipment(prototype: string , quality?: EquipmentQuality) {
+        if (!prototype || !getEquipmentPrototype(prototype)) return
         const id = createId()
         this.emit("addEquipment" , {id , prototype , quality: quality || EquipmentQuality.Ordinary})
-        this.equipments.push({ 
+        const dto = { 
             id ,
             prototype,
             lv: 1,
             extraProperty: {},
             quality: quality || EquipmentQuality.Ordinary,
-        })
+        }
+        this.equipments.push(dto)
+        return dto
     }
 
     // 强化装备
@@ -193,6 +202,8 @@ export const equipmentManager = new Manager({
     descrypt: Config.descrypt,
     Constructor: EquipmentData,
     DtoCostructor: EquipmentManagerDTO,
+    save: (data: EquipmentData) => {
+    }
 })
 
 try {

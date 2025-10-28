@@ -104,6 +104,12 @@ export class EquipmentInstanceProperty extends BaseInstanceProperty {
         const extra = this.extraProperty.criticalDamage || 0
         return base + extra
     }
+    // 冷却指数
+    public get coolDown(): number {
+        const base = this.proto.baseProperty.coolDown
+        const extra = this.extraProperty.coolDown || 0
+        return base + extra
+    }
     // 攻击速度
     public get attackSpeed(): number {
         const base = this.proto.baseProperty.attackSpeed

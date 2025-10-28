@@ -41,22 +41,22 @@ export class ResourcecData extends BaseEventManagerData<EventType> {
     }
 
     addGold(value: number) {
-        this._gold += value
+        this._gold += value || 0
         this.emit("goldChange" , value)
     }
 
     reduceGold(value: number) {
-        this._gold -= value
+        this._gold -= value || 0
         this.emit("goldChange" , -value)
     }
 
     addDiamond(value: number) {
-        this._diamond += value
+        this._diamond += value || 0
         this.emit("diamondChange" , value)
     }
 
     reduceDiamond(value: number) {
-        this._diamond -= value
+        this._diamond -= value || 0
         this.emit("diamondChange" , -value)
     }
 
